@@ -25,7 +25,9 @@ public class SearchActivity extends AppCompatActivity {
     EditText inputText;
     Button searchButton;
     String basePlayerUrl = "https://nba-stats-db.herokuapp.com/api/playerdata/name/";
-
+    // This is a flag for whether or not to finish (aka terminate) activities while switching
+    // If we don't finish, then the back button can be used to go to previous page
+    private final boolean shouldFinish = true;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,7 +53,7 @@ public class SearchActivity extends AppCompatActivity {
                 // This line basically says to perform the transition right after activity start
                 overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
                 //This line 'terminates' the current activity since we're switching
-                finish();
+                if (shouldFinish) finish();
                 return true;
             }
             else if (item.getItemId() == R.id.bottom_person_search) {
@@ -60,13 +62,13 @@ public class SearchActivity extends AppCompatActivity {
             else if (item.getItemId() == R.id.bottom_compare) {
                 startActivity(new Intent(getApplicationContext(), CompareActivity.class));
                 overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
-                finish();
+                if (shouldFinish) finish();
                 return true;
             }
             else if (item.getItemId() == R.id.bottom_games) {
                 startActivity(new Intent(getApplicationContext(), MainActivity.class));
                 overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
-                finish();
+                if (shouldFinish) finish();
                 return true;
             }
             return false;

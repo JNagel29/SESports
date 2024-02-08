@@ -9,6 +9,9 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class CompareActivity extends AppCompatActivity {
 
+    // This is a flag for whether or not to finish (aka terminate) activities while switching
+    // If we don't finish, then the back button can be used to go to previous page
+    private final boolean shouldFinish = true;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -24,7 +27,7 @@ public class CompareActivity extends AppCompatActivity {
                 // This line basically says to perform the transition right after activity start
                 overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
                 //This line 'terminates' the current activity since we're switching
-                finish();
+                if (shouldFinish) finish();
                 return true;
             }
             else if (item.getItemId() == R.id.bottom_person_search) {
@@ -32,7 +35,7 @@ public class CompareActivity extends AppCompatActivity {
                 // This line basically says to perform the transition right after activity start
                 overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
                 //This line 'terminates' the current activity since we're switching
-                finish();
+                if (shouldFinish) finish();
             }
             else if (item.getItemId() == R.id.bottom_compare) {
                 return true;
@@ -40,7 +43,7 @@ public class CompareActivity extends AppCompatActivity {
             else if (item.getItemId() == R.id.bottom_games) {
                 startActivity(new Intent(getApplicationContext(), MainActivity.class));
                 overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
-                finish();
+                if (shouldFinish) finish();
                 return true;
             }
             return false;
