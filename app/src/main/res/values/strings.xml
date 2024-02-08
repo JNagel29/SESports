@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">FantasyBasketball</string>
+    <string name="welcome">Welcome to Fantasy Basketball!</string>
+    <string name="start">Start</string>
+    <string name="desc">Image of basketball</string>
+    <string name="error">Something went wrong loading the JSON</string>
+
+
+</resources>

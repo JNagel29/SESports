@@ -1,2 +1,0 @@
-# SESports
-Sports group project 

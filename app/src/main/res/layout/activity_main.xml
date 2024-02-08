@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity"
+    android:background="@color/teal_700"
+    >
+
+    <TextView
+        android:layout_width="382dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_centerInParent="true"
+        android:layout_marginStart="19dp"
+        android:layout_marginTop="249dp"
+        android:layout_marginEnd="10dp"
+        android:gravity="center_vertical|center_horizontal"
+        android:text="@string/welcome"
+        android:textColor="#de4c12"
+        android:textSize="35sp"
+        android:typeface="monospace" />
+
+    <Button
+        android:id="@+id/button"
+        android:layout_width="150dp"
+        android:layout_height="65dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="289dp"
+        android:backgroundTint="#ebdcb2"
+        android:text="@string/start"
+        android:textColor="@color/black"
+        android:textSize="30sp"
+        android:typeface="monospace" />
+
+    <ImageView
+        android:layout_width="334dp"
+        android:layout_height="126dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginStart="47dp"
+        android:layout_marginTop="59dp"
+        android:layout_marginEnd="30dp"
+        android:src="@drawable/basketball"
+        android:contentDescription="@string/desc"/>
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginEnd="30dp"
+        android:layout_marginBottom="30dp"
+        android:id="@+id/bottomNavigationView"
+        android:background="@drawable/bottom_background"
+        app:menu="@menu/bottom_menu"
+        app:itemIconSize="30dp"
+        app:itemIconTint="@drawable/item_selector"
+        app:itemRippleColor="@android:color/transparent"
+        app:labelVisibilityMode="unlabeled"/>
+
+
+
+</RelativeLayout>
