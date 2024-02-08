@@ -1,0 +1,118 @@
+[
+    {
+        "merged": "C:\\Users\\arake\\.gradle\\daemon\\8.2\\com.calculatorv5.fantasybasketball.app-merged_res-31:\\mipmap-anydpi-v26_ic_launcher_round.xml.flat",
+        "source": "C:\\Users\\arake\\.gradle\\daemon\\8.2\\com.calculatorv5.fantasybasketball.app-main-33:\\mipmap-anydpi-v26\\ic_launcher_round.xml"
+    },
+    {
+        "merged": "C:\\Users\\arake\\.gradle\\daemon\\8.2\\com.calculatorv5.fantasybasketball.app-merged_res-31:\\drawable_ic_launcher_background.xml.flat",
+        "source": "C:\\Users\\arake\\.gradle\\daemon\\8.2\\com.calculatorv5.fantasybasketball.app-main-33:\\drawable\\ic_launcher_background.xml"
+    },
+    {
+        "merged": "C:\\Users\\arake\\.gradle\\daemon\\8.2\\com.calculatorv5.fantasybasketball.app-merged_res-31:\\mipmap-xhdpi_ic_launcher.png.flat",
+        "source": "C:\\Users\\arake\\.gradle\\daemon\\8.2\\com.calculatorv5.fantasybasketball.app-main-33:\\mipmap-xhdpi\\ic_launcher.png"
+    },
+    {
+        "merged": "com.calculatorv5.fantasybasketball.app-merged_res-31:/layout_activity_search.xml.flat",
+        "source": "com.calculatorv5.fantasybasketball.app-main-33:/layout/activity_search.xml"
+    },
+    {
+        "merged": "C:\\Users\\arake\\.gradle\\daemon\\8.2\\com.calculatorv5.fantasybasketball.app-merged_res-31:\\mipmap-xxxhdpi_ic_launcher_round.png.flat",
+        "source": "C:\\Users\\arake\\.gradle\\daemon\\8.2\\com.calculatorv5.fantasybasketball.app-main-33:\\mipmap-xxxhdpi\\ic_launcher_round.png"
+    },
+    {
+        "merged": "C:\\Users\\arake\\.gradle\\daemon\\8.2\\com.calculatorv5.fantasybasketball.app-merged_res-31:\\drawable-v24_basketball.png.flat",
+        "source": "C:\\Users\\arake\\.gradle\\daemon\\8.2\\com.calculatorv5.fantasybasketball.app-main-33:\\drawable-v24\\basketball.png"
+    },
+    {
+        "merged": "C:\\Users\\arake\\.gradle\\daemon\\8.2\\com.calculatorv5.fantasybasketball.app-merged_res-31:\\drawable_baseline_calendar_month_24.xml.flat",
+        "source": "C:\\Users\\arake\\.gradle\\daemon\\8.2\\com.calculatorv5.fantasybasketball.app-main-33:\\drawable\\baseline_calendar_month_24.xml"
+    },
+    {
+        "merged": "C:\\Users\\arake\\.gradle\\daemon\\8.2\\com.calculatorv5.fantasybasketball.app-merged_res-31:\\drawable_bottom_background.xml.flat",
+        "source": "C:\\Users\\arake\\.gradle\\daemon\\8.2\\com.calculatorv5.fantasybasketball.app-main-33:\\drawable\\bottom_background.xml"
+    },
+    {
+        "merged": "C:\\Users\\arake\\.gradle\\daemon\\8.2\\com.calculatorv5.fantasybasketball.app-merged_res-31:\\drawable_item_selector.xml.flat",
+        "source": "C:\\Users\\arake\\.gradle\\daemon\\8.2\\com.calculatorv5.fantasybasketball.app-main-33:\\drawable\\item_selector.xml"
+    },
+    {
+        "merged": "C:\\Users\\arake\\.gradle\\daemon\\8.2\\com.calculatorv5.fantasybasketball.app-merged_res-31:\\mipmap-mdpi_ic_launcher.png.flat",
+        "source": "C:\\Users\\arake\\.gradle\\daemon\\8.2\\com.calculatorv5.fantasybasketball.app-main-33:\\mipmap-mdpi\\ic_launcher.png"
+    },
+    {
+        "merged": "C:\\Users\\arake\\.gradle\\daemon\\8.2\\com.calculatorv5.fantasybasketball.app-merged_res-31:\\anim_slide_in_right.xml.flat",
+        "source": "C:\\Users\\arake\\.gradle\\daemon\\8.2\\com.calculatorv5.fantasybasketball.app-main-33:\\anim\\slide_in_right.xml"
+    },
+    {
+        "merged": "C:\\Users\\arake\\.gradle\\daemon\\8.2\\com.calculatorv5.fantasybasketball.app-merged_res-31:\\drawable_baseline_home_24.xml.flat",
+        "source": "C:\\Users\\arake\\.gradle\\daemon\\8.2\\com.calculatorv5.fantasybasketball.app-main-33:\\drawable\\baseline_home_24.xml"
+    },
+    {
+        "merged": "C:\\Users\\arake\\.gradle\\daemon\\8.2\\com.calculatorv5.fantasybasketball.app-merged_res-31:\\mipmap-anydpi-v26_ic_launcher.xml.flat",
+        "source": "C:\\Users\\arake\\.gradle\\daemon\\8.2\\com.calculatorv5.fantasybasketball.app-main-33:\\mipmap-anydpi-v26\\ic_launcher.xml"
+    },
+    {
+        "merged": "C:\\Users\\arake\\.gradle\\daemon\\8.2\\com.calculatorv5.fantasybasketball.app-merged_res-31:\\mipmap-xxhdpi_ic_launcher_round.png.flat",
+        "source": "C:\\Users\\arake\\.gradle\\daemon\\8.2\\com.calculatorv5.fantasybasketball.app-main-33:\\mipmap-xxhdpi\\ic_launcher_round.png"
+    },
+    {
+        "merged": "C:\\Users\\arake\\.gradle\\daemon\\8.2\\com.calculatorv5.fantasybasketball.app-merged_res-31:\\layout_activity_search.xml.flat",
+        "source": "C:\\Users\\arake\\.gradle\\daemon\\8.2\\com.calculatorv5.fantasybasketball.app-main-33:\\layout\\activity_search.xml"
+    },
+    {
+        "merged": "C:\\Users\\arake\\.gradle\\daemon\\8.2\\com.calculatorv5.fantasybasketball.app-merged_res-31:\\mipmap-hdpi_ic_launcher_round.png.flat",
+        "source": "C:\\Users\\arake\\.gradle\\daemon\\8.2\\com.calculatorv5.fantasybasketball.app-main-33:\\mipmap-hdpi\\ic_launcher_round.png"
+    },
+    {
+        "merged": "C:\\Users\\arake\\.gradle\\daemon\\8.2\\com.calculatorv5.fantasybasketball.app-merged_res-31:\\mipmap-xxxhdpi_ic_launcher.png.flat",
+        "source": "C:\\Users\\arake\\.gradle\\daemon\\8.2\\com.calculatorv5.fantasybasketball.app-main-33:\\mipmap-xxxhdpi\\ic_launcher.png"
+    },
+    {
+        "merged": "C:\\Users\\arake\\.gradle\\daemon\\8.2\\com.calculatorv5.fantasybasketball.app-merged_res-31:\\layout_activity_compare.xml.flat",
+        "source": "C:\\Users\\arake\\.gradle\\daemon\\8.2\\com.calculatorv5.fantasybasketball.app-main-33:\\layout\\activity_compare.xml"
+    },
+    {
+        "merged": "C:\\Users\\arake\\.gradle\\daemon\\8.2\\com.calculatorv5.fantasybasketball.app-merged_res-31:\\layout_activity_main.xml.flat",
+        "source": "C:\\Users\\arake\\.gradle\\daemon\\8.2\\com.calculatorv5.fantasybasketball.app-main-33:\\layout\\activity_main.xml"
+    },
+    {
+        "merged": "C:\\Users\\arake\\.gradle\\daemon\\8.2\\com.calculatorv5.fantasybasketball.app-merged_res-31:\\mipmap-xxhdpi_ic_launcher.png.flat",
+        "source": "C:\\Users\\arake\\.gradle\\daemon\\8.2\\com.calculatorv5.fantasybasketball.app-main-33:\\mipmap-xxhdpi\\ic_launcher.png"
+    },
+    {
+        "merged": "C:\\Users\\arake\\.gradle\\daemon\\8.2\\com.calculatorv5.fantasybasketball.app-merged_res-31:\\drawable-anydpi-v24_ic_launcher_foreground.xml.flat",
+        "source": "C:\\Users\\arake\\.gradle\\daemon\\8.2\\com.calculatorv5.fantasybasketball.app-pngs-27:\\drawable-anydpi-v24\\ic_launcher_foreground.xml"
+    },
+    {
+        "merged": "C:\\Users\\arake\\.gradle\\daemon\\8.2\\com.calculatorv5.fantasybasketball.app-merged_res-31:\\menu_bottom_menu.xml.flat",
+        "source": "C:\\Users\\arake\\.gradle\\daemon\\8.2\\com.calculatorv5.fantasybasketball.app-main-33:\\menu\\bottom_menu.xml"
+    },
+    {
+        "merged": "C:\\Users\\arake\\.gradle\\daemon\\8.2\\com.calculatorv5.fantasybasketball.app-merged_res-31:\\anim_slide_out_left.xml.flat",
+        "source": "C:\\Users\\arake\\.gradle\\daemon\\8.2\\com.calculatorv5.fantasybasketball.app-main-33:\\anim\\slide_out_left.xml"
+    },
+    {
+        "merged": "C:\\Users\\arake\\.gradle\\daemon\\8.2\\com.calculatorv5.fantasybasketball.app-merged_res-31:\\drawable_baseline_compare_arrows_24.xml.flat",
+        "source": "C:\\Users\\arake\\.gradle\\daemon\\8.2\\com.calculatorv5.fantasybasketball.app-main-33:\\drawable\\baseline_compare_arrows_24.xml"
+    },
+    {
+        "merged": "C:\\Users\\arake\\.gradle\\daemon\\8.2\\com.calculatorv5.fantasybasketball.app-merged_res-31:\\drawable_baseline_person_search_24.xml.flat",
+        "source": "C:\\Users\\arake\\.gradle\\daemon\\8.2\\com.calculatorv5.fantasybasketball.app-main-33:\\drawable\\baseline_person_search_24.xml"
+    },
+    {
+        "merged": "C:\\Users\\arake\\.gradle\\daemon\\8.2\\com.calculatorv5.fantasybasketball.app-merged_res-31:\\mipmap-xhdpi_ic_launcher_round.png.flat",
+        "source": "C:\\Users\\arake\\.gradle\\daemon\\8.2\\com.calculatorv5.fantasybasketball.app-main-33:\\mipmap-xhdpi\\ic_launcher_round.png"
+    },
+    {
+        "merged": "C:\\Users\\arake\\.gradle\\daemon\\8.2\\com.calculatorv5.fantasybasketball.app-merged_res-31:\\mipmap-hdpi_ic_launcher.png.flat",
+        "source": "C:\\Users\\arake\\.gradle\\daemon\\8.2\\com.calculatorv5.fantasybasketball.app-main-33:\\mipmap-hdpi\\ic_launcher.png"
+    },
+    {
+        "merged": "C:\\Users\\arake\\.gradle\\daemon\\8.2\\com.calculatorv5.fantasybasketball.app-merged_res-31:\\mipmap-mdpi_ic_launcher_round.png.flat",
+        "source": "C:\\Users\\arake\\.gradle\\daemon\\8.2\\com.calculatorv5.fantasybasketball.app-main-33:\\mipmap-mdpi\\ic_launcher_round.png"
+    },
+    {
+        "merged": "C:\\Users\\arake\\.gradle\\daemon\\8.2\\com.calculatorv5.fantasybasketball.app-merged_res-31:\\drawable_mybutton.xml.flat",
+        "source": "C:\\Users\\arake\\.gradle\\daemon\\8.2\\com.calculatorv5.fantasybasketball.app-main-33:\\drawable\\mybutton.xml"
+    }
+]
