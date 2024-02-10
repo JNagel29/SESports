@@ -32,28 +32,29 @@ public class MainActivity extends AppCompatActivity {
         //Niko: Used this vid to make the NavBar, it gets it from layout/menu, which gets its icons
         //from the drawable folder
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
+        setupBottomNavigation(bottomNavigationView);
+    }
+
+    public void setupBottomNavigation(BottomNavigationView bottomNavigationView) {
         bottomNavigationView.setSelectedItemId(R.id.bottom_home);
         //Note: had to upgrade gradle material to 1.11.0 for setOnItemSelectedListener to work
-        bottomNavigationView.setOnItemSelectedListener(item ->  {
+        bottomNavigationView.setOnItemSelectedListener(item -> {
             if (item.getItemId() == R.id.bottom_home) {
                 return true;
-            }
-            else if (item.getItemId() == R.id.bottom_person_search) {
+            } else if (item.getItemId() == R.id.bottom_person_search) {
                 startActivity(new Intent(getApplicationContext(), SearchActivity.class));
                 // This line basically says to perform the transition right after activity start
                 overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
                 //This line 'terminates' the current activity since we're switching
                 if (shouldFinish) finish();
                 return true;
-            }
-            else if (item.getItemId() == R.id.bottom_compare) {
+            } else if (item.getItemId() == R.id.bottom_compare) {
                 startActivity(new Intent(getApplicationContext(), CompareActivity.class));
                 overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
                 if (shouldFinish) finish();
                 return true;
-            }
-            else if (item.getItemId() == R.id.bottom_games) {
-                startActivity(new Intent(getApplicationContext(), SearchActivity.class));
+            } else if (item.getItemId() == R.id.bottom_games) {
+                startActivity(new Intent(getApplicationContext(), GamesActivity.class));
                 overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
                 if (shouldFinish) finish();
                 return true;
@@ -61,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
             return false;
         });
     }
+
     //Small Override that makes it so back button changes selected icon
     @Override
     protected void onResume() {

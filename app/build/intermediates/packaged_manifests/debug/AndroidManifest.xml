@@ -28,6 +28,9 @@
         android:testOnly="true"
         android:theme="@style/Theme.FantasyBasketball" >
         <activity
+            android:name="com.calculatorv5.fantasybasketball.GamesActivity"
+            android:exported="false" />
+        <activity
             android:name="com.calculatorv5.fantasybasketball.CompareActivity"
             android:exported="false" />
         <activity android:name="com.calculatorv5.fantasybasketball.SearchActivity" />
