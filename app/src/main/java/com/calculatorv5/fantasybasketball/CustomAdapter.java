@@ -33,6 +33,10 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomViewHolder> {
         holder.textHomeScore.setText(list.get(position).getHomeScore());
         holder.textAwayScore.setText(list.get(position).getAwayScore());
         holder.textGameStatus.setText(list.get(position).getGameStatus());
+        //The getters for home/away logos returns the resource ID (an int) for the correct drawable
+        holder.imageHomeLogo.setImageResource(list.get(position).getHomeLogo());
+        holder.imageAwayLogo.setImageResource(list.get(position).getAwayLogo());
+
     }
 
     @Override

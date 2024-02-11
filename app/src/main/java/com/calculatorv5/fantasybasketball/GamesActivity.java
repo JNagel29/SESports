@@ -24,8 +24,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.TimeZone;
 
 public class GamesActivity extends AppCompatActivity {
@@ -37,6 +39,8 @@ public class GamesActivity extends AppCompatActivity {
     RecyclerView recyclerView;
     List<Game> myGames = new ArrayList<>();
     CustomAdapter customAdapter;
+    //This hashmap will be used to map each team's name to its associated drawable logo
+    private final Map<String, Integer> logoMap = new HashMap<String, Integer>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,6 +48,8 @@ public class GamesActivity extends AppCompatActivity {
         //Declares and calls function to set up Bottom Navigation Bar
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
         setupBottomNavigation(bottomNavigationView);
+        //This populates our hashmap
+        fillMap();
         //Gets all the games on current day
         getDailyGames();
         //Used this video to implement RecyclerView for all the daily games
@@ -52,7 +58,6 @@ public class GamesActivity extends AppCompatActivity {
         //Can use this short follow-up if we need to implement click listeners on each game
         //https://www.youtube.com/watch?v=-gs1hllisG4
         displayItems();
-
     }
 
     public void displayItems() {
@@ -113,6 +118,7 @@ public class GamesActivity extends AppCompatActivity {
                     JSONArray arrGames = response.getJSONArray("data"); // results of all games that day
                     JSONObject game, homeTeam, awayTeam;
                     String homeTeamName, awayTeamName, homeTeamScore, awayTeamScore, gameStatus;
+                    int homeTeamLogo, awayTeamLogo; // These are int because they refer to resource ID's
                     for (int i=0; i < arrGames.length(); i++) { //Loop through each game
                         game = arrGames.getJSONObject(i);
                         //Inside each game, there's another JSON object for home/visitor info
@@ -129,11 +135,16 @@ public class GamesActivity extends AppCompatActivity {
                         if (gameStatus.startsWith("20")) { // checks if it starts with year
                             gameStatus = getGameTime(gameStatus);
                         }
+                        //Now, we get the logos for each team via the hashmap
+                        homeTeamLogo = logoMap.get(homeTeamName);
+                        awayTeamLogo = logoMap.get(awayTeamName);
                         //Add to list of games that will be later displayed out
-                        myGames.add(new Game(homeTeamName, awayTeamName, homeTeamScore, awayTeamScore, gameStatus));
+                        myGames.add(new Game(homeTeamName, awayTeamName, homeTeamScore, awayTeamScore, gameStatus, homeTeamLogo,
+                                awayTeamLogo));
                     }
                     // Here, we update view with most recent data, very important since its async
-                    updateRecyclerView();
+                    //updateRecyclerView();
+                    customAdapter.notifyDataSetChanged();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -154,11 +165,6 @@ public class GamesActivity extends AppCompatActivity {
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
         bottomNavigationView.setSelectedItemId(R.id.bottom_games);
     }
-    //Small function that will update the view, without this it wasn't showing all the games
-    private void updateRecyclerView() {
-        customAdapter = new CustomAdapter(this, myGames);
-        recyclerView.setAdapter(customAdapter);
-    }
     //Used in the event game hasn't started, since we need to convert game status to time game starts
     private String getGameTime(String unformattedDate) {
         String[] dateArr = unformattedDate.split("T");
@@ -178,5 +184,44 @@ public class GamesActivity extends AppCompatActivity {
         }
         return "N/A";
     }
+    /* Commenting out b/c replaced it with customAdapter.notifyDataSetChanged()
+    private void updateRecyclerView() {
+        customAdapter = new CustomAdapter(this, myGames);
+        recyclerView.setAdapter(customAdapter);
+    }
+    */
 
+    private void fillMap() {
+        //Map the shortened names (what we get from the API) to the appropriate logo resource ID
+        logoMap.put("Bucks", R.drawable.bucks);
+        logoMap.put("Bulls", R.drawable.bulls);
+        logoMap.put("Cavaliers", R.drawable.cavaliers);
+        logoMap.put("Celtics", R.drawable.celtics);
+        logoMap.put("Clippers", R.drawable.clippers);
+        logoMap.put("Grizzlies", R.drawable.grizzlies);
+        logoMap.put("Hawks", R.drawable.hawks);
+        logoMap.put("Heat", R.drawable.heat);
+        logoMap.put("Hornets", R.drawable.hornets);
+        logoMap.put("Jazz", R.drawable.jazz);
+        logoMap.put("Kings", R.drawable.kings);
+        logoMap.put("Knicks", R.drawable.knicks);
+        logoMap.put("Lakers", R.drawable.lakers);
+        logoMap.put("Magic", R.drawable.magic);
+        logoMap.put("Mavericks", R.drawable.mavericks);
+        logoMap.put("Nets", R.drawable.nets);
+        logoMap.put("Nuggets", R.drawable.nuggets);
+        logoMap.put("Pacers", R.drawable.pacers);
+        logoMap.put("Pelicans", R.drawable.pelicans);
+        logoMap.put("Pistons", R.drawable.pistons);
+        logoMap.put("Raptors", R.drawable.raptors);
+        logoMap.put("Rockets", R.drawable.rockets);
+        logoMap.put("Spurs", R.drawable.spurs);
+        logoMap.put("Suns", R.drawable.suns);
+        logoMap.put("Thunder", R.drawable.thunder);
+        logoMap.put("Timberwolves", R.drawable.timberwolves);
+        logoMap.put("Trail Blazers", R.drawable.trailblazers);
+        logoMap.put("Warriors", R.drawable.warriors);
+        logoMap.put("Wizards", R.drawable.wizards);
+        logoMap.put("76ers", R.drawable.sixers);
+    }
 }

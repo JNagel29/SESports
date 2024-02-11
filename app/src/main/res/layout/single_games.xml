@@ -57,13 +57,34 @@
                 android:layout_weight="1">
             </TextView>
         </LinearLayout>
-        <TextView
-            android:id="@+id/textGameStatus"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="1st Qtr"
-            android:textColor="@color/white"
-            android:textSize="22sp" />
+        <!-- This Frame is used to align logos and status under team -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <ImageView
+                android:id="@+id/imageHomeLogo"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:src="@drawable/trailblazers"
+                android:layout_gravity="start|bottom"
+                android:layout_margin = "8dp"
+                android:contentDescription="@string/homeLogo" />
+            <ImageView
+                android:id="@+id/imageAwayLogo"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:src="@drawable/clippers"
+                android:layout_gravity="end|bottom"
+                android:layout_margin = "8dp"
+                android:contentDescription="@string/awayLogo" />
+            <TextView
+                android:id="@+id/textGameStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="@string/statusPlaceHolder"
+                android:textColor="@color/white"
+                android:textSize="22sp" />
+        </FrameLayout>
     </LinearLayout>
 </androidx.cardview.widget.CardView>

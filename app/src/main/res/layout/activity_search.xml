@@ -20,7 +20,7 @@
         android:layout_marginEnd="55dp"
         android:layout_marginBottom="626dp"
         android:autofillHints="name"
-        android:hint="Search for a player's stats!"
+        android:hint="@string/playerSearchHint"
         android:inputType="textPersonName"
         android:textColor="@color/black"
         android:textSize="25sp" />
@@ -48,8 +48,7 @@
         android:background="@drawable/mybutton"
         android:paddingStart="100dp"
         android:paddingEnd="100dp"
-        android:text="Search"
-
+        android:text="@string/search"
         android:textSize="25sp"
         android:typeface="monospace" />
 
