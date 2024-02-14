@@ -3019,6 +3019,7 @@ drawable pelicans
 drawable pistons
 drawable raptors
 drawable rockets
+drawable search_view_bg
 drawable sixers
 drawable spurs
 drawable suns
@@ -3365,7 +3366,8 @@ id progress_horizontal
 id radio
 id ratio
 id rectangles
-id recycler_main
+id recycler_games
+id recycler_players
 id report_drawn
 id reverseSawtooth
 id right
@@ -3385,6 +3387,7 @@ id scrollIndicatorUp
 id scrollView
 id scrollable
 id searchButton
+id searchView
 id search_badge
 id search_bar
 id search_button
@@ -3395,6 +3398,7 @@ id search_mag_icon
 id search_plate
 id search_src_text
 id search_voice_btn
+id seasonCheckBox
 id select_dialog_listview
 id selected
 id selection_type
@@ -3450,8 +3454,11 @@ id textAway
 id textAwayScore
 id textEnd
 id textGameStatus
+id textGameTime
 id textHome
 id textHomeScore
+id textName
+id textPlayerName
 id textSpacerNoButtons
 id textSpacerNoTitle
 id textStart
@@ -3615,6 +3622,7 @@ layout abc_tooltip
 layout activity_compare
 layout activity_games
 layout activity_main
+layout activity_profile
 layout activity_search
 layout custom_dialog
 layout design_bottom_navigation_item
@@ -3692,7 +3700,8 @@ layout notification_template_part_time
 layout select_dialog_item_material
 layout select_dialog_multichoice_material
 layout select_dialog_singlechoice_material
-layout single_games
+layout single_game
+layout single_player
 layout support_simple_spinner_dropdown_item
 menu bottom_menu
 mipmap ic_launcher

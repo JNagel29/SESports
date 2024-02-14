@@ -4,9 +4,10 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
+import androidx.appcompat.widget.SearchView;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import android.widget.TextView;
 
 import com.android.volley.Response;
@@ -20,11 +21,19 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.HashSet;
 
-public class SearchActivity extends AppCompatActivity {
+
+
+public class SearchActivity extends AppCompatActivity implements SelectListener {
     TextView data;
-    EditText inputText;
-    Button searchButton;
+    SearchView searchView;
+    //These three will be used to list out the player profiles via a scrollable recyclerView
+    RecyclerView recyclerView;
+    List<Player> myPlayers = new ArrayList<>();
+    CustomAdapter customAdapter;
     String basePlayerUrl = "https://nba-stats-db.herokuapp.com/api/playerdata/name/";
     // This is a flag for whether or not to finish (aka terminate) activities while switching
     // If we don't finish, then the back button can be used to go to previous page
@@ -35,20 +44,39 @@ public class SearchActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
 
-        data = findViewById(R.id.data);
-        inputText = findViewById(R.id.inputText);
-        searchButton = findViewById(R.id.searchButton);
-        //Declares listener for search button
-        searchButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                getPlayerData(inputText.getText().toString());
-            }
-        });
         //Declares and calls function to set up Bottom Navigation Bar
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
         setupBottomNavigation(bottomNavigationView);
+
+        searchView = findViewById(R.id.searchView);
+        searchView.clearFocus(); //Older version's auto open keyboard, this removes that
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                myPlayers.clear(); // Clears out any past results before handling new query
+                getPlayerDataV2(query);
+                displayItems();
+                searchView.clearFocus(); // dismisses keyboard after search
+                return true;
+            }
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
     }
+
+    public void displayItems() {
+        recyclerView = findViewById(R.id.recycler_players);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new GridLayoutManager(this, 1));
+        //Then, we declare the adapter and set it to the recycler view
+        customAdapter = new CustomAdapter(this, myPlayers, this);
+        recyclerView.setAdapter(customAdapter);
+    }
+
+
     public void setupBottomNavigation(BottomNavigationView bottomNavigationView) {
         bottomNavigationView.setSelectedItemId(R.id.bottom_person_search);
         //Note: had to upgrade gradle material to 1.11.0 for setOnItemSelectedListener to work
@@ -79,7 +107,6 @@ public class SearchActivity extends AppCompatActivity {
 
     public void getPlayerData(String playerName) {
         String playerURL = basePlayerUrl + playerName;
-
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, playerURL, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
@@ -114,6 +141,45 @@ public class SearchActivity extends AppCompatActivity {
         Volley.newRequestQueue(this).add(request);
     }
 
+    public void getPlayerDataV2(String playerName) {
+        String playerURL = basePlayerUrl + playerName;
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, playerURL, null, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    JSONArray arrPlayers = response.getJSONArray("results"); // Grabs each player from each szn
+                    JSONObject playerInstance;
+                    String playerName;
+                    HashSet<String> playerSet = new HashSet<String>();
+                    for (int i=0; i<arrPlayers.length(); i++) {
+                        playerInstance = arrPlayers.getJSONObject(i);
+                        //playerSet.add(playerInstance.getString("player_name"));
+                        playerName = playerInstance.getString("player_name");
+                        boolean playerFound = false;
+                        for (int j=0; j < myPlayers.size(); j++) {
+                            if ( (myPlayers.get(j).getPlayerName()).equals(playerName))
+                                playerFound = true;
+                        }
+                        if (!playerFound) myPlayers.add(new Player(playerName));
+                    }
+                    // Here, we update view with most recent data, very important since its async
+                    customAdapter.notifyDataSetChanged();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    data.setText("It's possible that " + playerName + " wasn't a valid player!");
+                    //data.setText(playerURL);
+                    //data.setText(R.string.error);
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                error.printStackTrace();
+                data.setText("It's possible that " + playerName + " wasn't a valid player!");
+            }
+        });
+        Volley.newRequestQueue(this).add(request);
+    }
 
     //Small Override that makes it so back button changes selected icon
     @Override
@@ -122,5 +188,12 @@ public class SearchActivity extends AppCompatActivity {
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
         bottomNavigationView.setSelectedItemId(R.id.bottom_person_search);
     }
-
+    //Click listener for each player card that passes name to profile activity to use
+    @Override
+    public void onItemClicked(Player player) {
+        Intent intent = new Intent(getApplicationContext(), ProfileActivity.class);
+        intent.putExtra("playerName", player.getPlayerName());
+        intent.setClass(getApplicationContext(), ProfileActivity.class);
+        startActivity(intent);
+    }
 }

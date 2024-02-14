@@ -11,6 +11,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.FantasyBasketball">
         <activity
+            android:name=".ProfileActivity"
+            android:exported="false" />
+        <activity
             android:name=".GamesActivity"
             android:exported="false" />
         <activity

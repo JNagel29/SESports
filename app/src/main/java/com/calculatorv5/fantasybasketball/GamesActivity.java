@@ -6,7 +6,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -40,7 +39,9 @@ public class GamesActivity extends AppCompatActivity {
     List<Game> myGames = new ArrayList<>();
     CustomAdapter customAdapter;
     //This hashmap will be used to map each team's name to its associated drawable logo
-    private final Map<String, Integer> logoMap = new HashMap<String, Integer>();
+    private final Map<String, Integer> logoMap = new HashMap<>();
+    //API Key for fetching game data (required)
+    private final String apiKey = "4a1cfcc3-0561-441e-bd6c-04df034dd237";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,13 +62,12 @@ public class GamesActivity extends AppCompatActivity {
     }
 
     public void displayItems() {
-        recyclerView = findViewById(R.id.recycler_main);
+        recyclerView = findViewById(R.id.recycler_games);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new GridLayoutManager(this, 1));
         //Then, we declare the adapter and set it to the recycler view
-        customAdapter = new CustomAdapter(this, myGames);
+        customAdapter = new CustomAdapter(this, myGames, null); // null b/c no listener
         recyclerView.setAdapter(customAdapter);
-
     }
 
     public void setupBottomNavigation(BottomNavigationView bottomNavigationView) {
@@ -103,7 +103,9 @@ public class GamesActivity extends AppCompatActivity {
     }
 
     public void getDailyGames() {
-        String baseGameUrl = "https://www.balldontlie.io/api/v1/games";
+        //String oldBaseGameUrl = "https://www.balldontlie.io/api/v1/games";
+        String baseGameUrl = "https://api.balldontlie.io/v1/games";
+        String test =        "https://api.balldontlie.io/v1/games?dates[]=20240213";
         //Get current date
         Date currentTime = Calendar.getInstance().getTime();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
@@ -117,7 +119,7 @@ public class GamesActivity extends AppCompatActivity {
                 try {
                     JSONArray arrGames = response.getJSONArray("data"); // results of all games that day
                     JSONObject game, homeTeam, awayTeam;
-                    String homeTeamName, awayTeamName, homeTeamScore, awayTeamScore, gameStatus;
+                    String homeTeamName, awayTeamName, homeTeamScore, awayTeamScore, gameStatus, gameTime;
                     int homeTeamLogo, awayTeamLogo; // These are int because they refer to resource ID's
                     for (int i=0; i < arrGames.length(); i++) { //Loop through each game
                         game = arrGames.getJSONObject(i);
@@ -127,10 +129,13 @@ public class GamesActivity extends AppCompatActivity {
                         //Grab the (shortened) name for each
                         homeTeamName = homeTeam.getString("name");
                         awayTeamName = awayTeam.getString("name");
-                        //Grab the scores for each, and status of the game (quarter or finished)
+                        //Grab the scores for each, and status/time of the game (quarter or finished)
                         homeTeamScore = String.valueOf(game.getInt("home_team_score"));
                         awayTeamScore = String.valueOf(game.getInt("visitor_team_score"));
                         gameStatus = game.getString("status");
+                        gameTime = game.getString("time");
+                        //gameTime set to Final means game ended, null means hasn't started
+                        if (gameTime.equals("Final") || gameTime.equals("null")) gameTime = "";
                         //However, gameStatus returns a long string if the game hasn't started:
                         if (gameStatus.startsWith("20")) { // checks if it starts with year
                             gameStatus = getGameTime(gameStatus);
@@ -139,8 +144,8 @@ public class GamesActivity extends AppCompatActivity {
                         homeTeamLogo = logoMap.get(homeTeamName);
                         awayTeamLogo = logoMap.get(awayTeamName);
                         //Add to list of games that will be later displayed out
-                        myGames.add(new Game(homeTeamName, awayTeamName, homeTeamScore, awayTeamScore, gameStatus, homeTeamLogo,
-                                awayTeamLogo));
+                        myGames.add(new Game(homeTeamName, awayTeamName, homeTeamScore, awayTeamScore, gameStatus, gameTime,
+                                homeTeamLogo, awayTeamLogo));
                     }
                     // Here, we update view with most recent data, very important since its async
                     //updateRecyclerView();
@@ -154,7 +159,15 @@ public class GamesActivity extends AppCompatActivity {
             public void onErrorResponse(VolleyError error) {
                 error.printStackTrace();
             }
-        });
+        }) {
+                //Adds api key to header in format Authorization: <key>
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Authorization", apiKey);
+                return headers;
+            }
+        };
         Volley.newRequestQueue(this).add(request);
     }
 

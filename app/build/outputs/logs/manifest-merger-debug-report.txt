@@ -1,9 +1,9 @@
 -- Merging decision tree log ---
 manifest
-ADDED from C:\Users\arake\AndroidStudioProjects\FantasyBasketball\app\src\main\AndroidManifest.xml:2:1-31:12
-INJECTED from C:\Users\arake\AndroidStudioProjects\FantasyBasketball\app\src\main\AndroidManifest.xml:2:1-31:12
-INJECTED from C:\Users\arake\AndroidStudioProjects\FantasyBasketball\app\src\main\AndroidManifest.xml:2:1-31:12
-INJECTED from C:\Users\arake\AndroidStudioProjects\FantasyBasketball\app\src\main\AndroidManifest.xml:2:1-31:12
+ADDED from C:\Users\arake\AndroidStudioProjects\FantasyBasketball\app\src\main\AndroidManifest.xml:2:1-34:12
+INJECTED from C:\Users\arake\AndroidStudioProjects\FantasyBasketball\app\src\main\AndroidManifest.xml:2:1-34:12
+INJECTED from C:\Users\arake\AndroidStudioProjects\FantasyBasketball\app\src\main\AndroidManifest.xml:2:1-34:12
+INJECTED from C:\Users\arake\AndroidStudioProjects\FantasyBasketball\app\src\main\AndroidManifest.xml:2:1-34:12
 MERGED from [com.google.android.material:material:1.11.0] C:\Users\arake\.gradle\caches\transforms-3\99dc24b8086e9e02f60cbc0643cdc897\transformed\material-1.11.0\AndroidManifest.xml:17:1-24:12
 MERGED from [androidx.constraintlayout:constraintlayout:2.0.4] C:\Users\arake\.gradle\caches\transforms-3\583a8b8824a1a4ed1d8b558adca83b34\transformed\constraintlayout-2.0.4\AndroidManifest.xml:2:1-11:12
 MERGED from [androidx.appcompat:appcompat-resources:1.6.1] C:\Users\arake\.gradle\caches\transforms-3\6bb17d2c54c905aa7b0c5b5bfe3537f3\transformed\jetified-appcompat-resources-1.6.1\AndroidManifest.xml:17:1-22:12
@@ -59,8 +59,8 @@ ADDED from C:\Users\arake\AndroidStudioProjects\FantasyBasketball\app\src\main\A
 	android:name
 		ADDED from C:\Users\arake\AndroidStudioProjects\FantasyBasketball\app\src\main\AndroidManifest.xml:4:22-64
 application
-ADDED from C:\Users\arake\AndroidStudioProjects\FantasyBasketball\app\src\main\AndroidManifest.xml:6:5-29:19
-INJECTED from C:\Users\arake\AndroidStudioProjects\FantasyBasketball\app\src\main\AndroidManifest.xml:6:5-29:19
+ADDED from C:\Users\arake\AndroidStudioProjects\FantasyBasketball\app\src\main\AndroidManifest.xml:6:5-32:19
+INJECTED from C:\Users\arake\AndroidStudioProjects\FantasyBasketball\app\src\main\AndroidManifest.xml:6:5-32:19
 MERGED from [com.google.android.material:material:1.11.0] C:\Users\arake\.gradle\caches\transforms-3\99dc24b8086e9e02f60cbc0643cdc897\transformed\material-1.11.0\AndroidManifest.xml:22:5-20
 MERGED from [com.google.android.material:material:1.11.0] C:\Users\arake\.gradle\caches\transforms-3\99dc24b8086e9e02f60cbc0643cdc897\transformed\material-1.11.0\AndroidManifest.xml:22:5-20
 MERGED from [androidx.constraintlayout:constraintlayout:2.0.4] C:\Users\arake\.gradle\caches\transforms-3\583a8b8824a1a4ed1d8b558adca83b34\transformed\constraintlayout-2.0.4\AndroidManifest.xml:9:5-20
@@ -93,38 +93,44 @@ MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] C:\Users\ar
 		ADDED from C:\Users\arake\AndroidStudioProjects\FantasyBasketball\app\src\main\AndroidManifest.xml:7:9-35
 	android:theme
 		ADDED from C:\Users\arake\AndroidStudioProjects\FantasyBasketball\app\src\main\AndroidManifest.xml:12:9-55
-activity#com.calculatorv5.fantasybasketball.GamesActivity
+activity#com.calculatorv5.fantasybasketball.ProfileActivity
 ADDED from C:\Users\arake\AndroidStudioProjects\FantasyBasketball\app\src\main\AndroidManifest.xml:13:9-15:40
 	android:exported
 		ADDED from C:\Users\arake\AndroidStudioProjects\FantasyBasketball\app\src\main\AndroidManifest.xml:15:13-37
 	android:name
-		ADDED from C:\Users\arake\AndroidStudioProjects\FantasyBasketball\app\src\main\AndroidManifest.xml:14:13-42
-activity#com.calculatorv5.fantasybasketball.CompareActivity
+		ADDED from C:\Users\arake\AndroidStudioProjects\FantasyBasketball\app\src\main\AndroidManifest.xml:14:13-44
+activity#com.calculatorv5.fantasybasketball.GamesActivity
 ADDED from C:\Users\arake\AndroidStudioProjects\FantasyBasketball\app\src\main\AndroidManifest.xml:16:9-18:40
 	android:exported
 		ADDED from C:\Users\arake\AndroidStudioProjects\FantasyBasketball\app\src\main\AndroidManifest.xml:18:13-37
 	android:name
-		ADDED from C:\Users\arake\AndroidStudioProjects\FantasyBasketball\app\src\main\AndroidManifest.xml:17:13-44
-activity#com.calculatorv5.fantasybasketball.SearchActivity
-ADDED from C:\Users\arake\AndroidStudioProjects\FantasyBasketball\app\src\main\AndroidManifest.xml:19:9-52
-	android:name
-		ADDED from C:\Users\arake\AndroidStudioProjects\FantasyBasketball\app\src\main\AndroidManifest.xml:19:19-49
-activity#com.calculatorv5.fantasybasketball.MainActivity
-ADDED from C:\Users\arake\AndroidStudioProjects\FantasyBasketball\app\src\main\AndroidManifest.xml:20:9-28:20
+		ADDED from C:\Users\arake\AndroidStudioProjects\FantasyBasketball\app\src\main\AndroidManifest.xml:17:13-42
+activity#com.calculatorv5.fantasybasketball.CompareActivity
+ADDED from C:\Users\arake\AndroidStudioProjects\FantasyBasketball\app\src\main\AndroidManifest.xml:19:9-21:40
 	android:exported
-		ADDED from C:\Users\arake\AndroidStudioProjects\FantasyBasketball\app\src\main\AndroidManifest.xml:22:13-36
+		ADDED from C:\Users\arake\AndroidStudioProjects\FantasyBasketball\app\src\main\AndroidManifest.xml:21:13-37
 	android:name
-		ADDED from C:\Users\arake\AndroidStudioProjects\FantasyBasketball\app\src\main\AndroidManifest.xml:21:13-41
+		ADDED from C:\Users\arake\AndroidStudioProjects\FantasyBasketball\app\src\main\AndroidManifest.xml:20:13-44
+activity#com.calculatorv5.fantasybasketball.SearchActivity
+ADDED from C:\Users\arake\AndroidStudioProjects\FantasyBasketball\app\src\main\AndroidManifest.xml:22:9-52
+	android:name
+		ADDED from C:\Users\arake\AndroidStudioProjects\FantasyBasketball\app\src\main\AndroidManifest.xml:22:19-49
+activity#com.calculatorv5.fantasybasketball.MainActivity
+ADDED from C:\Users\arake\AndroidStudioProjects\FantasyBasketball\app\src\main\AndroidManifest.xml:23:9-31:20
+	android:exported
+		ADDED from C:\Users\arake\AndroidStudioProjects\FantasyBasketball\app\src\main\AndroidManifest.xml:25:13-36
+	android:name
+		ADDED from C:\Users\arake\AndroidStudioProjects\FantasyBasketball\app\src\main\AndroidManifest.xml:24:13-41
 intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER
-ADDED from C:\Users\arake\AndroidStudioProjects\FantasyBasketball\app\src\main\AndroidManifest.xml:23:13-27:29
+ADDED from C:\Users\arake\AndroidStudioProjects\FantasyBasketball\app\src\main\AndroidManifest.xml:26:13-30:29
 action#android.intent.action.MAIN
-ADDED from C:\Users\arake\AndroidStudioProjects\FantasyBasketball\app\src\main\AndroidManifest.xml:24:17-69
+ADDED from C:\Users\arake\AndroidStudioProjects\FantasyBasketball\app\src\main\AndroidManifest.xml:27:17-69
 	android:name
-		ADDED from C:\Users\arake\AndroidStudioProjects\FantasyBasketball\app\src\main\AndroidManifest.xml:24:25-66
+		ADDED from C:\Users\arake\AndroidStudioProjects\FantasyBasketball\app\src\main\AndroidManifest.xml:27:25-66
 category#android.intent.category.LAUNCHER
-ADDED from C:\Users\arake\AndroidStudioProjects\FantasyBasketball\app\src\main\AndroidManifest.xml:26:17-77
+ADDED from C:\Users\arake\AndroidStudioProjects\FantasyBasketball\app\src\main\AndroidManifest.xml:29:17-77
 	android:name
-		ADDED from C:\Users\arake\AndroidStudioProjects\FantasyBasketball\app\src\main\AndroidManifest.xml:26:27-74
+		ADDED from C:\Users\arake\AndroidStudioProjects\FantasyBasketball\app\src\main\AndroidManifest.xml:29:27-74
 uses-sdk
 INJECTED from C:\Users\arake\AndroidStudioProjects\FantasyBasketball\app\src\main\AndroidManifest.xml reason: use-sdk injection requested
 INJECTED from C:\Users\arake\AndroidStudioProjects\FantasyBasketball\app\src\main\AndroidManifest.xml

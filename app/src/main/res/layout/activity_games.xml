@@ -15,7 +15,7 @@
     0dp (from match_parent) and add a layout_weight of 1
     for it to work with the bottom nav bar below-->
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler_main"
+        android:id="@+id/recycler_games"
         android:layout_margin="8dp"
         android:layout_width="match_parent"
         android:layout_height="0dp"
