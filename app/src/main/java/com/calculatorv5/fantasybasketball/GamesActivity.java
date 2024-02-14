@@ -41,7 +41,7 @@ public class GamesActivity extends AppCompatActivity {
     //This hashmap will be used to map each team's name to its associated drawable logo
     private final Map<String, Integer> logoMap = new HashMap<>();
     //API Key for fetching game data (required)
-    private final String apiKey = "4a1cfcc3-0561-441e-bd6c-04df034dd237";
+    private final String apiKey = "";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

@@ -29,7 +29,7 @@ public class ProfileActivity extends AppCompatActivity {
     // If we don't finish, then the back button can be used to go to previous page
     private final boolean shouldFinish = true;
     //API Key for fetching game data (required)
-    private final String apiKey = "4a1cfcc3-0561-441e-bd6c-04df034dd237";
+    private final String apiKey = "";
     //Player ID, member variable b/c it needs to be used from one JSON request to another
     private int playerId;
     //TextView for testing right now
