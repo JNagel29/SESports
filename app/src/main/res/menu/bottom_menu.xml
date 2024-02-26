@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+        <item
+            android:id="@+id/bottom_home"
+            android:icon="@drawable/baseline_home_24"
+            android:title="Home"/>
+        <item
+            android:id="@+id/bottom_person_search"
+            android:icon="@drawable/baseline_person_search_24"
+            android:title="Search" />
+        <item
+            android:id="@+id/bottom_compare"
+            android:icon="@drawable/baseline_compare_arrows_24"
+            android:title="Compare" />
+        <item
+            android:id="@+id/bottom_games"
+            android:icon="@drawable/baseline_calendar_month_24"
+            android:title="Games" />
+
+</menu>

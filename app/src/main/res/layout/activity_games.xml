@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="bottom"
+    tools:context=".GamesActivity"
+    android:background="@color/gray"
+    android:orientation="vertical">
+
+    <!-- Had to change layout orientation to vertical (from horizon),
+    and had to change layout_height of recycler below to
+    0dp (from match_parent) and add a layout_weight of 1
+    for it to work with the bottom nav bar below-->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_main"
+        android:layout_margin="8dp"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginEnd="30dp"
+        android:layout_marginBottom="30dp"
+        android:id="@+id/bottomNavigationView"
+        android:background="@drawable/bottom_background"
+        app:menu="@menu/bottom_menu"
+        app:itemIconSize="30dp"
+        app:itemIconTint="@drawable/item_selector"
+        app:itemRippleColor="@android:color/transparent"
+        app:labelVisibilityMode="unlabeled" />
+
+</LinearLayout>
