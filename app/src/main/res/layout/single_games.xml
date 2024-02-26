@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_height="wrap_content"
+    android:layout_width="match_parent"
+    android:layout_margin="8dp"
+    app:cardElevation="8dp"
+    app:cardCornerRadius="8dp"
+    app:cardBackgroundColor="@color/lavender"
+    android:id="@+id/main_container">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:orientation="vertical">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <TextView
+                android:id="@+id/textHome"
+                android:text="Home Team"
+                android:textSize="22sp"
+                android:textColor="@color/black"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+            </TextView>
+            <TextView
+                android:id="@+id/textHomeScore"
+                android:text="0"
+                android:textSize="22sp"
+                android:textColor="@color/white"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+            </TextView>
+            <TextView
+                android:id="@+id/textAwayScore"
+                android:text="0"
+                android:textSize="22sp"
+                android:textColor="@color/white"
+                android:textAlignment="textEnd"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+            </TextView>
+            <TextView
+                android:id="@+id/textAway"
+                android:text="Away Team"
+                android:textAlignment="textEnd"
+                android:textSize="22sp"
+                android:textColor="@color/black"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+            </TextView>
+        </LinearLayout>
+        <!-- This Frame is used to align logos and status under team -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <ImageView
+                android:id="@+id/imageHomeLogo"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:src="@drawable/trailblazers"
+                android:layout_gravity="start|bottom"
+                android:layout_margin = "8dp"
+                android:contentDescription="@string/homeLogo" />
+            <ImageView
+                android:id="@+id/imageAwayLogo"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:src="@drawable/clippers"
+                android:layout_gravity="end|bottom"
+                android:layout_margin = "8dp"
+                android:contentDescription="@string/awayLogo" />
+            <TextView
+                android:id="@+id/textGameStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="@string/statusPlaceHolder"
+                android:textColor="@color/white"
+                android:textSize="22sp" />
+        </FrameLayout>
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

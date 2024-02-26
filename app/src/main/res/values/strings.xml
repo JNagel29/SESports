@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">FantasyBasketball</string>
+    <string name="welcome">Welcome to Fantasy Basketball!</string>
+    <string name="start">Start</string>
+    <string name="desc">Image of basketball</string>
+    <string name="error">Something went wrong loading the JSON</string>
+    <string name="playerSearchHint">Search for a player\'s stats!</string>
+    <string name="search">Search</string>
+    <string name="homeLogo">Image of Home Logo</string>
+    <string name="awayLogo">Image of Away Logo</string>
+    <string name="statusPlaceHolder">1st Qtr</string>
+
+
+</resources>
