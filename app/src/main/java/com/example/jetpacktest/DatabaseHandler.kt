@@ -67,7 +67,9 @@ class DatabaseHandler {
                 rowCount++
             }
             //Before anything after, reset resultSet back so it points to first row again
-            resultSet = statement.executeQuery(sql)
+            resultSet.beforeFirst()
+            //resultSet = statement.executeQuery(sql)
+
             //If rowCount is greater than 1, that means that there is a record with
             //team "TOT" (total) that we will grab stats from, and we'll also use other rows
             //to append to team so profile shows all teams they were on that year!
@@ -88,6 +90,8 @@ class DatabaseHandler {
             }
             //Otherwise, we only have one record and can just grab all our data
             else {
+                //First, need to point resultSet one ahead so it actually points at first row (not b4)
+                resultSet.next()
                 //Give player instance all the fitting params in constructor
                 player = Player(
                     name = resultSet.getString("Player"),

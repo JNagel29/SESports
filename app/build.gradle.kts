@@ -76,6 +76,8 @@ dependencies {
     implementation(platform("androidx.compose:compose-bom:2023.08.00"))
     //For loading images
     implementation("io.coil-kt:coil-compose:2.6.0")
+    //For displaying table for profiles (lazy table on git)
+    implementation("io.github.oleksandrbalan:lazytable:1.8.0")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")

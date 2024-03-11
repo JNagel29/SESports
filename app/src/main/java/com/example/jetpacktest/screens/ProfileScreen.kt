@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
@@ -31,6 +32,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
@@ -39,6 +41,10 @@ import com.example.jetpacktest.DatabaseHandler
 import com.example.jetpacktest.R
 import com.example.jetpacktest.HeadshotHandler
 import com.example.jetpacktest.models.Player
+//Lazy Table
+import eu.wewox.lazytable.LazyTable
+import eu.wewox.lazytable.LazyTableItem
+import eu.wewox.lazytable.lazyTableDimensions
 
 @Composable
 fun ProfileScreen(playerName: String, navigateBack: () -> Unit) {
@@ -59,8 +65,10 @@ fun ProfileScreen(playerName: String, navigateBack: () -> Unit) {
     //Change icon arrow depending on if dropdown is expanded or not
     val iconYear = if (expandedYear) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown
     //Variable for Player object that will hold the data about this player
-    //TODO: not working
-    //val player = remember { mutableStateOf(Player())
+    // Variable to track whether to show the player data table
+    var showPlayerData by remember { mutableStateOf(false) }
+    // Variable to hold the player data inside object
+    var playerObj by remember { mutableStateOf(Player()) }
 
     LaunchedEffect(Unit) {
         //On first launch, fetch the headshot and assign imgUrl to result using lambda callback
@@ -75,6 +83,12 @@ fun ProfileScreen(playerName: String, navigateBack: () -> Unit) {
                 chosenYear = yearsList.first()
             }
         }
+        //Finally, by default we want to display the current year's stats
+        databaseHandler.executePlayerData(playerName, chosenYear) { data ->
+            playerObj = data
+            showPlayerData = true // Show the player data table
+        }
+
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -123,19 +137,85 @@ fun ProfileScreen(playerName: String, navigateBack: () -> Unit) {
                                 //Update year, close menu and fetch new data on click
                                 chosenYear = year
                                 expandedYear = false
-                                //TODO: get this to work
-                                /*
-                                databaseHandler.executePlayerData(playerName, chosenYear) { data ->
-                                    dataArrIMadeAbove = data
-                                }
-
-                                 */
+                                //TODO: uncomment and add else for bdl api
+                                //if (chosenYear != "2024") {
+                                    databaseHandler.executePlayerData(playerName, chosenYear) { data ->
+                                        playerObj = data
+                                        showPlayerData = true // Show the player data table
+                                    }
+                               // }
                             }
                         )
                     }
                 }
             }
+            //Show PlayerDataTable based on showPlayerData
+            if (showPlayerData) {
+                PlayerDataTable(playerObj)
+            }
         }
+    }
+}
+
+@Composable
+fun PlayerDataTable(playerObj: Player) {
+    //Header and slight amount of vertical space
+    Text("Player Averages", fontSize = 25.sp,
+        fontWeight = FontWeight.Bold,
+        textAlign = TextAlign.Center,
+    )
+    Spacer(modifier = Modifier.height(4.dp))
+    //Now the actual list of values
+    LazyColumn(
+        modifier = Modifier.padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        //Pass in list of rows with Label and Value
+        item {
+            PlayerDataRow("Year", playerObj.year.toString())
+            PlayerDataRow("Position", playerObj.position)
+            PlayerDataRow("Team", playerObj.team)
+            PlayerDataRow("Points", playerObj.points.toString())
+            PlayerDataRow("Assists", playerObj.assists.toString())
+            PlayerDataRow("Steals", playerObj.steals.toString())
+            PlayerDataRow("Blocks", playerObj.blocks.toString())
+            PlayerDataRow("Rebounds", playerObj.totalRebounds.toString())
+            PlayerDataRow("Turnovers", playerObj.turnovers.toString())
+            PlayerDataRow("Fouls", playerObj.personalFouls.toString())
+            PlayerDataRow("Mins. Played", playerObj.minutesPlayed.toString())
+            PlayerDataRow("FG", playerObj.fieldGoals.toString())
+            PlayerDataRow("FGA", playerObj.fieldGoalAttempts.toString())
+            PlayerDataRow("FG%", playerObj.fieldGoalPercent.toString())
+            PlayerDataRow("3P ", playerObj.threePointers.toString())
+            PlayerDataRow("3PA", playerObj.threePointerAttempts.toString())
+            PlayerDataRow("3P%", playerObj.threePointPercent.toString())
+            PlayerDataRow("2P", playerObj.twoPointers.toString())
+            PlayerDataRow("2PA", playerObj.twoPointerAttempts.toString())
+            PlayerDataRow("2P%", playerObj.twoPointPercent.toString())
+            PlayerDataRow("EFG%", playerObj.effectiveFieldGoalPercent.toString())
+            PlayerDataRow("ORB", playerObj.offensiveRebounds.toString())
+            PlayerDataRow("DRB", playerObj.defensiveRebounds.toString())
+        }
+    }
+}
+
+@Composable
+fun PlayerDataRow(label: String, value: String) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    ) {
+        //Prints bolded label (Year, Position, etc.)
+        Text(
+            label,
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.width(100.dp)
+        )
+        Spacer(modifier = Modifier.width(16.dp))
+        //Prints actual value after the spacer
+        Text(value, fontSize = 18.sp)
     }
 }
 
@@ -195,3 +275,24 @@ fun ReturnToSearchHeader(navigateBack: () -> Unit) {
     }
 }
 
+@Composable
+fun LazyTableTest() {
+    //Now, we create our lazy table (TODO: put in own func and implement dynamic)
+    val columns = 10
+    val rows = 10
+    LazyTable(
+        dimensions = lazyTableDimensions(48.dp, 32.dp)
+    ) {
+        items(
+            count = columns * rows,
+            layoutInfo = {
+                LazyTableItem(
+                    column = it % columns,
+                    row = it / columns,
+                )
+            }
+        ) { index ->
+            Text(text = "#$index")
+        }
+    }
+}
