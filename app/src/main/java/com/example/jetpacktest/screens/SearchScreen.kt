@@ -125,13 +125,13 @@ fun SearchScreen(navController: NavController) {
             //Add vertical space between search and list
             Spacer(modifier = Modifier.height(16.dp))
             //Finally, we can display Search results via lazy column
-            SearchResultsDisplay(searchResults = searchResults) {playerName ->
+            SearchResultsDisplay(searchResults = searchResults) {nameArg ->
                 //We have to pass in the lambda that navigates to the new screen using navController
                 if (selectedSearchType == "Player")
-                    navController.navigate("${Screens.ProfileScreen.route}/$playerName")
+                    navController.navigate("${Screens.ProfileScreen.route}/$nameArg")
                 else if (selectedSearchType == "Team")
                     //TODO: Possibly switch this to another screen if we ever need to separate
-                    navController.navigate("${Screens.ProfileScreen.route}/$playerName")
+                    navController.navigate("${Screens.TeamProfileScreen.route}/$nameArg")
             }
         }
     }

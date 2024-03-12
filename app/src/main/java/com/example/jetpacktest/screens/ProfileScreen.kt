@@ -83,7 +83,7 @@ fun ProfileScreen(playerName: String, navigateBack: () -> Unit) {
                 chosenYear = yearsList.first()
             }
         }
-        //TODO: Need to fix this, not working
+        //TODO: Need to fix this, not working since its not getting chosenYear first THEn running this
         /*
         //Finally, by default we want to display the current year's stats
         databaseHandler.executePlayerData(playerName, chosenYear) { data ->
@@ -252,7 +252,6 @@ fun NameAndHeadshot(playerName: String, imgUrl: String, headshotHandler: Headsho
 @Composable
 fun ReturnToSearchHeader(navigateBack: () -> Unit) {
     Column(
-        //Arrange it on top TODO: might remove this?
         modifier = Modifier.padding(10.dp),
         verticalArrangement = Arrangement.Top
     ) {
@@ -280,7 +279,7 @@ fun ReturnToSearchHeader(navigateBack: () -> Unit) {
 
 @Composable
 fun LazyTableTest() {
-    //Now, we create our lazy table (TODO: put in own func and implement dynamic)
+    //Now, we create our lazy table
     val columns = 10
     val rows = 10
     LazyTable(

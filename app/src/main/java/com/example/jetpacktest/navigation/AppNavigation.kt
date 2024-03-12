@@ -19,6 +19,7 @@ import com.example.jetpacktest.screens.GameScreen
 import com.example.jetpacktest.screens.HomeScreen
 import com.example.jetpacktest.screens.ProfileScreen
 import com.example.jetpacktest.screens.SearchScreen
+import com.example.jetpacktest.screens.TeamProfileScreen
 
 @Composable
 fun AppNavigation() {
@@ -72,9 +73,16 @@ fun AppNavigation() {
             composable(route=Screens.GameScreen.name) {
                 GameScreen()
             }
+            //Profile screens for player/team (we pass in player/team name as arg in route)
             composable(route = "${Screens.ProfileScreen.route}/{playerName}") { backStackEntry ->
                 val playerName = backStackEntry.arguments?.getString("playerName") ?: ""
                 ProfileScreen(playerName) {
+                    navController.popBackStack()
+                }
+            }
+            composable(route = "${Screens.TeamProfileScreen.route}/{teamName}") { backStackEntry ->
+                val teamName = backStackEntry.arguments?.getString("teamName") ?: ""
+                TeamProfileScreen(teamName) {
                     navController.popBackStack()
                 }
             }

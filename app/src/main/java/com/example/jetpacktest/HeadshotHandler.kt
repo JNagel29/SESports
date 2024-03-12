@@ -22,9 +22,9 @@ import java.text.Normalizer
 class HeadshotHandler {
     private val useBiggerImage: Boolean = true
     private var imageUrlPrefix: String? = null
+    private val apiKey = "010c01189ccd41809218da51a0850ac8"
     private val activePlayersUrl =
-        "https://api.sportsdata.io/v3/nba/scores/json/PlayersActiveBasic?key=" +
-                "010c01189ccd41809218da51a0850ac8"
+        "https://api.sportsdata.io/v3/nba/scores/json/PlayersActiveBasic?key=" + apiKey
     private var matchingPlayerId = -1 // -1 means no match found and to not bother calling next request
     private var nbaDotComPlayerId = -1
     object Const { // We use object since only way to make var constant
@@ -33,8 +33,6 @@ class HeadshotHandler {
     }
     //Used in fetchPlayerId/fetchImageUrl to get active players and their ID
     private var imgUrl = "DEFAULT"
-
-
 
     fun fetchImageUrl(playerName: String, context: Context, onResult: (String) -> Unit){
         imageUrlPrefix = if (useBiggerImage) "https://cdn.nba.com/headshots/nba/latest/1040x760/"
@@ -65,8 +63,7 @@ class HeadshotHandler {
                             //New request uses the matching ID, also we pass in the API key again
                             val playerDetailUrl =
                                 "https://api.sportsdata.io/v3/nba/scores/json/Player/" +
-                                        matchingPlayerId + "?key=" +
-                                        "010c01189ccd41809218da51a0850ac8"
+                                        matchingPlayerId + "?key=" + apiKey
                             // Call the second Volley request here within the first request's onResponse method
                             // If we tried doing it sequentially, it wouldn't work since the timing is async
                             val request2 = JsonObjectRequest(
