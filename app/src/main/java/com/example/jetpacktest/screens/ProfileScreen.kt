@@ -83,11 +83,14 @@ fun ProfileScreen(playerName: String, navigateBack: () -> Unit) {
                 chosenYear = yearsList.first()
             }
         }
+        //TODO: Need to fix this, not working
+        /*
         //Finally, by default we want to display the current year's stats
         databaseHandler.executePlayerData(playerName, chosenYear) { data ->
             playerObj = data
             showPlayerData = true // Show the player data table
         }
+         */
 
     }
 

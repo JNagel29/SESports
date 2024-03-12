@@ -60,16 +60,14 @@ class DatabaseHandler {
             myConn = DriverManager.getConnection(url, user, password)
             val statement = myConn.createStatement()
             val sql = "SELECT* FROM PLAYER WHERE Player = '$playerName' AND Year = $year"
-            var resultSet = statement.executeQuery(sql)
+            val resultSet = statement.executeQuery(sql)
             //First thing to do, is check if player was on multiple teams
             var rowCount = 0
             while (resultSet.next()) {
                 rowCount++
             }
-            //Before anything after, reset resultSet back so it points to first row again
+            //Before anything after, reset resultSet back so it points to before first row again
             resultSet.beforeFirst()
-            //resultSet = statement.executeQuery(sql)
-
             //If rowCount is greater than 1, that means that there is a record with
             //team "TOT" (total) that we will grab stats from, and we'll also use other rows
             //to append to team so profile shows all teams they were on that year!
