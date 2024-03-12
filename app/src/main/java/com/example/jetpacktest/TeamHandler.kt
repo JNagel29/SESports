@@ -44,6 +44,6 @@ class TeamHandler {
             playerNames.add(fullName)
         }
         //Return list of playerNames, which fetch will return to our TeamProfileScreen to display
-        return playerNames;
+        return playerNames
     }
 }
