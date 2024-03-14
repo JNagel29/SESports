@@ -45,7 +45,7 @@ class HeadshotHandler {
                     val noAccentPlayerName = removeAccents(playerName)
                     //Splits up name in first/last since API requires that
                     val nameParts =
-                        noAccentPlayerName.split(" ".toRegex(), limit = 2).toTypedArray()
+                        noAccentPlayerName.split(" ".toRegex(), limit = 2)
                     val firstName = nameParts[0]
                     val lastName = nameParts[1]
                     matchingPlayerId = -1 // Default for if no id found (aka not active player)
@@ -70,14 +70,21 @@ class HeadshotHandler {
                                 Request.Method.GET, playerDetailUrl, null,
                                 { response2 ->
                                     try {
+                                        //TODO: the isNull check isnt working
+                                        //test it on RaiQuan Gray and see it wont work
                                         //Grabs NBA's site player ID
-                                        nbaDotComPlayerId = response2.getInt("NbaDotComPlayerID")
-                                        //Creates our new imgUrl using the NBA ID
-                                        imgUrl =
-                                            "$imageUrlPrefix$nbaDotComPlayerId.png"
-                                        //Performs lambda callback using our new imgUrl to
-                                        //communicate back to ProfileScreen that we got a url
-                                        onResult(imgUrl)
+                                        if (response2.isNull("NbaDotComPlayerID")) {
+                                            // Handle the case where the value is null
+                                            onResult("Default")
+                                        } else {
+                                            // Parse the integer value if it's not null
+                                            nbaDotComPlayerId = response2.getInt("NbaDotComPlayerID")
+                                            //Creates our new imgUrl using the NBA ID
+                                            imgUrl = "$imageUrlPrefix$nbaDotComPlayerId.png"
+                                            //Performs lambda callback using our new imgUrl to
+                                            //communicate back to ProfileScreen that we got a url
+                                            onResult(imgUrl)
+                                        }
                                     } catch (e: JSONException) {
                                         e.printStackTrace()
                                     }
@@ -90,8 +97,7 @@ class HeadshotHandler {
                     }
                     // If id still equals -1, then no match so we set to DEFAULT and callback
                     if (matchingPlayerId == -1) {
-                        imgUrl = "DEFAULT"
-                        onResult(imgUrl)
+                        onResult("Default")
                     }
                 } catch (e: JSONException) {
                     e.printStackTrace() // Prints error in logcat

@@ -9,8 +9,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -81,17 +83,13 @@ fun ProfileScreen(playerName: String, navigateBack: () -> Unit) {
             //Also, default the chosenYear to the most recent year
             if (yearsList.isNotEmpty()) {
                 chosenYear = yearsList.first()
+                //Then, fetch all our data for that most recent year
+                databaseHandler.executePlayerData(playerName, chosenYear) { data ->
+                    playerObj = data
+                    showPlayerData = true // Show the player data table
+                }
             }
         }
-        //TODO: Need to fix this, not working since its not getting chosenYear first THEn running this
-        /*
-        //Finally, by default we want to display the current year's stats
-        databaseHandler.executePlayerData(playerName, chosenYear) { data ->
-            playerObj = data
-            showPlayerData = true // Show the player data table
-        }
-         */
-
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -128,7 +126,8 @@ fun ProfileScreen(playerName: String, navigateBack: () -> Unit) {
                     onDismissRequest = { expandedYear = false },
                     modifier = Modifier
                         .width(80.dp) // Limit width
-                        .height(250.dp), // Limit height so user can scroll when many years
+                        .heightIn(max = 250.dp) // Limit height to maximum 250dp
+                        .wrapContentHeight(align = Alignment.Top), // Wrap content height
                     offset = DpOffset(300.dp, 0.dp) // Move items 300dp to the right
                 ) {
                     //For each year in the dynamic list we made, create a dropdown menu item
@@ -167,11 +166,15 @@ fun ProfileScreen(playerName: String, navigateBack: () -> Unit) {
 
 @Composable
 fun PlayerDataTable(playerObj: Player) {
-    //Header and slight amount of vertical space
-    Text("Player Averages", fontSize = 25.sp,
-        fontWeight = FontWeight.Bold,
-        textAlign = TextAlign.Center,
-    )
+    Box(modifier = Modifier.fillMaxWidth()) {
+        //Header (We wrap inside box to center it)
+        Text(
+            "Player Averages", fontSize = 25.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.align(Alignment.Center)
+        )
+    }
+    //Slight amount of vertical space
     Spacer(modifier = Modifier.height(4.dp))
     //Now the actual list of values
     LazyColumn(
@@ -274,7 +277,7 @@ fun ReturnToSearchHeader(navigateBack: () -> Unit) {
             //Spacer between the icon and text
             Spacer(modifier = Modifier.width(10.dp))
             Text(
-                text = "Return to Search",
+                text = "Return to Previous",
                 fontSize = 18.sp,
                 fontFamily = FontFamily.Serif
             )

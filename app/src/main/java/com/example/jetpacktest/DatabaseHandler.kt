@@ -6,6 +6,7 @@ import com.example.jetpacktest.models.TopPlayer
 import java.sql.Connection
 import java.sql.DriverManager
 import java.sql.SQLException
+import java.text.Normalizer
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 
@@ -55,11 +56,13 @@ class DatabaseHandler {
     private fun getPlayerData(playerName: String, year: String): Player {
         val myConn: Connection
         var player = Player() //Instantiate with secondary constructor
+        //Remove accents since can't have any when searching DB
+        val playerNameNoAccents = removeAccents(playerName)
         try {
             Class.forName("com.mysql.jdbc.Driver")
             myConn = DriverManager.getConnection(url, user, password)
             val statement = myConn.createStatement()
-            val sql = "SELECT* FROM PLAYER WHERE Player = '$playerName' AND Year = $year"
+            val sql = "SELECT* FROM PLAYER WHERE Player = '$playerNameNoAccents' AND Year = $year"
             val resultSet = statement.executeQuery(sql)
             //First thing to do, is check if player was on multiple teams
             var rowCount = 0
@@ -165,12 +168,14 @@ class DatabaseHandler {
     private fun getPlayerYears(playerName: String): MutableList<String> {
         val yearsList = mutableListOf<String>()
         val myConn: Connection
+        //We remove accents since searching DB requires none
+        val playerNameNoAccents = removeAccents(playerName)
         try {
             Class.forName("com.mysql.jdbc.Driver")
             myConn = DriverManager.getConnection(url, user, password)
             val statement = myConn.createStatement()
             //This SQL selects a single column of years for that player
-            val sql = "SELECT Year FROM PLAYER WHERE Player = '$playerName' ORDER BY Year DESC"
+            val sql = "SELECT Year FROM PLAYER WHERE Player = '$playerNameNoAccents' ORDER BY Year DESC"
             val resultSet = statement.executeQuery(sql)
             while (resultSet.next()) {
                 val year = resultSet.getInt("Year").toString()
@@ -183,6 +188,13 @@ class DatabaseHandler {
             e.printStackTrace()
         }
         return yearsList
+    }
+
+    //Niko: Helper function to remove accents from playerName, since DB doesn't like them
+    //Got it from https://stackoverflow.com/a/3322174
+    private fun removeAccents(input: String): String {
+        return Normalizer.normalize(input, Normalizer.Form.NFD)
+            .replace("\\p{InCombiningDiacriticalMarks}+".toRegex(), "")
     }
 }
 

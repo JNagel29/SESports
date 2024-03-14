@@ -3,9 +3,11 @@ package com.example.jetpacktest.screens
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -32,7 +34,9 @@ import com.example.jetpacktest.TeamHandler
 import com.example.jetpacktest.models.NbaTeam
 
 @Composable
-fun TeamProfileScreen(teamName: String, navigateBack: () -> Unit) {
+fun TeamProfileScreen(teamName: String,
+                      navigateBack: () -> Unit,
+                      navigateToPlayerProfile: (String) -> Unit) {
     //Instantiate a team handler that we'll use to fetch players in a given team
     val teamHandler = TeamHandler()
     //Also, create a variable to hold our list of players
@@ -58,12 +62,15 @@ fun TeamProfileScreen(teamName: String, navigateBack: () -> Unit) {
         ReturnToSearchHeader(navigateBack)
         //Adds space between header and actual data
         Spacer(modifier = Modifier.height(15.dp))
-        //TODO: textAlign below (and in header of currPlayerList not centering)
         //Team name and logo (will pass into own composable w/ teamName, contentDesc, width/height
-        Text(text = teamName,
-            fontSize = 22.sp,
-            fontFamily = FontFamily.Serif,
-            textAlign = TextAlign.Center)
+        //Wrap text in box to center it
+        Box(modifier = Modifier.fillMaxWidth()) {
+            Text(text = teamName,
+                fontSize = 22.sp,
+                fontFamily = FontFamily.Serif,
+                modifier = Modifier.align(Alignment.Center)
+            )
+        }
         //We get the logo from NbaTeam.logos map (String to resource id)
         //The "?:" means if we get null, then just use default, else use left side
         val teamLogo = NbaTeam.logos[teamName] ?: R.drawable.fallback
@@ -76,16 +83,20 @@ fun TeamProfileScreen(teamName: String, navigateBack: () -> Unit) {
                 .align(Alignment.CenterHorizontally)
         )
         //Display list of players using composable
-        CurrentPlayerList(teamPlayersList)
+        CurrentPlayerList(teamPlayersList, navigateToPlayerProfile)
     }
 }
 @Composable
-fun CurrentPlayerList(teamPlayersList: List<String>) {
-    //Header
-    Text("Current Players", fontSize = 25.sp,
-        fontWeight = FontWeight.Bold,
-        textAlign = TextAlign.Center,
-    )
+fun CurrentPlayerList(teamPlayersList: List<String>,
+                      navigateToPlayerProfile: (String) -> Unit) {
+    //Header (we wrap inside box to center it)
+    Box(modifier = Modifier.fillMaxWidth()) {
+        Text("Current Players", fontSize = 25.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.align(Alignment.Center)
+
+        )
+    }
     //Slight amount of vertical space b/w header and list of names
     Spacer(modifier = Modifier.height(4.dp))
     //Now, we show list of player names
@@ -98,7 +109,7 @@ fun CurrentPlayerList(teamPlayersList: List<String>) {
                     .clickable {
                         //TODO: implement this navigation from team profile to player profile
                         //Navigate using lambda that routes profile screen
-                        //navigateToProfile(playerName) // Navigate to that player's profile
+                        navigateToPlayerProfile(playerName) // Navigate to that player's profile
                     })
         }
     }

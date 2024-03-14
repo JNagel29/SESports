@@ -82,14 +82,20 @@ fun AppNavigation() {
             composable(route = "${Screens.ProfileScreen.route}/{playerName}") { backStackEntry ->
                 val playerName = backStackEntry.arguments?.getString("playerName") ?: ""
                 ProfileScreen(playerName) {
+                    //Used for back button
                     navController.popBackStack()
                 }
             }
             composable(route = "${Screens.TeamProfileScreen.route}/{teamName}") { backStackEntry ->
                 val teamName = backStackEntry.arguments?.getString("teamName") ?: ""
-                TeamProfileScreen(teamName) {
-                    navController.popBackStack()
-                }
+                TeamProfileScreen(teamName = teamName,
+                    //Used for back button
+                    navigateBack = { navController.popBackStack()},
+                    //When user clicks on a current player of a team, we'll use this to switch over
+                    navigateToPlayerProfile = { playerName ->
+                        navController.navigate("${Screens.ProfileScreen.route}/$playerName") }
+                )
+
             }
         }
 
