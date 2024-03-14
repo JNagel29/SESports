@@ -284,25 +284,3 @@ fun ReturnToSearchHeader(navigateBack: () -> Unit) {
         }
     }
 }
-
-@Composable
-fun LazyTableTest() {
-    //Now, we create our lazy table
-    val columns = 10
-    val rows = 10
-    LazyTable(
-        dimensions = lazyTableDimensions(48.dp, 32.dp)
-    ) {
-        items(
-            count = columns * rows,
-            layoutInfo = {
-                LazyTableItem(
-                    column = it % columns,
-                    row = it / columns,
-                )
-            }
-        ) { index ->
-            Text(text = "#$index")
-        }
-    }
-}
