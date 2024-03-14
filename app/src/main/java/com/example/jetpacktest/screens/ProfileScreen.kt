@@ -43,10 +43,6 @@ import com.example.jetpacktest.DatabaseHandler
 import com.example.jetpacktest.R
 import com.example.jetpacktest.HeadshotHandler
 import com.example.jetpacktest.models.Player
-//Lazy Table
-import eu.wewox.lazytable.LazyTable
-import eu.wewox.lazytable.LazyTableItem
-import eu.wewox.lazytable.lazyTableDimensions
 
 @Composable
 fun ProfileScreen(playerName: String, navigateBack: () -> Unit) {
