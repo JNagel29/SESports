@@ -149,7 +149,9 @@ fun RadioButtonsDisplay(selectedSearchType: String,
             selected = selectedSearchType == "Player",
             //Set var to Player on click
             //We use the lambda that sets the searchTypeSelected from the caller function, to Team
-            onClick = { onSearchTypeSelected("Player")},
+            //TODO: add searchText = "" here to reset search bar, wasn't working
+            onClick = { onSearchTypeSelected("Player")
+                       },
             colors = RadioButtonDefaults.colors(Color.Blue)
         )
         Text(text = "Player")
@@ -173,13 +175,17 @@ fun SearchResultsDisplay(searchResults: List<String>, navigateToProfile: (String
     LazyColumn(modifier = Modifier.fillMaxSize()) {
         //items is function that loops through our list of results and displays it
         items(searchResults) { itemName ->
-            Text(text = itemName,
+            Box( // We use Box wrapping text to make it so entire row is clickable, not just text
                 modifier = Modifier
+                    .fillMaxWidth()
                     .padding(vertical = 8.dp)
                     .clickable {
                         //Navigate using lambda that routes profile screen
                         navigateToProfile(itemName) // Pass in item (aka player/team name)
-                    })
+                    }
+            ) {
+                Text(text = itemName)
+            }
         }
     }
 }
@@ -201,7 +207,7 @@ fun handlePlayerSearch(searchedPlayerName: String, context: Context, onSearchRes
                     response.getJSONArray("results") // Grabs each player from each szn as array
                 var playerInstance: JSONObject
                 var playerName: String
-                //Loops through array and grabs each JSONobject and checks its name
+                //Loops through array and grabs each JSONObject and checks its name
                 for (i in 0 until arrPlayers.length()) {
                     playerInstance = arrPlayers.getJSONObject(i)
                     playerName = playerInstance.getString("player_name")

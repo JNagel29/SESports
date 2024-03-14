@@ -64,7 +64,7 @@ fun TeamProfileScreen(teamName: String, navigateBack: () -> Unit) {
             fontSize = 22.sp,
             fontFamily = FontFamily.Serif,
             textAlign = TextAlign.Center)
-        //TODO: Finish implementing this in NbaTeam.kt
+        //We get the logo from NbaTeam.logos map (String to resource id)
         //The "?:" means if we get null, then just use default, else use left side
         val teamLogo = NbaTeam.logos[teamName] ?: R.drawable.fallback
         Image(
@@ -96,6 +96,7 @@ fun CurrentPlayerList(teamPlayersList: List<String>) {
                 modifier = Modifier
                     .padding(vertical = 8.dp)
                     .clickable {
+                        //TODO: implement this navigation from team profile to player profile
                         //Navigate using lambda that routes profile screen
                         //navigateToProfile(playerName) // Navigate to that player's profile
                     })

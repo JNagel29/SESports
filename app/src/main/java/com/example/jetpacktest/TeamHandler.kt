@@ -9,7 +9,7 @@ import org.json.JSONException
 
 class TeamHandler {
     //API Key and prefix of URL (we will append the team abbreviation, and key in fetchTeamPlayers)
-    private val apiKey = "010c01189ccd41809218da51a0850ac8"
+    private val apiKey = Keys.SportsDataAPIKey
     private val teamPlayersUrlPrefix = "https://api.sportsdata.io/v3/nba/scores/json/PlayersBasic/"
     private var playerNames = mutableListOf<String>()
     fun fetchTeamPlayers(teamAbbrev: String, context: Context, onResult: (MutableList<String>) -> Unit) {

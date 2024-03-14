@@ -78,6 +78,8 @@ dependencies {
     implementation("io.coil-kt:coil-compose:2.6.0")
     //For displaying table for profiles (lazy table on git)
     implementation("io.github.oleksandrbalan:lazytable:1.8.0")
+    //For extra icons
+    implementation("androidx.compose.material:material-icons-extended:1.6.3")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")

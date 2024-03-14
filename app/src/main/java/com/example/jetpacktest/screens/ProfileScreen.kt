@@ -104,7 +104,6 @@ fun ProfileScreen(playerName: String, navigateBack: () -> Unit) {
             //Now, we display the name and headshot, need to pass in name, url, and headshotHandler
             NameAndHeadshot(
                 playerName = playerName,
-                //imgUrl = "https://cdn.nba.com/headshots/nba/latest/1040x760/1628366.png"
                 imgUrl = imgUrl,
                 headshotHandler
             )
@@ -130,7 +129,7 @@ fun ProfileScreen(playerName: String, navigateBack: () -> Unit) {
                     modifier = Modifier
                         .width(80.dp) // Limit width
                         .height(250.dp), // Limit height so user can scroll when many years
-                offset = DpOffset(300.dp, 0.dp) // Move items 300dp to the right
+                    offset = DpOffset(300.dp, 0.dp) // Move items 300dp to the right
                 ) {
                     //For each year in the dynamic list we made, create a dropdown menu item
                     yearsList.forEach { year ->
@@ -140,13 +139,19 @@ fun ProfileScreen(playerName: String, navigateBack: () -> Unit) {
                                 //Update year, close menu and fetch new data on click
                                 chosenYear = year
                                 expandedYear = false
-                                //TODO: uncomment and add else for bdl api
-                                //if (chosenYear != "2024") {
+                                if (chosenYear != "2024") {
                                     databaseHandler.executePlayerData(playerName, chosenYear) { data ->
                                         playerObj = data
                                         showPlayerData = true // Show the player data table
                                     }
-                               // }
+                                }
+                                else {
+                                    //TODO: change this to diff function that uses api, apiHandler
+                                    databaseHandler.executePlayerData(playerName, chosenYear) { data ->
+                                        playerObj = data
+                                        showPlayerData = true // Show the player data table
+                                    }
+                                }
                             }
                         )
                     }

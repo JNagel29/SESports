@@ -10,12 +10,12 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun GameScreen() {
+fun StandingsScreen() {
     Box(modifier = Modifier
         .fillMaxSize(),
         contentAlignment = Alignment.Center)
     {
-        Text(text = "Game Screen",
+        Text(text = "Standings Screen",
             fontFamily = FontFamily.Serif,
             fontSize = 22.sp)
     }

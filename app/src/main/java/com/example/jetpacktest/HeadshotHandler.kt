@@ -22,9 +22,9 @@ import java.text.Normalizer
 class HeadshotHandler {
     private val useBiggerImage: Boolean = true
     private var imageUrlPrefix: String? = null
-    private val apiKey = "010c01189ccd41809218da51a0850ac8"
+    private val apiKey = Keys.SportsDataAPIKey
     private val activePlayersUrl =
-        "https://api.sportsdata.io/v3/nba/scores/json/PlayersActiveBasic?key=" + apiKey
+        "https://api.sportsdata.io/v3/nba/scores/json/PlayersActiveBasic?key=$apiKey"
     private var matchingPlayerId = -1 // -1 means no match found and to not bother calling next request
     private var nbaDotComPlayerId = -1
     object Const { // We use object since only way to make var constant

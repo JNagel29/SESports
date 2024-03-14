@@ -20,8 +20,8 @@ class DatabaseHandler {
     private val executor: Executor = Executors.newSingleThreadExecutor()
     //Variables and info to connect to DB
     private val url = "jdbc:mysql://nikoarak.cikeys.com:3306/nikoarak_SESports"
-    private val user = "nikoarak_420db"
-    private val password = "Kozon1008$"
+    private val user = Keys.DBUser
+    private val password = Keys.DBPass
 
     //This function will run the getStatLeaders fun in its own thread, using executor
     fun executeStatLeaders(chosenStat: String, year: String,

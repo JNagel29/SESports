@@ -15,10 +15,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.jetpacktest.screens.GameScreen
 import com.example.jetpacktest.screens.HomeScreen
 import com.example.jetpacktest.screens.ProfileScreen
 import com.example.jetpacktest.screens.SearchScreen
+import com.example.jetpacktest.screens.StandingsScreen
+import com.example.jetpacktest.screens.CompareScreen
+
 import com.example.jetpacktest.screens.TeamProfileScreen
 
 @Composable
@@ -70,10 +72,13 @@ fun AppNavigation() {
             composable(route=Screens.SearchScreen.name) {
                 SearchScreen(navController = navController)
             }
-            composable(route=Screens.GameScreen.name) {
-                GameScreen()
+            composable(route=Screens.CompareScreen.name) {
+                CompareScreen()
             }
-            //Profile screens for player/team (we pass in player/team name as arg in route)
+            composable(route=Screens.StandingsScreen.name) {
+                StandingsScreen()
+            }
+            //Profile screens for player/team (we pass in player/team name as arg in route), not on nav bar
             composable(route = "${Screens.ProfileScreen.route}/{playerName}") { backStackEntry ->
                 val playerName = backStackEntry.arguments?.getString("playerName") ?: ""
                 ProfileScreen(playerName) {
@@ -86,7 +91,6 @@ fun AppNavigation() {
                     navController.popBackStack()
                 }
             }
-
         }
 
     }
