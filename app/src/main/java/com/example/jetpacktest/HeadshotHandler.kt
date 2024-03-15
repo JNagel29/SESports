@@ -70,21 +70,13 @@ class HeadshotHandler {
                                 Request.Method.GET, playerDetailUrl, null,
                                 { response2 ->
                                     try {
-                                        //TODO: the isNull check isnt working
-                                        //test it on RaiQuan Gray and see it wont work
-                                        //Grabs NBA's site player ID
-                                        if (response2.isNull("NbaDotComPlayerID")) {
-                                            // Handle the case where the value is null
-                                            onResult("Default")
-                                        } else {
-                                            // Parse the integer value if it's not null
-                                            nbaDotComPlayerId = response2.getInt("NbaDotComPlayerID")
-                                            //Creates our new imgUrl using the NBA ID
-                                            imgUrl = "$imageUrlPrefix$nbaDotComPlayerId.png"
-                                            //Performs lambda callback using our new imgUrl to
-                                            //communicate back to ProfileScreen that we got a url
-                                            onResult(imgUrl)
-                                        }
+                                        //Fetch player ID (might be null, if so set to -1)
+                                        nbaDotComPlayerId = response2.optInt("NbaDotComPlayerID", -1)
+                                        //As long as we didn't get null (-1), set imgUrl, otherwise default
+                                        imgUrl = if (nbaDotComPlayerId != -1) "$imageUrlPrefix$nbaDotComPlayerId.png"
+                                                else "DEFAULT" // Without this, null id's would have no fallback
+                                        //Performs lambda callback to send back new imgUrl
+                                        onResult(imgUrl)
                                     } catch (e: JSONException) {
                                         e.printStackTrace()
                                     }
@@ -97,7 +89,7 @@ class HeadshotHandler {
                     }
                     // If id still equals -1, then no match so we set to DEFAULT and callback
                     if (matchingPlayerId == -1) {
-                        onResult("Default")
+                        onResult("DEFAULT")
                     }
                 } catch (e: JSONException) {
                     e.printStackTrace() // Prints error in logcat

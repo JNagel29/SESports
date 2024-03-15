@@ -5,7 +5,7 @@ data class Player(
     val name: String,
     val year: Int,
     val position: String,
-    val team: String,
+    var team: String, // var b/c we need to append to it
     val points: Float,
     val assists: Float,
     val steals: Float,

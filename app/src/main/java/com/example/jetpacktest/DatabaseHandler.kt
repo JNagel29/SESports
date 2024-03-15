@@ -49,7 +49,43 @@ class DatabaseHandler {
             // After getting data of player, callback to calling function to send back the data
             onDataReceived(playerObj)
         }
+    }
 
+    //Same as last function, but for grabbing entire pieces of data for players for profile
+    fun executePlayerSearchResults(searchResultName: String,
+                             onDataReceived: (MutableList<String>) -> Unit) {
+        executor.execute {
+            val playerResultsList = getPlayerSearchResults(searchResultName)
+            // After getting list of results, callback to calling function to send back the data
+            onDataReceived(playerResultsList)
+        }
+    }
+
+    private fun getPlayerSearchResults(searchResultName: String): MutableList<String> {
+        val playerResultsList = mutableListOf<String>()
+        val myConn: Connection
+        //We remove accents since searching DB requires none
+        val searchResultsNameNoAccents = removeAccents(searchResultName)
+        try {
+            Class.forName("com.mysql.jdbc.Driver")
+            myConn = DriverManager.getConnection(url, user, password)
+            val statement = myConn.createStatement()
+            //Use SQL "Like" to find similar names
+            //ORDER makes sure to put more recent players at the top
+            val sql = "SELECT DISTINCT Player FROM PLAYER p1 WHERE Player LIKE \"%$searchResultsNameNoAccents%\" " +
+                    "ORDER BY (SELECT MAX(Year) FROM PLAYER p2 WHERE p2.Player = p1.Player) DESC"
+            val resultSet = statement.executeQuery(sql)
+            while (resultSet.next()) {
+                val playerName = resultSet.getString("Player")
+                playerResultsList.add(playerName) // Add to list of results
+            }
+        } catch (e: SQLException) {
+            Log.d(Const.TAG, e.message!!)
+            e.printStackTrace()
+        } catch (e: ClassNotFoundException) {
+            e.printStackTrace()
+        }
+        return playerResultsList
     }
 
     //This function uses DB to store all data in a player object and returns
@@ -62,7 +98,8 @@ class DatabaseHandler {
             Class.forName("com.mysql.jdbc.Driver")
             myConn = DriverManager.getConnection(url, user, password)
             val statement = myConn.createStatement()
-            val sql = "SELECT* FROM PLAYER WHERE Player = '$playerNameNoAccents' AND Year = $year"
+            //NOTE: Needed to wrap in double, not single quotes, since some players have ' in name
+            val sql = "SELECT* FROM PLAYER WHERE Player = \"$playerNameNoAccents\" AND Year = $year"
             val resultSet = statement.executeQuery(sql)
             //First thing to do, is check if player was on multiple teams
             var rowCount = 0
@@ -74,12 +111,37 @@ class DatabaseHandler {
             //If rowCount is greater than 1, that means that there is a record with
             //team "TOT" (total) that we will grab stats from, and we'll also use other rows
             //to append to team so profile shows all teams they were on that year!
-            //TODO: Running into trouble here cause we can't alter data class val
             if (rowCount > 1) {
                 var appendedTeam = ""
                 while (resultSet.next()) {
                     if (resultSet.getString("Team") == "TOT") {
-                        //Get numerical data from total row
+                        //Get numerical data from row (everything except team)
+                        player = Player(
+                            name = resultSet.getString("Player"),
+                            year = resultSet.getInt("Year"),
+                            position = resultSet.getString("Position"),
+                            team = "",
+                            points = resultSet.getFloat("PTS"),
+                            assists = resultSet.getFloat("AST"),
+                            steals = resultSet.getFloat("STL"),
+                            blocks = resultSet.getFloat("BLK"),
+                            totalRebounds = resultSet.getFloat("TRB"),
+                            turnovers = resultSet.getFloat("TOV"),
+                            personalFouls = resultSet.getFloat("PF"),
+                            minutesPlayed = resultSet.getFloat("MP"),
+                            fieldGoals = resultSet.getFloat("FG"),
+                            fieldGoalAttempts = resultSet.getFloat("FGA"),
+                            fieldGoalPercent = resultSet.getFloat("FG_PERCENT"),
+                            threePointers = resultSet.getFloat("3P"),
+                            threePointerAttempts = resultSet.getFloat("3PA"),
+                            threePointPercent = resultSet.getFloat("3P_PERCENT"),
+                            twoPointers = resultSet.getFloat("2P"),
+                            twoPointerAttempts = resultSet.getFloat("2PA"),
+                            twoPointPercent = resultSet.getFloat("2P_PERCENT"),
+                            effectiveFieldGoalPercent = resultSet.getFloat("eFG_PERCENT"),
+                            offensiveRebounds = resultSet.getFloat("ORB"),
+                            defensiveRebounds = resultSet.getFloat("DRB")
+                        )
                     }
                     else {
                         //From the other rows, just grab the team name and append
@@ -87,7 +149,8 @@ class DatabaseHandler {
                     }
                 }
                 //Now, we've set all fields except team name, so do that now
-                //player.team = appendTeam
+                //We needed to change team to var for this
+                player.team = appendedTeam.dropLast(1) // Drop trailing slash
             }
             //Otherwise, we only have one record and can just grab all our data
             else {
@@ -175,7 +238,9 @@ class DatabaseHandler {
             myConn = DriverManager.getConnection(url, user, password)
             val statement = myConn.createStatement()
             //This SQL selects a single column of years for that player
-            val sql = "SELECT Year FROM PLAYER WHERE Player = '$playerNameNoAccents' ORDER BY Year DESC"
+            //NOTE: We needed to wrap in double, not single quotes, since some players have ' in name
+            //We use distinct since players who switched teams have multiple entries for same year
+            val sql = "SELECT DISTINCT Year FROM PLAYER WHERE Player = \"$playerNameNoAccents\" ORDER BY Year DESC"
             val resultSet = statement.executeQuery(sql)
             while (resultSet.next()) {
                 val year = resultSet.getInt("Year").toString()

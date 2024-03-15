@@ -101,7 +101,7 @@ fun ProfileScreen(playerName: String, navigateBack: () -> Unit) {
                 imgUrl = imgUrl,
                 headshotHandler
             )
-            //Now, our dropdown menu TODO: Might wanna separate this into own composable
+            //Now, our dropdown menu
             //Creates the button to expand dropdown menu for stats
             OutlinedButton(
                 onClick = { expandedYear = !expandedYear },

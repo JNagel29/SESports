@@ -39,7 +39,11 @@ class TeamHandler {
             //Then, retrieve the firstName/lastName fields and append for full name
             val firstName = playerObject.getString("FirstName")
             val lastName = playerObject.getString("LastName")
-            val fullName = "$firstName $lastName"
+            val jerseyNum = playerObject.optInt("Jersey", -1)
+            val position = playerObject.getString("Position")
+            // Check if jerseyNum was -1 aka null, if so, replace it with "N/A"
+            val jerseyText = if (jerseyNum == -1) "N/A" else "#$jerseyNum"
+            val fullName = "$firstName $lastName - $jerseyText - $position"
             //Add fullName list of playerNames for that team
             playerNames.add(fullName)
         }

@@ -106,9 +106,10 @@ fun CurrentPlayerList(teamPlayersList: List<String>,
                 modifier = Modifier
                     .padding(vertical = 8.dp)
                     .clickable {
-                        //TODO: implement this navigation from team profile to player profile
                         //Navigate using lambda that routes profile screen
-                        navigateToPlayerProfile(playerName) // Navigate to that player's profile
+                        //Our playerName text includes jersey num and position with dashes, so trim
+                        val trimmedPlayerName = playerName.substringBefore(" - ").trim()
+                        navigateToPlayerProfile(trimmedPlayerName) // Navigate to that player's profile
                     })
         }
     }
