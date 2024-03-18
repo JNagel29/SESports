@@ -23,7 +23,6 @@ import com.example.jetpacktest.screens.SearchScreen
 import com.example.jetpacktest.screens.StandingsScreen
 import com.example.jetpacktest.screens.CompareScreen
 import com.example.jetpacktest.screens.GamesScreen
-import com.example.jetpacktest.screens.GamesViewModel
 
 import com.example.jetpacktest.screens.TeamProfileScreen
 
