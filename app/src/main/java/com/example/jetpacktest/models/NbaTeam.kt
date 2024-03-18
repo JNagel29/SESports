@@ -106,7 +106,6 @@ object NbaTeam { // We use object so it's a singleton that we don't have to inst
         "Minnesota Timberwolves" to R.drawable.wolves,
         "New Orleans Pelicans" to R.drawable.pelicans,
         "New York Knicks" to R.drawable.knicks,
-
         "Oklahoma City Thunder" to R.drawable.thunder,
         "Orlando Magic" to R.drawable.magic,
         "Philadelphia Sixers" to R.drawable.sixers,
@@ -117,8 +116,6 @@ object NbaTeam { // We use object so it's a singleton that we don't have to inst
         "Toronto Raptors" to R.drawable.raptors,
         "Utah Jazz" to R.drawable.jazz,
         "Washington Wizards" to R.drawable.wizards
-
-
     )
 
 }

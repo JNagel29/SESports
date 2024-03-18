@@ -28,6 +28,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -41,7 +42,7 @@ import com.example.jetpacktest.ui.theme.JetpackTestTheme
 @Composable
 fun HomeScreen(navigateToPlayerProfile: (String) -> Unit) {
     //'Remember' keyword means, whenever this var changes, recompose our Home Screen
-    val databaseHandler = remember { DatabaseHandler() }
+    val databaseHandler = DatabaseHandler()
     var topPlayerList by remember { mutableStateOf<List<TopPlayer>>(emptyList()) } // Default to empty list
     var chosenStat by remember { mutableStateOf("PTS") } //Default to pts
     var chosenYear by remember { mutableStateOf("2024") } //Default to 2024
@@ -71,99 +72,165 @@ fun HomeScreen(navigateToPlayerProfile: (String) -> Unit) {
         modifier = Modifier.fillMaxWidth()
                             .padding(20.dp)
     ) {
-        //Create header text
-        Text(
-            "Stat Leaders",
-            fontSize = 25.sp,
-            fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center
-        )
+        //Call header composable
+        Header()
         //Spacer between header and menu
         Spacer(modifier = Modifier.height(8.dp))
-        //Creates the button to expand dropdown menu for stats
-        OutlinedButton(
-            onClick = { expandedStat = !expandedStat },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            //Put text and up/down arrow in same row inside button
-            Text("Select Stat: $chosenStat")
-            Icon(
-                iconStat,
-                "Stat Select",
-                Modifier.align(Alignment.CenterVertically)
-            )
-        }
-        //We create a box to enclose the menu AND all the items
-        Box {
-            DropdownMenu(
-                expanded = expandedStat,
-                onDismissRequest = { expandedStat = false },
-                modifier = Modifier
-                    .width(80.dp), // Limit width
-                offset = DpOffset(300.dp, 0.dp) // Move items 300dp to the right
-            ) {
-                //For each stat in the list, create a dropdown menu item
-                statOptions.forEach { stat ->
-                    DropdownMenuItem(
-                        text = { Text(text = stat) },
-                        onClick = {
-                            //Update stat, close menu and fetch new data on click
-                            chosenStat = stat
-                            expandedStat = false
-                            databaseHandler.executeStatLeaders(chosenStat, chosenYear) { data ->
-                                topPlayerList = data
-                            }
-                        }
-                    )
-                }
+        //Set up stat dropdown (need to pass in lambdas to change variables
+        StatDropdown(
+            chosenStat = chosenStat,
+            chosenYear = chosenYear,
+            iconStat = iconStat,
+            expandedStat = expandedStat,
+            statOptions = statOptions,
+            databaseHandler = databaseHandler,
+            onToggleExpandStat = { expandedStat = !expandedStat },
+            onCloseStatMenu = { expandedStat = false },
+            onChosenStatUpdate = {stat ->
+              chosenStat = stat
+            },
+            onTopPlayerListUpdate = { updatedList ->
+                topPlayerList = updatedList
             }
-        }
-
-        //Creates the button to expand dropdown menu for years
-        OutlinedButton(
-            onClick = { expandedYear = !expandedYear },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            //Put text and up/down arrow in same row inside button
-            Text("Select Year: $chosenYear")
-            Icon(
-                iconYear,
-                "contentDescription",
-                Modifier.align(Alignment.CenterVertically)
-            )
-        }
-
-        //We create a box to enclose the menu AND all the items
-        Box {
-            DropdownMenu(
-                expanded = expandedYear,
-                onDismissRequest = { expandedYear = false },
-                modifier = Modifier
-                    .width(80.dp) //Limit width
-                    .height(250.dp), // Limit height so user can scroll
-                offset = DpOffset(300.dp, 0.dp) // Move menu items 300 dp to right
-            ) {
-                //For each year in the list, create a dropdown menu item
-                yearOptions.forEach { year ->
-                    DropdownMenuItem(
-                        text = { Text(text = year) },
-                        onClick = {
-                            //Update year, close menu and fetch new data on click
-                            chosenYear = year
-                            expandedYear = false
-                            databaseHandler.executeStatLeaders(chosenStat, chosenYear) { data ->
-                                topPlayerList = data
-                            }
-                        }
-                    )
-                }
+        )
+        //Now, we similarly set up year dropdown
+        YearDropdown(
+            chosenStat = chosenStat,
+            chosenYear = chosenYear,
+            iconYear = iconYear,
+            expandedYear = expandedYear,
+            yearOptions = yearOptions,
+            databaseHandler = databaseHandler,
+            onToggleExpandYear = { expandedYear = !expandedYear },
+            onCloseYearMenu = { expandedYear = false },
+            onChosenYearUpdate = {year ->
+                chosenYear = year
+            },
+            onTopPlayerListUpdate = { updatedList ->
+                topPlayerList = updatedList
             }
-        }
+        )
         //Finally, we can display all our data in a lazy column, (we pass in lambda to go to player)
         TopPlayerDisplay(topPlayerList, chosenStat, navigateToPlayerProfile)
     }
 }
 
+@Composable
+fun Header() {
+    Text(
+        "Stat Leaders",
+        fontSize = 25.sp,
+        fontWeight = FontWeight.Bold,
+        textAlign = TextAlign.Center
+    )
+}
+
+@Composable
+fun StatDropdown(
+    chosenStat: String,
+    chosenYear: String,
+    iconStat: ImageVector,
+    expandedStat: Boolean,
+    databaseHandler: DatabaseHandler,
+    statOptions: List<String>,
+    onToggleExpandStat: () -> Unit,
+    onCloseStatMenu: () -> Unit,
+    onChosenStatUpdate: (String) -> Unit,
+    onTopPlayerListUpdate: (List<TopPlayer>) -> Unit
+) {
+    //Creates the button to expand dropdown menu for stats
+    OutlinedButton(
+        onClick = { onToggleExpandStat() },
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        //Put text and up/down arrow in same row inside button
+        Text("Select Stat: $chosenStat")
+        Icon(
+            iconStat,
+            "Stat Select",
+            Modifier.align(Alignment.CenterVertically)
+        )
+    }
+    //We create a box to enclose the menu AND all the items
+    Box {
+        DropdownMenu(
+            expanded = expandedStat,
+            onDismissRequest = { onCloseStatMenu() },
+            modifier = Modifier
+                .width(80.dp), // Limit width
+            offset = DpOffset(300.dp, 0.dp) // Move items 300dp to the right
+        ) {
+            //For each stat in the list, create a dropdown menu item
+            statOptions.forEach { stat ->
+                DropdownMenuItem(
+                    text = { Text(text = stat) },
+                    onClick = {
+                        //Update stat, close menu and fetch new data on click
+                        onChosenStatUpdate(stat)
+                        onCloseStatMenu()
+                        databaseHandler.executeStatLeaders(chosenStat, chosenYear) { data ->
+                            onTopPlayerListUpdate(data)
+                        }
+                    }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun YearDropdown(
+    chosenStat: String,
+    chosenYear: String,
+    iconYear: ImageVector,
+    expandedYear: Boolean,
+    databaseHandler: DatabaseHandler,
+    yearOptions: List<String>,
+    onToggleExpandYear: () -> Unit,
+    onCloseYearMenu: () -> Unit,
+    onChosenYearUpdate: (String) -> Unit,
+    onTopPlayerListUpdate: (List<TopPlayer>) -> Unit
+) {
+    //Creates the button to expand dropdown menu for years
+    OutlinedButton(
+        onClick = { onToggleExpandYear() },
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        //Put text and up/down arrow in same row inside button
+        Text("Select Year: $chosenYear")
+        Icon(
+            iconYear,
+            "contentDescription",
+            Modifier.align(Alignment.CenterVertically)
+        )
+    }
+    //We create a box to enclose the menu AND all the items
+    Box {
+        DropdownMenu(
+            expanded = expandedYear,
+            onDismissRequest = { onCloseYearMenu() },
+            modifier = Modifier
+                .width(80.dp) //Limit width
+                .height(250.dp), // Limit height so user can scroll
+            offset = DpOffset(300.dp, 0.dp) // Move menu items 300 dp to right
+        ) {
+            //For each year in the list, create a dropdown menu item
+            yearOptions.forEach { year ->
+                DropdownMenuItem(
+                    text = { Text(text = year) },
+                    onClick = {
+                        //Update year, close menu and fetch new data on click
+                        onChosenYearUpdate(year)
+                        onCloseYearMenu()
+                        databaseHandler.executeStatLeaders(chosenStat, chosenYear) { data ->
+                            onTopPlayerListUpdate(data)
+                        }
+                    }
+                )
+            }
+        }
+    }
+}
 
 @Composable
 fun TopPlayerDisplay(topPlayerList: List<TopPlayer>, chosenStat: String,

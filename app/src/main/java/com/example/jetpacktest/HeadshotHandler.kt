@@ -29,7 +29,7 @@ class HeadshotHandler {
     private var nbaDotComPlayerId = -1
     object Const { // We use object since only way to make var constant
         //Const tag for logging
-        const val TAG = "ProfileActivity"
+        const val TAG = "Headshot Handler"
     }
     //Used in fetchPlayerId/fetchImageUrl to get active players and their ID
     private var imgUrl = "DEFAULT"

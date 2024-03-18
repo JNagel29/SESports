@@ -1,7 +1,7 @@
 package com.example.jetpacktest.models
 
+//Data Class to hold data fetched from DB/API
 data class Player(
-    //Data for players fetched from DB
     val name: String,
     val year: Int,
     val position: String,

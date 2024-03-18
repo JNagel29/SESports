@@ -10,6 +10,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
@@ -21,29 +22,31 @@ import com.example.jetpacktest.screens.ProfileScreen
 import com.example.jetpacktest.screens.SearchScreen
 import com.example.jetpacktest.screens.StandingsScreen
 import com.example.jetpacktest.screens.CompareScreen
+import com.example.jetpacktest.screens.GamesScreen
+import com.example.jetpacktest.screens.GamesViewModel
 
 import com.example.jetpacktest.screens.TeamProfileScreen
 
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
-
     Scaffold(
         bottomBar = {
             NavigationBar {
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentDestination = navBackStackEntry?.destination
-
+                //Loop through each nav item and set it up as a navigation bar item
                 listOfNavItems.forEach { navItem ->
                     NavigationBarItem(
                         //We know it's selected if current route matches item route
-                        selected = currentDestination?.hierarchy?.any { it.route == navItem.route } == true,
+                        selected = currentDestination?.hierarchy?.any
+                        { it.route == navItem.route } == true,
                         onClick = {
                                   navController.navigate(navItem.route) {
                                       popUpTo(navController.graph.findStartDestination().id) {
                                           saveState = true
                                       }
-                                      //Prevents creating multiple instances of same screen when spamming
+                                      //Prevents creating multiple instances of same screen
                                       launchSingleTop = true
                                       //Restores state when re-selecting a previously selected item
                                       restoreState = true
@@ -94,15 +97,20 @@ fun AppNavigation() {
             composable(route=Screens.StandingsScreen.name) {
                 StandingsScreen()
             }
+            composable(route=Screens.GamesScreen.name) {
+                GamesScreen(gamesViewModel = viewModel())
+            }
             //Profile screens for player/team (we pass in player/team name as arg in route), not on nav bar
-            composable(route = "${Screens.ProfileScreen.route}/{playerName}") { backStackEntry ->
+            composable(route = "${Screens.ProfileScreen.route}/{playerName}")
+            { backStackEntry ->
                 val playerName = backStackEntry.arguments?.getString("playerName") ?: ""
                 ProfileScreen(playerName) {
                     //Used for back button
                     navController.popBackStack()
                 }
             }
-            composable(route = "${Screens.TeamProfileScreen.route}/{teamName}") { backStackEntry ->
+            composable(route = "${Screens.TeamProfileScreen.route}/{teamName}")
+            { backStackEntry ->
                 val teamName = backStackEntry.arguments?.getString("teamName") ?: ""
                 TeamProfileScreen(teamName = teamName,
                     //Used for back button
@@ -111,7 +119,6 @@ fun AppNavigation() {
                     navigateToPlayerProfile = { playerName ->
                         navController.navigate("${Screens.ProfileScreen.route}/$playerName") }
                 )
-
             }
         }
 
