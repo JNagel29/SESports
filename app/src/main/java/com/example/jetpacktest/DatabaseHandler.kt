@@ -15,7 +15,7 @@ class DatabaseHandler {
         //Tag for logging
         const val TAG = "Stat Leaders Activity"
         //Constant to hold how many players to grab (top 10, top 20, etc.)
-        const val MAX_PLAYERS = 30
+        const val MAX_PLAYERS = 10
     }
     //Executor for the database requesting (used to run in background as its own thread)
     private val executor: Executor = Executors.newSingleThreadExecutor()

@@ -30,14 +30,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.jetpacktest.DatabaseHandler
 import com.example.jetpacktest.models.NbaTeam
 import com.example.jetpacktest.navigation.Screens
 
 @Composable
-fun SearchScreen(navController: NavController) {
+fun SearchScreen(navigateToPlayerProfile: (String) -> Unit,
+                 navigateToTeamProfile: (String) -> Unit) {
     //For holding search text and for clearing focus
     var searchText by remember { mutableStateOf("") }
     val focusManager = LocalFocusManager.current
@@ -126,11 +126,9 @@ fun SearchScreen(navController: NavController) {
             Spacer(modifier = Modifier.height(16.dp))
             //Finally, we can display Search results via lazy column
             SearchResultsDisplay(searchResults = searchResults) {nameArg ->
-                //We have to pass in the lambda that navigates to the new screen using navController
-                if (selectedSearchType == "Player")
-                    navController.navigate("${Screens.ProfileScreen.route}/$nameArg")
-                else if (selectedSearchType == "Team")
-                    navController.navigate("${Screens.TeamProfileScreen.route}/$nameArg")
+                //We pass in the lambda that navigates to the new screen
+                if (selectedSearchType == "Player") navigateToPlayerProfile(nameArg)
+                else if (selectedSearchType == "Team") navigateToTeamProfile(nameArg)
             }
         }
     }
@@ -144,41 +142,45 @@ fun RadioButtonsDisplay(selectedSearchType: String, onSearchTypeSelected: (Strin
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.Center, // Puts button in center
         verticalAlignment = Alignment.CenterVertically // Aligns text with buttons
-    ){ // Enclose two radio buttons (with their text) on same row
+    ){
+        //Nested function to handle click events for both radio buttons and text
+        fun handleClick(searchType: String) {
+            if (selectedSearchType != searchType) {
+                onSearchTypeSelected(searchType)
+                onSearchTextChange("")
+                onClearSearchResults()
+            }
+        }
         //First our player button
         RadioButton(
             //If var equals Player, then we know it's selected and so it gets a check on it
             selected = selectedSearchType == "Player",
             //Set var to Player on click
             //We use the lambda that sets the searchTypeSelected from the caller function, to Team
-            onClick = {
-                if (selectedSearchType != "Player") { // Only if button isn't already clicked
-                    onSearchTypeSelected("Player")
-                    onSearchTextChange("") // Reset text to nothing on click w/ lambda
-                    onClearSearchResults() // Clear list of results on switch
-                }
-            },
+            onClick = { handleClick("Player")},
             colors = RadioButtonDefaults.colors(Color.Blue)
         )
-        Text(text = "Player")
+        Text(
+            text = "Player",
+            modifier = Modifier.clickable { handleClick("Player") }
+        )
         //Then, team button
         RadioButton(
             //If var equals Team, then we know it's selected and so it gets a check on it
             selected = selectedSearchType == "Team",
             //Set var to Team on click
             //We use the lambda that sets the searchTypeSelected from the caller function, to Team
-            onClick = {
-                if (selectedSearchType != "Team") { // Only if button isn't already clicked
-                    onSearchTypeSelected("Team")
-                    onSearchTextChange("") // Reset text to nothing on click w/ lambda
-                    onClearSearchResults() // Clear list of results on switch
-                }
+            onClick = {handleClick("Team")
             },
             colors = RadioButtonDefaults.colors(Color.Blue)
         )
-        Text(text = "Team")
+        Text(
+            text = "Team",
+            modifier = Modifier.clickable { handleClick("Team") }
+        )
     }
 }
+
 
 //This function actually displays our results
 @Composable
@@ -220,5 +222,14 @@ fun handleTeamSearch(searchedTeamName: String, onSearchResult: (List<String>) ->
 fun SearchScreenPreview() {
     //Dummy navController for previewing
     val navController = rememberNavController()
-    SearchScreen(navController = navController)
+    SearchScreen(
+        //Pass in a lambda that'll let us go to a player's profile on click
+        navigateToPlayerProfile = { playerName ->
+            navController.navigate("${Screens.ProfileScreen.route}/$playerName")
+        },
+        //Pass in lambda that'll let us go to a team's profile on click
+        navigateToTeamProfile = { teamName ->
+            navController.navigate("${Screens.TeamProfileScreen.route}/$teamName")
+        }
+    )
 }

@@ -1,7 +1,11 @@
 package com.example.jetpacktest.screens
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -25,6 +29,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
@@ -33,7 +39,7 @@ import com.example.jetpacktest.DatabaseHandler
 import com.example.jetpacktest.models.TopPlayer
 import com.example.jetpacktest.ui.theme.JetpackTestTheme
 @Composable
-fun HomeScreen() {
+fun HomeScreen(navigateToPlayerProfile: (String) -> Unit) {
     //'Remember' keyword means, whenever this var changes, recompose our Home Screen
     val databaseHandler = remember { DatabaseHandler() }
     var topPlayerList by remember { mutableStateOf<List<TopPlayer>>(emptyList()) } // Default to empty list
@@ -60,7 +66,20 @@ fun HomeScreen() {
     }
 
     //Put everything in a column
-    Column(Modifier.padding(20.dp)) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.fillMaxWidth()
+                            .padding(20.dp)
+    ) {
+        //Create header text
+        Text(
+            "Stat Leaders",
+            fontSize = 25.sp,
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Center
+        )
+        //Spacer between header and menu
+        Spacer(modifier = Modifier.height(8.dp))
         //Creates the button to expand dropdown menu for stats
         OutlinedButton(
             onClick = { expandedStat = !expandedStat },
@@ -140,25 +159,47 @@ fun HomeScreen() {
                 }
             }
         }
-        //Finally, we can display all our data in a lazy column
-        TopPlayerDisplay(topPlayerList, chosenStat)
+        //Finally, we can display all our data in a lazy column, (we pass in lambda to go to player)
+        TopPlayerDisplay(topPlayerList, chosenStat, navigateToPlayerProfile)
     }
 }
 
 
 @Composable
-fun TopPlayerDisplay(topPlayerList: List<TopPlayer>, chosenStat: String) {
+fun TopPlayerDisplay(topPlayerList: List<TopPlayer>, chosenStat: String,
+                     navigateToPlayerProfile: (String) -> Unit) {
     LazyColumn(
         modifier = Modifier.padding(top = 16.dp)
     ) {
         //Loop through topPlayerList, and for each player, make a text row with rank/name/stat val
         items(topPlayerList) { player ->
-            Text(
-                text = "${player.rank}: ${player.name}, ${player.stat} $chosenStat",
-                modifier = Modifier.padding(16.dp),
-                fontSize = 16.sp,
-                fontFamily = FontFamily.Serif
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                //Rank and name on the left
+                Text(
+                    text = "${player.rank}: ${player.name}",
+                    fontSize = 20.sp,
+                    fontFamily = FontFamily.Serif,
+                    textAlign = TextAlign.Start,
+                    modifier = Modifier.clickable {
+                        // Navigate to that player's profile
+                        navigateToPlayerProfile(player.name)
+                    }
+
+                )
+                //Stat value on the right
+                Text(
+                    text = "${player.stat} $chosenStat",
+                    fontSize = 20.sp,
+                    fontFamily = FontFamily.Serif,
+                    textAlign = TextAlign.End
+                )
+            }
+            //Spacer between each row for readability
+            Spacer(modifier = Modifier.height(40.dp))
         }
     }
 }
@@ -167,6 +208,6 @@ fun TopPlayerDisplay(topPlayerList: List<TopPlayer>, chosenStat: String) {
 @Composable
 fun HomePreview() {
     JetpackTestTheme {
-        HomeScreen()
+        //HomeScreen()
     }
 }

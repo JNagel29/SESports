@@ -65,11 +65,14 @@ fun TeamProfileScreen(teamName: String,
         //Wrap text in box to center it
         Box(modifier = Modifier.fillMaxWidth()) {
             Text(text = teamName,
-                fontSize = 22.sp,
+                fontSize = 26.sp,
                 fontFamily = FontFamily.Serif,
+                fontWeight = FontWeight.ExtraBold,
                 modifier = Modifier.align(Alignment.Center)
             )
         }
+        //Add space between team name and logo
+        Spacer(modifier = Modifier.height(8.dp))
         //We get the logo from NbaTeam.logos map (String to resource id)
         //The "?:" means if we get null, then just use default, else use left side
         val teamLogo = NbaTeam.logos[teamName] ?: R.drawable.fallback
@@ -81,6 +84,8 @@ fun TeamProfileScreen(teamName: String,
                 .height(200.dp)
                 .align(Alignment.CenterHorizontally)
         )
+        //Adds space between image and list
+        Spacer(modifier = Modifier.height(10.dp))
         //Display list of players using composable
         CurrentPlayerList(teamPlayersList, navigateToPlayerProfile)
     }
@@ -93,7 +98,6 @@ fun CurrentPlayerList(teamPlayersList: List<String>,
         Text("Current Players", fontSize = 25.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.align(Alignment.Center)
-
         )
     }
     //Slight amount of vertical space b/w header and list of names
@@ -103,6 +107,7 @@ fun CurrentPlayerList(teamPlayersList: List<String>,
         modifier = Modifier.fillMaxSize()) {
         items(teamPlayersList) { playerName ->
             Text(text = playerName,
+                fontSize = 22.sp,
                 modifier = Modifier
                     .padding(vertical = 8.dp)
                     .clickable {

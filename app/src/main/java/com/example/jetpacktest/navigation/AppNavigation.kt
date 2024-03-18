@@ -1,5 +1,6 @@
 package com.example.jetpacktest.navigation
 
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -64,13 +65,28 @@ fun AppNavigation() {
             startDestination = Screens.HomeScreen.name,
             modifier = Modifier
                 .padding(paddingValues)
+                .fillMaxSize() // Fixes weird transition effect
         ) {
+            //When passing navigation control, we pass lambdas instead of navController itself
             composable(route=Screens.HomeScreen.name) {
-                HomeScreen()
+                HomeScreen(
+                    //Pass in a lambda that'll let us go to a stat leader's profile on click
+                    navigateToPlayerProfile = { playerName ->
+                        navController.navigate("${Screens.ProfileScreen.route}/$playerName")
+                    }
+                )
             }
-            //We pass navController into this one since it'll need it to switch to a profile
             composable(route=Screens.SearchScreen.name) {
-                SearchScreen(navController = navController)
+                SearchScreen(
+                    //Pass in a lambda that'll let us go to a player's profile on click
+                            navigateToPlayerProfile = { playerName ->
+                        navController.navigate("${Screens.ProfileScreen.route}/$playerName")
+                    },
+                    //Pass in lambda that'll let us go to a team's profile on click
+                    navigateToTeamProfile = { teamName ->
+                        navController.navigate("${Screens.TeamProfileScreen.route}/$teamName")
+                    }
+                )
             }
             composable(route=Screens.CompareScreen.name) {
                 CompareScreen()

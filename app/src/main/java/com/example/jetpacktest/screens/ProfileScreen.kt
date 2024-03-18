@@ -213,16 +213,21 @@ fun PlayerDataRow(label: String, value: String) {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center
     ) {
-        //Prints bolded label (Year, Position, etc.)
+        //Prints label aligned to the left
         Text(
             label,
-            fontSize = 18.sp,
+            fontSize = 22.sp,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.width(100.dp)
+            modifier = Modifier.weight(1f)
         )
-        Spacer(modifier = Modifier.width(16.dp))
-        //Prints actual value after the spacer
-        Text(value, fontSize = 18.sp)
+        Spacer(modifier = Modifier.width(8.dp))
+        //Prints actual value aligned to the right
+        Text(
+            value,
+            fontSize = 22.sp,
+            textAlign = TextAlign.End,
+            modifier = Modifier.weight(1f)
+        )
     }
 }
 
@@ -238,9 +243,10 @@ fun NameAndHeadshot(playerName: String, imgUrl: String, headshotHandler: Headsho
         ) {
             Text(
                 text = playerName,
-                fontSize = 22.sp,
+                fontSize = 26.sp,
                 fontFamily = FontFamily.Serif,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
+                fontWeight = FontWeight.ExtraBold
             )
             //Now use our headshot handler to compose the image using that URL
             headshotHandler.ComposeImage(
