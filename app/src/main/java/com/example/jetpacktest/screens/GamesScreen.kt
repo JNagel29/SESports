@@ -2,9 +2,11 @@ package com.example.jetpacktest.screens
 
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -19,6 +21,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
@@ -38,6 +41,17 @@ class GamesViewModel: ViewModel() {
 
 @Composable
 fun GamesScreen(gamesViewModel: GamesViewModel = viewModel()) {
+    //Commenting out actual code for now since it's unfinished feature
+    Box(modifier = Modifier
+        .fillMaxSize(),
+        contentAlignment = Alignment.Center)
+    {
+        Text(text = "Games Screen",
+            fontFamily = FontFamily.Serif,
+            fontSize = 22.sp)
+    }
+
+    /*
     //Instantiate a games handler that we'll use to fetch daily games
     val gamesHandler = GamesHandler()
     //Also, instantiate empty list of games that we'll fetch on launch
@@ -130,4 +144,6 @@ fun GameCard(game: Game) {
             }
         }
     }
+
+     */
 }

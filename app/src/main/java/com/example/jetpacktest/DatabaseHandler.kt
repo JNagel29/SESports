@@ -5,7 +5,9 @@ import com.example.jetpacktest.models.Player
 import com.example.jetpacktest.models.TopPlayer
 import java.sql.Connection
 import java.sql.DriverManager
+import java.sql.ResultSet
 import java.sql.SQLException
+import java.sql.Statement
 import java.text.Normalizer
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
@@ -63,18 +65,20 @@ class DatabaseHandler {
 
     private fun getPlayerSearchResults(searchResultName: String): MutableList<String> {
         val playerResultsList = mutableListOf<String>()
-        val myConn: Connection
+        var myConn: Connection? = null
+        var statement: Statement? = null
+        var resultSet: ResultSet? = null
         //We remove accents since searching DB requires none
         val searchResultsNameNoAccents = removeAccents(searchResultName)
         try {
             Class.forName("com.mysql.jdbc.Driver")
             myConn = DriverManager.getConnection(url, user, password)
-            val statement = myConn.createStatement()
+            statement = myConn.createStatement()
             //Use SQL "Like" to find similar names
             //ORDER makes sure to put more recent players at the top
             val sql = "SELECT DISTINCT Player FROM PLAYER p1 WHERE Player LIKE \"%$searchResultsNameNoAccents%\" " +
                     "ORDER BY (SELECT MAX(Year) FROM PLAYER p2 WHERE p2.Player = p1.Player) DESC"
-            val resultSet = statement.executeQuery(sql)
+            resultSet = statement.executeQuery(sql)
             while (resultSet.next()) {
                 val playerName = resultSet.getString("Player")
                 playerResultsList.add(playerName) // Add to list of results
@@ -84,23 +88,28 @@ class DatabaseHandler {
             e.printStackTrace()
         } catch (e: ClassNotFoundException) {
             e.printStackTrace()
+        } finally {
+            //Close resources
+            closeResources(myConn, resultSet, statement)
         }
         return playerResultsList
     }
 
     //This function uses DB to store all data in a player object and returns
     private fun getPlayerData(playerName: String, year: String): Player {
-        val myConn: Connection
+        var myConn: Connection? = null
+        var statement: Statement? = null
+        var resultSet: ResultSet? = null
         var player = Player() //Instantiate with secondary constructor
         //Remove accents since can't have any when searching DB
         val playerNameNoAccents = removeAccents(playerName)
         try {
             Class.forName("com.mysql.jdbc.Driver")
             myConn = DriverManager.getConnection(url, user, password)
-            val statement = myConn.createStatement()
+            statement = myConn.createStatement()
             //NOTE: Needed to wrap in double, not single quotes, since some players have ' in name
             val sql = "SELECT* FROM PLAYER WHERE Player = \"$playerNameNoAccents\" AND Year = $year"
-            val resultSet = statement.executeQuery(sql)
+            resultSet = statement.executeQuery(sql)
             //First thing to do, is check if player was on multiple teams
             var rowCount = 0
             while (resultSet.next()) {
@@ -189,6 +198,9 @@ class DatabaseHandler {
             e.printStackTrace()
         } catch (e: ClassNotFoundException) {
             e.printStackTrace()
+        } finally {
+            //Close resources
+            closeResources(myConn, resultSet, statement)
         }
         return player
     }
@@ -196,52 +208,66 @@ class DatabaseHandler {
 
     //This function is the one actually connecting to DB and giving us the data for stat leads
     private fun getStatLeaders(chosenStat: String, year: String): MutableList<TopPlayer> {
-        val myConn: Connection
+        var myConn: Connection? = null
+        var statement: Statement? = null
+        var resultSet: ResultSet? = null
         val statData = StringBuilder()
         val topPlayerList = mutableListOf<TopPlayer>()
+        //Used to keep track of added player names to prevent duplicates
+        val addedPlayers = mutableSetOf<String>()
         try {
             Class.forName("com.mysql.jdbc.Driver")
             myConn = DriverManager.getConnection(url, user, password)
-            val statement = myConn.createStatement()
+            statement = myConn.createStatement()
             val sql = "SELECT * FROM PLAYER WHERE YEAR = $year ORDER BY $chosenStat DESC"
-            val resultSet = statement.executeQuery(sql)
+            resultSet = statement.executeQuery(sql)
             var counter = 0 // increment variable to count up
             statData.append("Year: ").append(year).append("\n")
                 .append("\n") // append year to top for reference
             while (resultSet.next()) {
                 val playerName = resultSet.getString("Player")
-                val chosenStatValue = resultSet.getFloat(chosenStat)
-                val topPlayer = TopPlayer(rank = counter+1, name = playerName, stat = chosenStatValue)
-                topPlayerList.add(topPlayer)
-                statData.append("Player Name: ").append(playerName).append(", ").append(chosenStat)
-                    .append(": ").append(chosenStatValue).append("\n")
-                counter++
-                if (counter >= Const.MAX_PLAYERS) break // break out after grabbing top x players
+                //Makes sure player name doesn't already exists in the addedPlayers set
+                if (!addedPlayers.contains(playerName)) {
+                    val chosenStatValue = resultSet.getFloat(chosenStat)
+                    val topPlayer = TopPlayer(rank = counter + 1, name = playerName,
+                                            stat = chosenStatValue)
+                    topPlayerList.add(topPlayer)
+                    addedPlayers.add(playerName) // add player name to the set
+                    statData.append("Player Name: ").append(playerName).append(", ")
+                        .append(chosenStat).append(": ").append(chosenStatValue).append("\n")
+                    counter++
+                    if (counter >= Const.MAX_PLAYERS) break // break out after grabbing top x players
+                }
             }
         } catch (e: SQLException) {
             Log.d(Const.TAG, e.message!!)
             e.printStackTrace()
         } catch (e: ClassNotFoundException) {
             e.printStackTrace()
+        } finally {
+            //Close resources
+            closeResources(myConn, resultSet, statement)
         }
         return topPlayerList
     }
 
     //This function will find us the years for which a player has stats for in our DB
     private fun getPlayerYears(playerName: String): MutableList<String> {
+        var myConn: Connection? = null
+        var statement: Statement? = null
+        var resultSet: ResultSet? = null
         val yearsList = mutableListOf<String>()
-        val myConn: Connection
         //We remove accents since searching DB requires none
         val playerNameNoAccents = removeAccents(playerName)
         try {
             Class.forName("com.mysql.jdbc.Driver")
             myConn = DriverManager.getConnection(url, user, password)
-            val statement = myConn.createStatement()
+            statement = myConn.createStatement()
             //This SQL selects a single column of years for that player
             //NOTE: We needed to wrap in double, not single quotes, since some players have ' in name
             //We use distinct since players who switched teams have multiple entries for same year
             val sql = "SELECT DISTINCT Year FROM PLAYER WHERE Player = \"$playerNameNoAccents\" ORDER BY Year DESC"
-            val resultSet = statement.executeQuery(sql)
+            resultSet = statement.executeQuery(sql)
             while (resultSet.next()) {
                 val year = resultSet.getInt("Year").toString()
                 yearsList.add(year) // Add to list of years
@@ -251,6 +277,9 @@ class DatabaseHandler {
             e.printStackTrace()
         } catch (e: ClassNotFoundException) {
             e.printStackTrace()
+        } finally {
+            //Close resources
+            closeResources(myConn, resultSet, statement)
         }
         return yearsList
     }
@@ -261,5 +290,13 @@ class DatabaseHandler {
         return Normalizer.normalize(input, Normalizer.Form.NFD)
             .replace("\\p{InCombiningDiacriticalMarks}+".toRegex(), "")
     }
+
+    //Helper function to Close all our DB resources to avoid memory leak
+    private fun closeResources(myConn: Connection?, resultSet: ResultSet?, statement: Statement?) {
+        resultSet?.close()
+        statement?.close()
+        myConn?.close()
+    }
+
 }
 

@@ -131,20 +131,28 @@ fun ProfileScreen(playerName: String, navigateBack: () -> Unit) {
                         DropdownMenuItem(
                             text = { Text(text = year) },
                             onClick = {
-                                //Update year, close menu and fetch new data on click
-                                chosenYear = year
+                                //Close menu
                                 expandedYear = false
-                                if (chosenYear != "2024") {
-                                    databaseHandler.executePlayerData(playerName, chosenYear) { data ->
-                                        playerObj = data
-                                        showPlayerData = true // Show the player data table
-                                    }
-                                }
-                                else {
-                                    //TODO: change this to diff function that uses api, apiHandler
-                                    databaseHandler.executePlayerData(playerName, chosenYear) { data ->
-                                        playerObj = data
-                                        showPlayerData = true // Show the player data table
+                                //As long as year isn't the same, update and fetch new data
+                                if (year != chosenYear) {
+                                    chosenYear = year
+                                    if (chosenYear != "2024") {
+                                        databaseHandler.executePlayerData(
+                                            playerName,
+                                            chosenYear
+                                        ) { data ->
+                                            playerObj = data
+                                            showPlayerData = true // Show the player data table
+                                        }
+                                    } else {
+                                        //TODO: change this to diff function that uses api,apiHandler
+                                        databaseHandler.executePlayerData(
+                                            playerName,
+                                            chosenYear
+                                        ) { data ->
+                                            playerObj = data
+                                            showPlayerData = true // Show the player data table
+                                        }
                                     }
                                 }
                             }

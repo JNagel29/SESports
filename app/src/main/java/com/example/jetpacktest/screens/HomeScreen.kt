@@ -168,8 +168,12 @@ fun StatDropdown(
                         //Update stat, close menu and fetch new data on click
                         onChosenStatUpdate(stat)
                         onCloseStatMenu()
-                        databaseHandler.executeStatLeaders(chosenStat, chosenYear) { data ->
-                            onTopPlayerListUpdate(data)
+                        // Check if the newly selected stat is different from the chosen stat
+                        if (stat != chosenStat) {
+                            // Fetch new data only if the stat is different
+                            databaseHandler.executeStatLeaders(stat, chosenYear) { data ->
+                                onTopPlayerListUpdate(data)
+                            }
                         }
                     }
                 )
@@ -222,8 +226,12 @@ fun YearDropdown(
                         //Update year, close menu and fetch new data on click
                         onChosenYearUpdate(year)
                         onCloseYearMenu()
-                        databaseHandler.executeStatLeaders(chosenStat, chosenYear) { data ->
-                            onTopPlayerListUpdate(data)
+                        // Check if the newly selected stat is different from the chosen stat
+                        if (year != chosenYear) {
+                            // Fetch new data only if the stat is different
+                            databaseHandler.executeStatLeaders(chosenStat, year) { data ->
+                                onTopPlayerListUpdate(data)
+                            }
                         }
                     }
                 )
