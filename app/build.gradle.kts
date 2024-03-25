@@ -80,6 +80,7 @@ dependencies {
     implementation("io.github.oleksandrbalan:lazytable:1.8.0")
     //For extra icons
     implementation("androidx.compose.material:material-icons-extended:1.6.3")
+    implementation("com.google.android.gms:play-services-dtdi:16.0.0-beta01")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
