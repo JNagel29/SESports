@@ -1,25 +1,23 @@
+package com.example.jetpacktest.screens
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
 import com.example.jetpacktest.models.Player
-import com.example.jetpacktest.screens.ReturnToSearchHeader
-
 
 @Composable
-fun Profile2Screen(navigateBack: NavHostController) {
+fun Profile2Screen(navigateBack: () -> Unit) {
     // Define player objects with hardcoded data
     val player1 = Player(
         name = "Lebron James",
@@ -75,7 +73,7 @@ fun Profile2Screen(navigateBack: NavHostController) {
         defensiveRebounds = 3.9f
     )
 
-    // Display player information using PlayerProfile
+    // Display player information using com.example.jetpacktest.screens.PlayerProfile
     Surface(modifier = Modifier.fillMaxSize(), color = Color.White) {
         Column(
             modifier = Modifier
@@ -83,7 +81,7 @@ fun Profile2Screen(navigateBack: NavHostController) {
                 .padding(16.dp)
                 .verticalScroll(rememberScrollState())
         ) {
- //           ReturnToSearchHeader(navigateBack = navigateBack)
+            ReturnToSearchHeader(navigateBack = navigateBack)
             Spacer(modifier = Modifier.height(15.dp))
             PlayerProfile(players = listOf(player1, player2))
             Spacer(modifier = Modifier.height(20.dp))
@@ -96,6 +94,7 @@ fun PlayerProfile(players: List<Player>) {
     val player1 = players.getOrNull(0)
     val player2 = players.getOrNull(1)
 
+    HorizontalDivider()
     player1?.let { player ->
         Box(
             modifier = Modifier
@@ -108,24 +107,12 @@ fun PlayerProfile(players: List<Player>) {
                     .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        text = player.name,
-                        style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 18.sp),
-                        modifier = Modifier.weight(1f)
-                    )
-                    Spacer(modifier = Modifier.weight(1f))
-                }
-                Spacer(modifier = Modifier.height(8.dp))
                 player2?.let { otherPlayer ->
                     PlayerStats(player, otherPlayer)
                 }
             }
         }
-        Divider()
+        HorizontalDivider()
     }
 }
 
@@ -135,7 +122,7 @@ fun PlayerStats(player: Player, otherPlayer: Player) {
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        StatRow("Name", player.name.toString(), otherPlayer.name.toString())
+        StatRow("Name", player.name, otherPlayer.name)
         StatRow("Year", player.year.toString(), otherPlayer.year.toString())
         StatRow("Position", player.position, otherPlayer.position)
         StatRow("Team", player.team, otherPlayer.team)

@@ -12,12 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -39,7 +34,6 @@ import com.example.jetpacktest.DatabaseHandler
 import com.example.jetpacktest.HeadshotHandler
 import com.example.jetpacktest.R
 import com.example.jetpacktest.models.Player
-import com.google.android.gms.dtdi.core.Extra
 
 
 @Composable

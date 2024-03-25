@@ -1,6 +1,6 @@
 package com.example.jetpacktest.navigation
 
-import Profile2Screen
+import com.example.jetpacktest.screens.Profile2Screen
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
@@ -18,7 +18,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.jetpacktest.models.Player
 import com.example.jetpacktest.screens.CompareScreen
 import com.example.jetpacktest.screens.HomeScreen
 import com.example.jetpacktest.screens.ProfileScreen
@@ -113,7 +112,13 @@ fun AppNavigation() {
             composable(route=Screens.GamesScreen.name) {
                 GamesScreen(gamesViewModel = viewModel())
             }
-            composable("profile2Screen") { Profile2Screen(navController) }
+            composable(route = Screens.Profile2Screen.name) {
+                //TODO: Will add parameters here to pass in playerName1, playerName2
+                Profile2Screen {
+                    //Used for back button
+                    navController.popBackStack()
+                }
+            }
             //Profile screens for player/team (we pass in player/team name as arg in route), not on nav bar
             composable(route = "${Screens.ProfileScreen.route}/{playerName}")
             { backStackEntry ->
