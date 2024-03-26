@@ -11,7 +11,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
@@ -82,7 +81,7 @@ fun AppNavigation() {
             composable(route=Screens.SearchScreen.name) {
                 SearchScreen(
                     //Pass in a lambda that'll let us go to a player's profile on click
-                            navigateToPlayerProfile = { playerName ->
+                    navigateToPlayerProfile = { playerName ->
                         navController.navigate("${Screens.ProfileScreen.route}/$playerName")
                     },
                     //Pass in lambda that'll let us go to a team's profile on click
@@ -110,7 +109,12 @@ fun AppNavigation() {
             composable("${Screens.StandingsScreen.route}/{player1}/{player2}") {
             }
             composable(route=Screens.GamesScreen.name) {
-                GamesScreen(gamesViewModel = viewModel())
+                GamesScreen(
+                    //Pass in lambda that lets us go to team profile from logo click
+                    navigateToTeamProfile = { teamName ->
+                        navController.navigate("${Screens.TeamProfileScreen.route}/$teamName")
+                    }
+                )
             }
             composable(route = Screens.Profile2Screen.name) {
                 //TODO: Will add parameters here to pass in playerName1, playerName2
@@ -125,7 +129,7 @@ fun AppNavigation() {
                 val playerName = backStackEntry.arguments?.getString("playerName") ?: ""
                 ProfileScreen(playerName) {
                     //Used for back button
-                    navController.popBackStack()
+                    navController.navigateUp()
                 }
             }
             composable(route = "${Screens.TeamProfileScreen.route}/{teamName}")

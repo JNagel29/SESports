@@ -16,6 +16,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.jetpacktest.navigation.AppNavigation
 import com.example.jetpacktest.ui.theme.JetpackTestTheme
+import com.jakewharton.threetenabp.AndroidThreeTen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -27,7 +28,8 @@ class MainActivity : ComponentActivity() {
                 .penaltyLog() // Log detected violations to the system log
                 .build()
         )
-
+        //Initializes timezone used in GamesScreen.kt
+        AndroidThreeTen.init(this);
         setContent {
             JetpackTestTheme {
                 // A surface container using the 'background' color from the theme
@@ -43,23 +45,9 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-//For printing out our data, usable by any file (like Screens)
-@Composable
-fun ItemList(statData: String) {
-    LazyColumn {
-        item {
-            Text(
-                text = statData,
-                modifier = Modifier.padding(16.dp) // Add padding for better spacing
-            )
-        }
-    }
-}
-
 @Preview(showBackground = true)
 @Composable
 fun MainPreview() {
     JetpackTestTheme {
-        ItemList("Preview Data")
     }
 }

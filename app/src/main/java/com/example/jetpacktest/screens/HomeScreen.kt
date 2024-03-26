@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -41,6 +42,21 @@ import com.example.jetpacktest.models.TopPlayer
 import com.example.jetpacktest.ui.theme.JetpackTestTheme
 @Composable
 fun HomeScreen(navigateToPlayerProfile: (String) -> Unit) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize(),
+        contentAlignment = Alignment.Center
+    )
+    {
+        Text(
+            text = "Home Screen",
+            fontFamily = FontFamily.Serif,
+            fontSize = 22.sp
+        )
+    }
+}
+//Commenting out now to test for memory leaks TODO: Will delete above and uncomment
+    /*
     //'Remember' keyword means, whenever this var changes, recompose our Home Screen
     val databaseHandler = DatabaseHandler()
     var topPlayerList by remember { mutableStateOf<List<TopPlayer>>(emptyList()) } // Default to empty list
@@ -286,3 +302,5 @@ fun HomePreview() {
         //HomeScreen()
     }
 }
+
+     */

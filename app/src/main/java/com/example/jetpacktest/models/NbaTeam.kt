@@ -84,7 +84,7 @@ object NbaTeam { // We use object so it's a singleton that we don't have to inst
         "Washington Wizards" to "WAS"
     )
 
-    // Define a mapping of team abbreviations to drawable resource IDs for the logos
+    //Define a mapping of team abbreviations to drawable resource IDs for the logos
     val logos: Map<String, Int> = mapOf(
         "Atlanta Hawks" to R.drawable.hawks,
         "Boston Celtics" to R.drawable.celtics,
@@ -116,6 +116,72 @@ object NbaTeam { // We use object so it's a singleton that we don't have to inst
         "Toronto Raptors" to R.drawable.raptors,
         "Utah Jazz" to R.drawable.jazz,
         "Washington Wizards" to R.drawable.wizards
+    )
+
+    //Map names to xml drawables, used in GamesScreen
+    val xmlLogos: Map<String, Int> = mapOf(
+        "Hawks" to R.drawable.xml_hawks,
+        "Celtics" to R.drawable.xml_celtics,
+        "Nets" to R.drawable.xml_nets,
+        "Hornets" to R.drawable.xml_hornets,
+        "Bulls" to R.drawable.xml_bulls,
+        "Cavaliers" to R.drawable.xml_cavaliers,
+        "Mavericks" to R.drawable.xml_mavericks,
+        "Nuggets" to R.drawable.xml_nuggets,
+        "Pistons" to R.drawable.xml_pistons,
+        "Warriors" to R.drawable.xml_warriors,
+        "Rockets" to R.drawable.xml_rockets,
+        "Pacers" to R.drawable.xml_pacers,
+        "Clippers" to R.drawable.xml_clippers,
+        "Lakers" to R.drawable.xml_lakers,
+        "Grizzlies" to R.drawable.xml_grizzlies,
+        "Heat" to R.drawable.xml_heat,
+        "Bucks" to R.drawable.xml_bucks,
+        "Timberwolves" to R.drawable.xml_timberwolves,
+        "Pelicans" to R.drawable.xml_pelicans,
+        "Knicks" to R.drawable.xml_knicks,
+        "Thunder" to R.drawable.xml_thunder,
+        "Magic" to R.drawable.xml_magic,
+        "76ers" to R.drawable.xml_sixers,
+        "Suns" to R.drawable.xml_suns,
+        "Trail Blazers" to R.drawable.xml_trailblazers,
+        "Kings" to R.drawable.xml_kings,
+        "Spurs" to R.drawable.xml_spurs,
+        "Raptors" to R.drawable.xml_raptors,
+        "Jazz" to R.drawable.xml_jazz,
+        "Wizards" to R.drawable.xml_wizards
+    )
+
+    val shortenedNamesToFullNames: Map<String, String> = mapOf(
+        "Hawks" to "Atlanta Hawks",
+        "Lakers" to "Los Angeles Lakers",
+        "Celtics" to "Boston Celtics",
+        "Warriors" to "Golden State Warriors",
+        "Bulls" to "Chicago Bulls",
+        "Heat" to "Miami Heat",
+        "Knicks" to "New York Knicks",
+        "Raptors" to "Toronto Raptors",
+        "Spurs" to "San Antonio Spurs",
+        "Clippers" to "Los Angeles Clippers",
+        "Mavericks" to "Dallas Mavericks",
+        "Nuggets" to "Denver Nuggets",
+        "Rockets" to "Houston Rockets",
+        "Trail Blazers" to "Portland Trail Blazers",
+        "Bucks" to "Milwaukee Bucks",
+        "Pacers" to "Indiana Pacers",
+        "Grizzlies" to "Memphis Grizzlies",
+        "Thunder" to "Oklahoma City Thunder",
+        "Suns" to "Phoenix Suns",
+        "Timberwolves" to "Minnesota Timberwolves",
+        "Pelicans" to "New Orleans Pelicans",
+        "Kings" to "Sacramento Kings",
+        "Magic" to "Orlando Magic",
+        "Wizards" to "Washington Wizards",
+        "Cavaliers" to "Cleveland Cavaliers",
+        "Hornets" to "Charlotte Hornets",
+        "Pistons" to "Detroit Pistons",
+        "Jazz" to "Utah Jazz",
+        "76ers" to "Philadelphia Sixers",
     )
 
 }
