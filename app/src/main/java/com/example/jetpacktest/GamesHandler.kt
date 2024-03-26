@@ -2,7 +2,6 @@ package com.example.jetpacktest
 
 //For Volley
 import android.content.Context
-import android.util.Log
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 //Custom models/object
