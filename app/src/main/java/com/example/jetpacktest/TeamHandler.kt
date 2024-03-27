@@ -11,7 +11,7 @@ class TeamHandler {
     //API Key and prefix of URL (we will append the team abbreviation, and key in fetchTeamPlayers)
     private val apiKey = Keys.SportsDataAPIKey
     private val teamPlayersUrlPrefix = "https://api.sportsdata.io/v3/nba/scores/json/PlayersBasic/"
-    private var playerNames = mutableListOf<String>()
+    private var playerRows = mutableListOf<String>()
     fun fetchTeamPlayers(teamAbbrev: String, context: Context, onResult: (MutableList<String>) -> Unit) {
         val teamPlayersUrl = "$teamPlayersUrlPrefix$teamAbbrev?key=$apiKey"
         val request = JsonArrayRequest(
@@ -19,9 +19,9 @@ class TeamHandler {
             { response ->
                 try {
                     //Parse through list of playerNames via function below
-                    playerNames = parsePlayersJsonResponse(response)
+                    playerRows = parsePlayersJsonResponse(response)
                     //Return back these names using our callback function (needed b/c async)
-                    onResult(playerNames)
+                    onResult(playerRows)
                 } catch (e: JSONException) {
                     e.printStackTrace() // Prints error in logcat
                 }
@@ -31,23 +31,19 @@ class TeamHandler {
     }
 
     private fun parsePlayersJsonResponse(jsonArray: JSONArray): MutableList<String> {
-        val playerNames = mutableListOf<String>()
-
         for (i in 0 until jsonArray.length()) {
             //Loop through array and get the ith JSON object
-            val playerObject = jsonArray.getJSONObject(i)
+            val player = jsonArray.getJSONObject(i)
             //Then, retrieve the firstName/lastName fields and append for full name
-            val firstName = playerObject.getString("FirstName")
-            val lastName = playerObject.getString("LastName")
-            val jerseyNum = playerObject.optInt("Jersey", -1)
-            val position = playerObject.getString("Position")
+            val firstName = player.getString("FirstName")
+            val lastName = player.getString("LastName")
+            val jerseyNum = player.optInt("Jersey", -1)
+            val position = player.getString("Position")
             // Check if jerseyNum was -1 aka null, if so, replace it with "N/A"
             val jerseyText = if (jerseyNum == -1) "N/A" else "#$jerseyNum"
-            val fullName = "$firstName $lastName - $jerseyText - $position"
-            //Add fullName list of playerNames for that team
-            playerNames.add(fullName)
+            val playerRow = "$firstName $lastName - $jerseyText - $position"
+            playerRows.add(playerRow)
         }
-        //Return list of playerNames, which fetch will return to our TeamProfileScreen to display
-        return playerNames
+        return playerRows
     }
 }

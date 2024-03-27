@@ -46,19 +46,19 @@ class HeadshotHandler {
                     //Splits up name in first/last since API requires that
                     val nameParts =
                         noAccentPlayerName.split(" ".toRegex(), limit = 2)
-                    val firstName = nameParts[0]
-                    val lastName = nameParts[1]
+                    val firstName = nameParts.getOrNull(0) ?: ""
+                    val lastName = nameParts.getOrNull(1) ?: ""
                     matchingPlayerId = -1 // Default for if no id found (aka not active player)
                     //Loop through each JSONObject aka each player
                     for (i in 0 until response.length()) {
-                        val playerObject = response.getJSONObject(i) // Grab ith player
+                        val player = response.getJSONObject(i) // Grab ith player
                         if (firstName.equals(
-                                playerObject.getString("FirstName"),
+                                player.getString("FirstName"),
                                 ignoreCase = true // Ignore casing of letters
                             ) &&
-                            lastName.equals(playerObject.getString("LastName"), ignoreCase = true)
+                            lastName.equals(player.getString("LastName"), ignoreCase = true)
                         ) {
-                            matchingPlayerId = playerObject.getInt("PlayerID")
+                            matchingPlayerId = player.getInt("PlayerID")
                             Log.d(Const.TAG, "Player ID found!")
                             //New request uses the matching ID, also we pass in the API key again
                             val playerDetailUrl =

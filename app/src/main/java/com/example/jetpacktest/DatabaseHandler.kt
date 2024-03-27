@@ -2,7 +2,7 @@ package com.example.jetpacktest
 
 import android.util.Log
 import com.example.jetpacktest.models.Player
-import com.example.jetpacktest.models.TopPlayer
+import com.example.jetpacktest.models.StatLeader
 import java.sql.Connection
 import java.sql.DriverManager
 import java.sql.ResultSet
@@ -26,34 +26,27 @@ class DatabaseHandler {
     private val user = Keys.DBUser
     private val password = Keys.DBPass
 
-    //This function will run the getStatLeaders fun in its own thread, using executor
     fun executeStatLeaders(chosenStat: String, year: String,
-                            onDataReceived: (MutableList<TopPlayer>) -> Unit) {
+                            onDataReceived: (MutableList<StatLeader>) -> Unit) {
         executor.execute {
-            val topPlayerList = getStatLeaders(chosenStat, year)
-            // After getting list of top players, callback to calling function to send back the data
-            onDataReceived(topPlayerList)
+            val statLeadersList = getStatLeaders(chosenStat, year)
+            onDataReceived(statLeadersList)
         }
     }
-    //Same as last function, but this one is for the years function
     fun executeYears(playerName: String, onDataReceived: (MutableList<String>) -> Unit) {
         executor.execute {
             val yearsList = getPlayerYears(playerName)
-            // After getting list of years, callback to calling function to send back the data
             onDataReceived(yearsList)
         }
     }
-    //Same as last function, but for grabbing entire pieces of data for players for profile
     fun executePlayerData(playerName: String, year: String,
                           onDataReceived: (Player) -> Unit) {
         executor.execute {
-            val playerObj = getPlayerData(playerName, year)
-            // After getting data of player, callback to calling function to send back the data
-            onDataReceived(playerObj)
+            val player = getPlayerData(playerName, year)
+            onDataReceived(player)
         }
     }
 
-    //Same as last function, but for grabbing entire pieces of data for players for profile
     fun executePlayerSearchResults(searchResultName: String,
                              onDataReceived: (MutableList<String>) -> Unit) {
         executor.execute {
@@ -207,12 +200,12 @@ class DatabaseHandler {
 
 
     //This function is the one actually connecting to DB and giving us the data for stat leads
-    private fun getStatLeaders(chosenStat: String, year: String): MutableList<TopPlayer> {
+    private fun getStatLeaders(chosenStat: String, year: String): MutableList<StatLeader> {
         var myConn: Connection? = null
         var statement: Statement? = null
         var resultSet: ResultSet? = null
         val statData = StringBuilder()
-        val topPlayerList = mutableListOf<TopPlayer>()
+        val statLeadersList = mutableListOf<StatLeader>()
         //Used to keep track of added player names to prevent duplicates
         val addedPlayers = mutableSetOf<String>()
         try {
@@ -229,9 +222,9 @@ class DatabaseHandler {
                 //Makes sure player name doesn't already exists in the addedPlayers set
                 if (!addedPlayers.contains(playerName)) {
                     val chosenStatValue = resultSet.getFloat(chosenStat)
-                    val topPlayer = TopPlayer(rank = counter + 1, name = playerName,
-                                            stat = chosenStatValue)
-                    topPlayerList.add(topPlayer)
+                    val statLeader = StatLeader(rank = counter + 1, name = playerName,
+                                            statValue = chosenStatValue)
+                    statLeadersList.add(statLeader)
                     addedPlayers.add(playerName) // add player name to the set
                     statData.append("Player Name: ").append(playerName).append(", ")
                         .append(chosenStat).append(": ").append(chosenStatValue).append("\n")
@@ -248,7 +241,7 @@ class DatabaseHandler {
             //Close resources
             closeResources(myConn, resultSet, statement)
         }
-        return topPlayerList
+        return statLeadersList
     }
 
     //This function will find us the years for which a player has stats for in our DB

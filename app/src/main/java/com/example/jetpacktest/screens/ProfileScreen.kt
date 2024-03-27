@@ -37,6 +37,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.jetpacktest.ApiHandler
 import com.example.jetpacktest.DatabaseHandler
 import com.example.jetpacktest.R
 import com.example.jetpacktest.HeadshotHandler
@@ -45,22 +46,15 @@ import com.example.jetpacktest.models.Player
 
 @Composable
 fun ProfileScreen(playerName: String, navigateBack: () -> Unit) {
-    //Instantiate a headshot handler that we'll use to fetch url by name
     val headshotHandler = HeadshotHandler()
-    //Context that we pass into fetchImageUrl for Volley
+    val databaseHandler = DatabaseHandler()
+    val apiHandler = ApiHandler()
     val context = LocalContext.current
-    //We instantiate imgUrl with mutableStateOf, so the screen recomposes automatically when it changes
-    var imgUrl by remember { mutableStateOf("") } // Default to ""
-    //DatabaseHandler to fetch years for dropdown menu and fetch the actual data
-    val databaseHandler = remember { DatabaseHandler() }
-    //Variable we'll use to create dropdown, will need to fetch every year player has played thru DB
-    //We use mutableStateOf for both, b/c when either changes, we need to recompose
-    var yearsList by remember { mutableStateOf<List<String>>(emptyList()) } // Default to empty list
-    var chosenYear by remember { mutableStateOf("") } //Default to nothing since dynamic
-    //Variable to track whether to show the player data table
+    var imgUrl by remember { mutableStateOf("") }
+    var yearsList by remember { mutableStateOf<List<String>>(emptyList()) }
+    var chosenYear by remember { mutableStateOf("") }
     var showExpandedData by remember { mutableStateOf(false) }
-    //Variable to hold the player data inside object
-    var playerObj by remember { mutableStateOf(Player()) }
+    var player by remember { mutableStateOf(Player()) }
 
     LaunchedEffect(Unit) {
         //On first launch, fetch the headshot and assign imgUrl to result using lambda callback
@@ -75,7 +69,7 @@ fun ProfileScreen(playerName: String, navigateBack: () -> Unit) {
                 chosenYear = yearsList.first()
                 //Then, fetch all our data for that most recent year
                 databaseHandler.executePlayerData(playerName, chosenYear) { data ->
-                    playerObj = data
+                    player = data
                     //showPlayerData = true // Show the player data table
                 }
             }
@@ -92,12 +86,12 @@ fun ProfileScreen(playerName: String, navigateBack: () -> Unit) {
             NameAndHeadshot(
                 playerName = playerName,
                 imgUrl = imgUrl,
-                team =  playerObj.team,
-                position = playerObj.position,
+                team =  player.team,
+                position = player.position,
                 headshotHandler = headshotHandler
             )
             HorizontalDivider(thickness = 2.dp, color = Color.White)
-            MainStatBoxes(playerObj = playerObj)
+            MainStatBoxes(player = player)
             //Custom Dropdown menu for each year
             LargeDropdownMenu(
                 label = "Select Year:",
@@ -105,8 +99,24 @@ fun ProfileScreen(playerName: String, navigateBack: () -> Unit) {
                 selectedIndex = yearsList.indexOf(chosenYear),
                 onItemSelected = { index, _ ->
                     chosenYear = yearsList[index]
-                    databaseHandler.executePlayerData(playerName, chosenYear) { data ->
-                        playerObj = data
+                    if (chosenYear != "2024") {
+                        databaseHandler.executePlayerData(playerName, chosenYear) { data ->
+                            player = data
+                        }
+                    }
+                    else {
+                        databaseHandler.executePlayerData(playerName, chosenYear) { data ->
+                            player = data
+                        }
+                        /*
+                        apiHandler.fetchPlayerData(
+                            context,
+                            onResult = {data ->
+                                player = data
+                            }
+                        )
+
+                         */
                     }
                 }
             )
@@ -114,8 +124,8 @@ fun ProfileScreen(playerName: String, navigateBack: () -> Unit) {
             ToggleFurtherStats(showExpandedData = showExpandedData,
                                 onClick = { showExpandedData = !showExpandedData })
             //Show the extra data only if user toggled via button above (and player has stats)
-            if (showExpandedData && playerObj.points != -1.0f) {
-                PlayerDataTable(playerObj)
+            if (showExpandedData && player.points != -1.0f) {
+                PlayerDataTable(player)
             }
         }
     }
@@ -169,9 +179,9 @@ fun NameAndHeadshot(
 }
 
 @Composable
-fun MainStatBoxes(playerObj: Player) {
+fun MainStatBoxes(player: Player) {
     //Bool used to print N/A if player has no stats (-1 points)
-    val isEmptyStats = (playerObj.points == -1.0f)
+    val isEmptyStats = (player.points == -1.0f)
     //Horizontal bar with PPG, RPG, APG (most important stats)
     Row(
         modifier = Modifier
@@ -182,19 +192,19 @@ fun MainStatBoxes(playerObj: Player) {
     ) {
         StatBox(
             label = "PPG",
-            value = if (!isEmptyStats) playerObj.points.toString() else "N/A"
+            value = if (!isEmptyStats) player.points.toString() else "N/A"
         )
         VerticalDivider(modifier = Modifier.height(50.dp),
             thickness = 2.dp, color = Color.White)
         StatBox(
             label = "RPG",
-            value = if (!isEmptyStats) playerObj.totalRebounds.toString() else "N/A"
+            value = if (!isEmptyStats) player.totalRebounds.toString() else "N/A"
         )
         VerticalDivider(modifier = Modifier.height(50.dp),
             thickness = 2.dp, color = Color.White)
         StatBox(
             label = "APG",
-            value = if (!isEmptyStats) playerObj.assists.toString() else "N/A"
+            value = if (!isEmptyStats) player.assists.toString() else "N/A"
         )
     }
 }
@@ -227,7 +237,7 @@ fun ToggleFurtherStats(onClick: () -> Unit, showExpandedData: Boolean) {
 }
 
 @Composable
-fun PlayerDataTable(playerObj: Player) {
+fun PlayerDataTable(player: Player) {
     //Slight amount of vertical space
     Spacer(modifier = Modifier.height(4.dp))
     //Now the actual list of values
@@ -237,29 +247,29 @@ fun PlayerDataTable(playerObj: Player) {
     ) {
         //Pass in list of rows with Label and Value
         item {
-            //PlayerDataRow("Year", playerObj.year.toString())
-            //PlayerDataRow("Position", playerObj.position)
-            //PlayerDataRow("Team", playerObj.team)
-            //PlayerDataRow("Points", playerObj.points.toString())
-            //PlayerDataRow("Assists", playerObj.assists.toString())
-            //PlayerDataRow("Rebounds", playerObj.totalRebounds.toString())
-            PlayerDataRow("Steals", playerObj.steals.toString())
-            PlayerDataRow("Blocks", playerObj.blocks.toString())
-            PlayerDataRow("FG", playerObj.fieldGoals.toString())
-            PlayerDataRow("FGA", playerObj.fieldGoalAttempts.toString())
-            PlayerDataRow("FG%", "%.1f%%".format(playerObj.fieldGoalPercent * 100))
-            PlayerDataRow("3P ", playerObj.threePointers.toString())
-            PlayerDataRow("3PA", playerObj.threePointerAttempts.toString())
-            PlayerDataRow("3P%", "%.1f%%".format(playerObj.threePointPercent * 100))
-            PlayerDataRow("Turnovers", playerObj.turnovers.toString())
-            PlayerDataRow("Fouls", playerObj.personalFouls.toString())
-            PlayerDataRow("Mins. Played", playerObj.minutesPlayed.toString())
-            PlayerDataRow("2P", playerObj.twoPointers.toString())
-            PlayerDataRow("2PA", playerObj.twoPointerAttempts.toString())
-            PlayerDataRow("2P%", "%.1f%%".format(playerObj.twoPointPercent * 100))
-            PlayerDataRow("EFG%", "%.1f%%".format(playerObj.effectiveFieldGoalPercent * 100))
-            //PlayerDataRow("ORB", playerObj.offensiveRebounds.toString())
-            //PlayerDataRow("DRB", playerObj.defensiveRebounds.toString())
+            //PlayerDataRow("Year", player.year.toString())
+            //PlayerDataRow("Position", player.position)
+            //PlayerDataRow("Team", player.team)
+            //PlayerDataRow("Points", player.points.toString())
+            //PlayerDataRow("Assists", player.assists.toString())
+            //PlayerDataRow("Rebounds", player.totalRebounds.toString())
+            PlayerDataRow("Steals", player.steals.toString())
+            PlayerDataRow("Blocks", player.blocks.toString())
+            PlayerDataRow("FG", player.fieldGoals.toString())
+            PlayerDataRow("FGA", player.fieldGoalAttempts.toString())
+            PlayerDataRow("FG%", "%.1f%%".format(player.fieldGoalPercent * 100))
+            PlayerDataRow("3P ", player.threePointers.toString())
+            PlayerDataRow("3PA", player.threePointerAttempts.toString())
+            PlayerDataRow("3P%", "%.1f%%".format(player.threePointPercent * 100))
+            PlayerDataRow("Turnovers", player.turnovers.toString())
+            PlayerDataRow("Fouls", player.personalFouls.toString())
+            PlayerDataRow("Mins. Played", player.minutesPlayed.toString())
+            PlayerDataRow("2P", player.twoPointers.toString())
+            PlayerDataRow("2PA", player.twoPointerAttempts.toString())
+            PlayerDataRow("2P%", "%.1f%%".format(player.twoPointPercent * 100))
+            PlayerDataRow("EFG%", "%.1f%%".format(player.effectiveFieldGoalPercent * 100))
+            //PlayerDataRow("ORB", player.offensiveRebounds.toString())
+            //PlayerDataRow("DRB", player.defensiveRebounds.toString())
         }
     }
 }

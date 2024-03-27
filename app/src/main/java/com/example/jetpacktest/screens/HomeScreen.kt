@@ -2,24 +2,19 @@ package com.example.jetpacktest.screens
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -29,60 +24,46 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.jetpacktest.DatabaseHandler
-import com.example.jetpacktest.models.TopPlayer
+import com.example.jetpacktest.models.StatLeader
 import com.example.jetpacktest.ui.theme.JetpackTestTheme
+import com.example.jetpacktest.ui.theme.LargeDropdownMenu
+
 @Composable
 fun HomeScreen(navigateToPlayerProfile: (String) -> Unit) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize(),
-        contentAlignment = Alignment.Center
-    )
-    {
-        Text(
-            text = "Home Screen",
-            fontFamily = FontFamily.Serif,
-            fontSize = 22.sp
-        )
-    }
-}
-//Commenting out now to test for memory leaks TODO: Will delete above and uncomment
-    /*
-    //'Remember' keyword means, whenever this var changes, recompose our Home Screen
     val databaseHandler = DatabaseHandler()
-    var topPlayerList by remember { mutableStateOf<List<TopPlayer>>(emptyList()) } // Default to empty list
+    var statLeadersList by remember { mutableStateOf<List<StatLeader>>(emptyList()) } // Default to empty list
     var chosenStat by remember { mutableStateOf("PTS") } //Default to pts
     var chosenYear by remember { mutableStateOf("2024") } //Default to 2024
-    //List of years that we'll loop through for dropdown menu
     val yearOptions = listOf("2009", "2010", "2011", "2012", "2013", "2014",
             "2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022",
             "2023", "2024").reversed()
-    //List of stats that we'll loop through for dropdown menu
     val statOptions = listOf("PTS", "AST", "TRB", "BLK", "STL")
-    //Variables to track if dropdown is expanded
-    var expandedStat by remember { mutableStateOf(false) }
-    var expandedYear by remember { mutableStateOf(false) }
-    //Change icon arrow from up to down depending on if its open
-    val iconStat = if (expandedStat) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown
-    val iconYear = if (expandedYear) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown
-    //On first launch, fetch the data initially for the default PTS and 2024, so user doesn't have
-    //to click on the spinner to get the data
+
     LaunchedEffect(Unit) {
+        //Fetch 2024 PTS on launch
         databaseHandler.executeStatLeaders(chosenStat, chosenYear) { data ->
-            topPlayerList = data
+            statLeadersList = data
         }
     }
+        /*
+        statLeadersList = listOf(StatLeader(rank = 5, name = "Jeff", statValue = 5.0f),
+            StatLeader(rank = 5, name = "Jeff", statValue = 5.0f),
+            StatLeader(rank = 5, name = "Jeff", statValue = 5.0f),
+            StatLeader(rank = 5, name = "Jeff", statValue = 5.0f),
+            StatLeader(rank = 5, name = "Jeff", statValue = 5.0f)
+        )
 
-    //Put everything in a column
+         */
+
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxWidth()
@@ -92,42 +73,49 @@ fun HomeScreen(navigateToPlayerProfile: (String) -> Unit) {
         Header()
         //Spacer between header and menu
         Spacer(modifier = Modifier.height(8.dp))
-        //Set up stat dropdown (need to pass in lambdas to change variables
-        StatDropdown(
-            chosenStat = chosenStat,
-            chosenYear = chosenYear,
-            iconStat = iconStat,
-            expandedStat = expandedStat,
-            statOptions = statOptions,
-            databaseHandler = databaseHandler,
-            onToggleExpandStat = { expandedStat = !expandedStat },
-            onCloseStatMenu = { expandedStat = false },
-            onChosenStatUpdate = {stat ->
-              chosenStat = stat
-            },
-            onTopPlayerListUpdate = { updatedList ->
-                topPlayerList = updatedList
+        //Custom Dropdown menus for each stat/year
+        LargeDropdownMenu(
+            label = "Select Stat:",
+            items = statOptions,
+            selectedIndex = statOptions.indexOf(chosenStat),
+            onItemSelected = { index, _ ->
+                val stat = statOptions[index]
+                //Check if newly selected stat is different from previous
+                if (stat != chosenStat) {
+                    chosenStat = stat
+                    databaseHandler.executeStatLeaders(stat, chosenYear) { data ->
+                        statLeadersList = data
+                    }
+                }
             }
         )
-        //Now, we similarly set up year dropdown
-        YearDropdown(
-            chosenStat = chosenStat,
-            chosenYear = chosenYear,
-            iconYear = iconYear,
-            expandedYear = expandedYear,
-            yearOptions = yearOptions,
-            databaseHandler = databaseHandler,
-            onToggleExpandYear = { expandedYear = !expandedYear },
-            onCloseYearMenu = { expandedYear = false },
-            onChosenYearUpdate = {year ->
-                chosenYear = year
-            },
-            onTopPlayerListUpdate = { updatedList ->
-                topPlayerList = updatedList
+        LargeDropdownMenu(
+            label = "Select Year:",
+            items = yearOptions,
+            selectedIndex = yearOptions.indexOf(chosenYear),
+            onItemSelected = { index, _ ->
+                val year = yearOptions[index]
+                //Check if newly selected year is different from previous
+                if (year != chosenYear) {
+                    chosenYear = year
+                    //databaseHandler.executeStatLeaders(chosenStat, year) { data ->
+                       // statLeadersList = data
+                   // }
+                }
             }
         )
-        //Finally, we can display all our data in a lazy column, (we pass in lambda to go to player)
-        TopPlayerDisplay(topPlayerList, chosenStat, navigateToPlayerProfile)
+        LazyColumn(modifier = Modifier.padding(top = 16.dp)) {
+            items(statLeadersList) {statLeader ->
+                //Text("${statLeader.name} ${statLeader.rank} ${statLeader.statValue}\n")
+                StatLeaderCard(
+                    statLeader = statLeader,
+                    chosenStat = chosenStat,
+                    navigateToPlayerProfile = navigateToPlayerProfile
+                )
+
+
+            }
+        }
     }
 }
 
@@ -137,133 +125,68 @@ fun Header() {
         "Stat Leaders",
         fontSize = 25.sp,
         fontWeight = FontWeight.Bold,
-        textAlign = TextAlign.Center
+        textAlign = TextAlign.Center,
+        fontFamily = FontFamily.Serif
     )
 }
 
 @Composable
-fun StatDropdown(
-    chosenStat: String,
-    chosenYear: String,
-    iconStat: ImageVector,
-    expandedStat: Boolean,
-    databaseHandler: DatabaseHandler,
-    statOptions: List<String>,
-    onToggleExpandStat: () -> Unit,
-    onCloseStatMenu: () -> Unit,
-    onChosenStatUpdate: (String) -> Unit,
-    onTopPlayerListUpdate: (List<TopPlayer>) -> Unit
-) {
-    //Creates the button to expand dropdown menu for stats
-    OutlinedButton(
-        onClick = { onToggleExpandStat() },
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        //Put text and up/down arrow in same row inside button
-        Text("Select Stat: $chosenStat")
-        Icon(
-            iconStat,
-            "Stat Select",
-            Modifier.align(Alignment.CenterVertically)
+fun StatLeaderCard(statLeader: StatLeader, chosenStat: String,
+                   navigateToPlayerProfile: (String) -> Unit) {
+    Card(
+        modifier = Modifier.padding(8.dp),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 10.dp //Adds a 'shadow' effect
+        ),
+        colors = CardDefaults.cardColors(
+            containerColor = Color.White,
+            contentColor = Color.Black
         )
-    }
-    //We create a box to enclose the menu AND all the items
-    Box {
-        DropdownMenu(
-            expanded = expandedStat,
-            onDismissRequest = { onCloseStatMenu() },
+    ) {
+        Column(
             modifier = Modifier
-                .width(80.dp), // Limit width
-            offset = DpOffset(300.dp, 0.dp) // Move items 300dp to the right
+                .padding(16.dp)
+                .fillMaxWidth()
         ) {
-            //For each stat in the list, create a dropdown menu item
-            statOptions.forEach { stat ->
-                DropdownMenuItem(
-                    text = { Text(text = stat) },
-                    onClick = {
-                        //Update stat, close menu and fetch new data on click
-                        onChosenStatUpdate(stat)
-                        onCloseStatMenu()
-                        // Check if the newly selected stat is different from the chosen stat
-                        if (stat != chosenStat) {
-                            // Fetch new data only if the stat is different
-                            databaseHandler.executeStatLeaders(stat, chosenYear) { data ->
-                                onTopPlayerListUpdate(data)
-                            }
-                        }
-                    }
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = "Rank ${statLeader.rank}: ${statLeader.name}",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 20.sp,
+                    modifier = Modifier
+                        .weight(1f)
+                        .clickable { navigateToPlayerProfile(statLeader.name) }
+                )
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                    contentDescription = "Go to profile",
+                    tint = Color.Blue,
+                    modifier = Modifier.clickable { navigateToPlayerProfile(statLeader.name) }
                 )
             }
+            Text(
+                text = "$chosenStat: ${statLeader.statValue}",
+                fontSize = 16.sp,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
         }
-    }
+
+        }
+
 }
 
 @Composable
-fun YearDropdown(
-    chosenStat: String,
-    chosenYear: String,
-    iconYear: ImageVector,
-    expandedYear: Boolean,
-    databaseHandler: DatabaseHandler,
-    yearOptions: List<String>,
-    onToggleExpandYear: () -> Unit,
-    onCloseYearMenu: () -> Unit,
-    onChosenYearUpdate: (String) -> Unit,
-    onTopPlayerListUpdate: (List<TopPlayer>) -> Unit
-) {
-    //Creates the button to expand dropdown menu for years
-    OutlinedButton(
-        onClick = { onToggleExpandYear() },
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        //Put text and up/down arrow in same row inside button
-        Text("Select Year: $chosenYear")
-        Icon(
-            iconYear,
-            "contentDescription",
-            Modifier.align(Alignment.CenterVertically)
-        )
-    }
-    //We create a box to enclose the menu AND all the items
-    Box {
-        DropdownMenu(
-            expanded = expandedYear,
-            onDismissRequest = { onCloseYearMenu() },
-            modifier = Modifier
-                .width(80.dp) //Limit width
-                .height(250.dp), // Limit height so user can scroll
-            offset = DpOffset(300.dp, 0.dp) // Move menu items 300 dp to right
-        ) {
-            //For each year in the list, create a dropdown menu item
-            yearOptions.forEach { year ->
-                DropdownMenuItem(
-                    text = { Text(text = year) },
-                    onClick = {
-                        //Update year, close menu and fetch new data on click
-                        onChosenYearUpdate(year)
-                        onCloseYearMenu()
-                        // Check if the newly selected stat is different from the chosen stat
-                        if (year != chosenYear) {
-                            // Fetch new data only if the stat is different
-                            databaseHandler.executeStatLeaders(chosenStat, year) { data ->
-                                onTopPlayerListUpdate(data)
-                            }
-                        }
-                    }
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun TopPlayerDisplay(topPlayerList: List<TopPlayer>, chosenStat: String,
+fun TopPlayerDisplay(statLeaderList: List<StatLeader>, chosenStat: String,
                      navigateToPlayerProfile: (String) -> Unit) {
     LazyColumn(
         modifier = Modifier.padding(top = 16.dp)
     ) {
-        //Loop through topPlayerList, and for each player, make a text row with rank/name/stat val
-        items(topPlayerList) { player ->
+        //Loop through list, and for each player, make a text row with rank/name/stat val
+        items(statLeaderList) { player ->
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
@@ -283,7 +206,7 @@ fun TopPlayerDisplay(topPlayerList: List<TopPlayer>, chosenStat: String,
                 )
                 //Stat value on the right
                 Text(
-                    text = "${player.stat} $chosenStat",
+                    text = "${player.statValue} $chosenStat",
                     fontSize = 20.sp,
                     fontFamily = FontFamily.Serif,
                     textAlign = TextAlign.End
@@ -303,4 +226,4 @@ fun HomePreview() {
     }
 }
 
-     */
+
