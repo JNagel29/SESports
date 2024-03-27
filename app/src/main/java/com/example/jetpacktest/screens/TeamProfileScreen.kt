@@ -95,7 +95,7 @@ fun CurrentPlayerList(teamPlayersList: List<String>,
                       navigateToPlayerProfile: (String) -> Unit) {
     //Header (we wrap inside box to center it)
     Box(modifier = Modifier.fillMaxWidth()) {
-        Text("Current Players", fontSize = 25.sp,
+        Text("Current Roster", fontSize = 25.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.align(Alignment.Center)
         )

@@ -61,7 +61,7 @@ object NbaTeam { // We use object so it's a singleton that we don't have to inst
         "Dallas Mavericks" to "DAL",
         "Denver Nuggets" to "DEN",
         "Detroit Pistons" to "DET",
-        "Golden State Warriors" to "GSW",
+        "Golden State Warriors" to "GS",
         "Houston Rockets" to "HOU",
         "Indiana Pacers" to "IND",
         "Los Angeles Clippers" to "LAC",

@@ -42,13 +42,6 @@ import java.util.Calendar
 import java.util.Date
 
 
-//TODO: Playing around with view model to see if data can persist b/w navbar screen change
-/*
-class GamesViewModel: ViewModel() {
-    var gamesList: List<Game> by mutableStateOf(emptyList())
-}
- */
-
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun GamesScreen(navigateToTeamProfile: (String) -> Unit) {
