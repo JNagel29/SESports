@@ -98,9 +98,9 @@ fun HomeScreen(navigateToPlayerProfile: (String) -> Unit) {
                 //Check if newly selected year is different from previous
                 if (year != chosenYear) {
                     chosenYear = year
-                    //databaseHandler.executeStatLeaders(chosenStat, year) { data ->
-                       // statLeadersList = data
-                   // }
+                    databaseHandler.executeStatLeaders(chosenStat, year) { data ->
+                        statLeadersList = data
+                    }
                 }
             }
         )
@@ -175,7 +175,7 @@ fun StatLeaderCard(statLeader: StatLeader, chosenStat: String,
             )
         }
 
-        }
+    }
 
 }
 
@@ -225,5 +225,4 @@ fun HomePreview() {
         //HomeScreen()
     }
 }
-
 

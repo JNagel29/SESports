@@ -1,6 +1,5 @@
 package com.example.jetpacktest.navigation
 
-import com.example.jetpacktest.screens.Profile2Screen
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
@@ -17,13 +16,13 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.jetpacktest.screens.CompareResultsScreen
 import com.example.jetpacktest.screens.CompareScreen
 import com.example.jetpacktest.screens.HomeScreen
 import com.example.jetpacktest.screens.ProfileScreen
 import com.example.jetpacktest.screens.SearchScreen
 import com.example.jetpacktest.screens.GamesScreen
 import com.example.jetpacktest.screens.StandingsScreen
-
 import com.example.jetpacktest.screens.TeamProfileScreen
 
 @Composable
@@ -94,19 +93,13 @@ fun AppNavigation() {
                 CompareScreen(
                     navigateToPlayerProfile = { /* Implement */ },
                     navController = navController,
-                    navigateToProfile2 = { playerNames ->
-                        // Navigate to profile2 screen with selected players
-                        navController.navigate("profile2Screen/${playerNames.joinToString(",")}")
+                    navigateToCompareResults = { playerNames ->
+                        navController.navigate("compareresultsscreen/${playerNames.joinToString(",")}")
                     }
                 )
             }
- //           composable("standingsScreen") {
-                composable("standingsScreen") {
+            composable(route = Screens.StandingsScreen.name) {
                     StandingsScreen()
-                }
-
-
-            composable("${Screens.StandingsScreen.route}/{player1}/{player2}") {
             }
             composable(route=Screens.GamesScreen.name) {
                 GamesScreen(
@@ -116,9 +109,9 @@ fun AppNavigation() {
                     }
                 )
             }
-            composable(route = Screens.Profile2Screen.name) {
+            composable(route = Screens.CompareResultsScreen.name) {
                 //TODO: Will add parameters here to pass in playerName1, playerName2
-                Profile2Screen {
+                CompareResultsScreen {
                     //Used for back button
                     navController.popBackStack()
                 }

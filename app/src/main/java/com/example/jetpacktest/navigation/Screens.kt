@@ -4,10 +4,9 @@ enum class Screens(val route: String) {
     HomeScreen("home"),
     SearchScreen("search"),
     CompareScreen("compare"),
+    CompareResultsScreen("compareresults"),
     ProfileScreen("profile"),
-    Profile2Screen("profile2"),
     TeamProfileScreen("teamprofile"),
     StandingsScreen("standings"),
     GamesScreen("games"),
-    CompareResultsScreen("compareresults")
 }

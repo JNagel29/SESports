@@ -182,6 +182,49 @@ object NbaTeam { // We use object so it's a singleton that we don't have to inst
         "Pistons" to "Detroit Pistons",
         "Jazz" to "Utah Jazz",
         "76ers" to "Philadelphia Sixers",
+        "Nets" to "Brooklyn Nets"
+    )
+
+    val teamColorsMap = mapOf(
+        "LAL" to R.color.lal,
+        "PHO" to R.color.phx,
+        "DAL" to R.color.dal,
+        "TOT" to R.color.sas, // San Antonio Spurs (formerly known as the Dallas Chaparrals)
+        "MIA" to R.color.mia,
+        "CLE" to R.color.cle,
+        "WSB" to R.color.was,
+        "MIL" to R.color.mil,
+        "CHI" to R.color.chi,
+        "GSW" to R.color.gsw,
+        "MIN" to R.color.min,
+        "IND" to R.color.ind,
+        "WAS" to R.color.was,
+        "BOS" to R.color.bos,
+        "HOU" to R.color.hou,
+        "SAC" to R.color.sac,
+        "DEN" to R.color.den,
+        "ORL" to R.color.orl,
+        "NOH" to R.color.nop, // New Orleans Pelicans (formerly New Orleans Hornets)
+        "TOR" to R.color.tor,
+        "CHO" to R.color.cha, // Charlotte Hornets (formerly New Orleans Hornets)
+        "PHI" to R.color.phi,
+        "ATL" to R.color.atl,
+        "POR" to R.color.por,
+        "DET" to R.color.det,
+        "OKC" to R.color.okc,
+        "UTA" to R.color.uta,
+        "VAN" to R.color.mem, // Memphis Grizzlies (formerly Vancouver Grizzlies)
+        "SEA" to R.color.okc, // Oklahoma City Thunder (formerly Seattle SuperSonics)
+        "NJN" to R.color.bkn, // Brooklyn Nets (formerly New Jersey Nets)
+        "NOK" to R.color.nop, // New Orleans Pelicans (formerly New Orleans Hornets)
+        "LAC" to R.color.lac,
+        "CHA" to R.color.cha,
+        "MEM" to R.color.mem,
+        "NYK" to R.color.nyk,
+        "NOP" to R.color.nop,
+        "BRK" to R.color.bkn,
+        "SAS" to R.color.sas,
+        "CHH" to R.color.cha // Charlotte Hornets (formerly Charlotte Bobcats)
     )
 
 }

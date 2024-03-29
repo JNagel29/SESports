@@ -41,6 +41,7 @@ import com.example.jetpacktest.ApiHandler
 import com.example.jetpacktest.DatabaseHandler
 import com.example.jetpacktest.R
 import com.example.jetpacktest.HeadshotHandler
+import com.example.jetpacktest.models.NbaTeam
 import com.example.jetpacktest.ui.theme.LargeDropdownMenu
 import com.example.jetpacktest.models.Player
 
@@ -143,7 +144,10 @@ fun NameAndHeadshot(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .background(color = colorResource(R.color.purple_lakers))
+            .background(color = colorResource(
+                //Split by / in case two teams
+                NbaTeam.teamColorsMap[team.split("/")[0]] ?: R.color.purple_lakers)
+            )
             .offset(y = 20.dp) //Move image down a bit
     ) {
         //This row will hold the headshot and player name
@@ -186,7 +190,10 @@ fun MainStatBoxes(player: Player) {
     Row(
         modifier = Modifier
                 .fillMaxWidth()
-                .background(colorResource(R.color.purple_lakers)),
+                .background(color = colorResource(
+                    NbaTeam.teamColorsMap[player.team.split("/")[0]]
+                        ?: R.color.purple_lakers)
+                ),
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically
     ) {

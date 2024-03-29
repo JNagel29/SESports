@@ -1,242 +1,212 @@
 package com.example.jetpacktest.screens
 
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.Icon
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.jetpacktest.DatabaseHandler
-import com.example.jetpacktest.HeadshotHandler
-import com.example.jetpacktest.R
 import com.example.jetpacktest.models.Player
 
-
 @Composable
-fun CompareResultsScreen(playerName1: String, playerName2: String, navigateBack: () -> Unit) {
-    // Instantiate a headshot handler that we'll use to fetch url by name
-    val headshotHandler = HeadshotHandler()
-    // Context that we pass into fetchImageUrl for Volley
-    val context = LocalContext.current
-    // We instantiate imgUrl with mutableStateOf, so the screen recomposes automatically when it changes
-    var imgUrl1 by remember { mutableStateOf("") } // Default to ""
-    var imgUrl2 by remember { mutableStateOf("") } // Default to ""
-    // DatabaseHandler to fetch years for dropdown menu and fetch the actual data
-    val databaseHandler = remember { DatabaseHandler() }
-    // Variable to track if dropdown is expanded
-    var expandedYear by remember { mutableStateOf(false) }
-    // Variable we'll use to create dropdown, will need to fetch every year player has played thru DB
-    var yearsList1 by remember { mutableStateOf<List<String>>(emptyList()) } // Default to empty list
-    var yearsList2 by remember { mutableStateOf<List<String>>(emptyList()) } // Default to empty list
-    var chosenYear1 by remember { mutableStateOf("") } // Default to nothing since dynamic
-    var chosenYear2 by remember { mutableStateOf("") } // Default to nothing since dynamic
-    // Variable for Player objects that will hold the data about the players
-    var playerObj1 by remember { mutableStateOf(Player()) }
-    var playerObj2 by remember { mutableStateOf(Player()) }
-    // Variable to track whether to show the player data table
-    var showPlayerData1 by remember { mutableStateOf(false) }
-    var showPlayerData2 by remember { mutableStateOf(false) }
+fun CompareResultsScreen(navigateBack: () -> Unit) {
+    // Define player objects with hardcoded data
+    val player1 = Player(
+        name = "Lebron James",
+        year = 2024,
+        position = "Forward",
+        team = "Lakers",
+        points = 25.4f,
+        assists = 8.1f,
+        steals = 1.2f,
+        blocks = 0.6f,
+        totalRebounds = 7.2f,
+        turnovers = 3.3f,
+        personalFouls = 1.2f,
+        minutesPlayed = 35.2f,
+        fieldGoals = 9.5f,
+        fieldGoalAttempts = 18.0f,
+        fieldGoalPercent = 53.0f,
+        threePointers = 2.2f,
+        threePointerAttempts = 5.3f,
+        threePointPercent = 40.6f,
+        twoPointers = 7.4f,
+        twoPointerAttempts = 12.7f,
+        twoPointPercent = 58.1f,
+        effectiveFieldGoalPercent = 59.0f,
+        offensiveRebounds = 0.8f,
+        defensiveRebounds = 6.3f
+    )
 
-    LaunchedEffect(Unit) {
-        // On first launch, fetch the headshots and assign imgUrls to results using lambda callback
-        headshotHandler.fetchImageUrl(playerName = playerName1, context = context) { result ->
-            imgUrl1 = result
-        }
-        headshotHandler.fetchImageUrl(playerName = playerName2, context = context) { result ->
-            imgUrl2 = result
-        }
-        // Also, fetch the list of years that we'll use to populate dropdown menu
-        databaseHandler.executeYears(playerName = playerName1) { result ->
-            yearsList1 = result
-            if (yearsList1.isNotEmpty()) {
-                chosenYear1 = yearsList1.first()
-                // Fetch the player data for the chosen year
-                databaseHandler.executePlayerData(playerName1, chosenYear1) { data ->
-                    playerObj1 = data
-                    showPlayerData1 = true
-                }
-            }
-        }
-        databaseHandler.executeYears(playerName = playerName2) { result ->
-            yearsList2 = result
-            if (yearsList2.isNotEmpty()) {
-                chosenYear2 = yearsList2.first()
-                // Fetch the player data for the chosen year
-                databaseHandler.executePlayerData(playerName2, chosenYear2) { data ->
-                    playerObj2 = data
-                    showPlayerData2 = true
-                }
-            }
-        }
-    }
+    val player2 = Player(
+        name = "Stephen Curry",
+        year = 2024,
+        position = "Guard",
+        team = "Warriors",
+        points = 26.8f,
+        assists = 4.9f,
+        steals = 0.8f,
+        blocks = 0.3f,
+        totalRebounds = 4.5f,
+        turnovers = 2.9f,
+        personalFouls = 1.6f,
+        minutesPlayed = 32.7f,
+        fieldGoals = 8.8f,
+        fieldGoalAttempts = 19.7f,
+        fieldGoalPercent = 44.8f,
+        threePointers = 4.9f,
+        threePointerAttempts = 12.1f,
+        threePointPercent = 40.4f,
+        twoPointers = 4.0f,
+        twoPointerAttempts = 7.7f,
+        twoPointPercent = 51.8f,
+        effectiveFieldGoalPercent = 57.2f,
+        offensiveRebounds = 0.5f,
+        defensiveRebounds = 3.9f
+    )
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        // Player 1 data on the left
+    // Display player information using com.example.jetpack test.screens.PlayerProfile
+    Surface(modifier = Modifier.fillMaxSize(), color = Color.White) {
         Column(
-            modifier = Modifier.fillMaxWidth(1f)
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
+                .verticalScroll(rememberScrollState())
         ) {
-            // Display player 1 name and headshot
-            NameAndHeadshotCompare(playerName1, imgUrl1, headshotHandler)
-            // Display player 1 data
-            if (showPlayerData1) {
-                PlayerDataTable(playerObj1)
-            }
-        }
-        // Player 2 data on the right
-        Column(
-            modifier = Modifier.fillMaxWidth(1f)
-        ) {
-            // Display player 2 name and headshot
-            NameAndHeadshotCompare(playerName2, imgUrl2, headshotHandler)
-            // Display player 2 data
-            if (showPlayerData2) {
-                PlayerDataTable(playerObj2)
-            }
+            ReturnToSearchHeader(navigateBack = navigateBack)
+            Spacer(modifier = Modifier.height(15.dp))
+            PlayerProfile(players = listOf(player1, player2))
+            Spacer(modifier = Modifier.height(20.dp))
         }
     }
 }
 
 @Composable
-fun NameAndHeadshotCompare(playerName: String, imgUrl: String, headshotHandler: HeadshotHandler) {
-    Box(
-        modifier = Modifier.fillMaxWidth(),
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(
-                text = playerName,
-                fontSize = 26.sp,
-                fontFamily = FontFamily.Serif,
-                textAlign = TextAlign.Center,
-                fontWeight = FontWeight.ExtraBold
-            )
-            // Now use our headshot handler to compose the image using that URL
-            headshotHandler.ComposeImage(
-                imgToCompose = imgUrl,
-                contentDesc = playerName,
-                width = 200.dp,
-                height = 200.dp
-            )
-        }
-    }
+fun PlayerProfile(players: List<Player>) {
+    val player1 = players.getOrNull(0)
+    val player2 = players.getOrNull(1)
 
-
-    @Composable
-    fun PlayerDataTable(playerObj: Player) {
-        Box(modifier = Modifier.fillMaxWidth()) {
-            // Header
-            Text(
-                "Player Averages", fontSize = 25.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.align(Alignment.Center)
-            )
-        }
-        Spacer(modifier = Modifier.height(4.dp))
-        // List of values
-        LazyColumn(
-            modifier = Modifier.padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+    HorizontalDivider()
+    player1?.let { player ->
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
         ) {
-            item {
-                PlayerDataRow("Year", playerObj.year.toString())
-                PlayerDataRow("Position", playerObj.position)
-                PlayerDataRow("Team", playerObj.team)
-                PlayerDataRow("Points", playerObj.points.toString())
-                PlayerDataRow("Assists", playerObj.assists.toString())
-                PlayerDataRow("Steals", playerObj.steals.toString())
-                PlayerDataRow("Blocks", playerObj.blocks.toString())
-                PlayerDataRow("Rebounds", playerObj.totalRebounds.toString())
-                PlayerDataRow("Turnovers", playerObj.turnovers.toString())
-                PlayerDataRow("Fouls", playerObj.personalFouls.toString())
-                PlayerDataRow("Mins. Played", playerObj.minutesPlayed.toString())
-                PlayerDataRow("FG", playerObj.fieldGoals.toString())
-                PlayerDataRow("FGA", playerObj.fieldGoalAttempts.toString())
-                PlayerDataRow("FG%", playerObj.fieldGoalPercent.toString())
-                PlayerDataRow("3P ", playerObj.threePointers.toString())
-                PlayerDataRow("3PA", playerObj.threePointerAttempts.toString())
-                PlayerDataRow("3P%", playerObj.threePointPercent.toString())
-                PlayerDataRow("2P", playerObj.twoPointers.toString())
-                PlayerDataRow("2PA", playerObj.twoPointerAttempts.toString())
-                PlayerDataRow("2P%", playerObj.twoPointPercent.toString())
-                PlayerDataRow("EFG%", playerObj.effectiveFieldGoalPercent.toString())
-                PlayerDataRow("ORB", playerObj.offensiveRebounds.toString())
-                PlayerDataRow("DRB", playerObj.defensiveRebounds.toString())
-            }
-        }
-    }
-
-    @Composable
-    fun PlayerDataRow(label: String, value: String) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
-        ) {
-            Text(
-                label,
-                fontSize = 22.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.weight(1f)
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                value,
-                fontSize = 22.sp,
-                textAlign = TextAlign.End,
-                modifier = Modifier.weight(1f)
-            )
-        }
-    }
-
-    @Composable
-    fun ReturnToSearchHeader(navigateBack: () -> Unit) {
-        Column(
-            modifier = Modifier.padding(10.dp),
-            verticalArrangement = Arrangement.Top
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.clickable {
-                    navigateBack()
-                }
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Icon(
-                    imageVector = ImageVector.vectorResource(R.drawable.baseline_arrow_back_ios_new_24),
-                    contentDescription = "Back"
-                )
-                Spacer(modifier = Modifier.width(10.dp))
-                Text(
-                    text = "Return to Previous",
-                    fontSize = 18.sp,
-                    fontFamily = FontFamily.Serif
-                )
+                player2?.let { otherPlayer ->
+                    PlayerStats(player, otherPlayer)
+                }
             }
         }
+        HorizontalDivider()
     }
 }
+
+@Composable
+fun PlayerStats(player: Player, otherPlayer: Player) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        StatRow("Name", player.name, otherPlayer.name)
+        StatRow("Year", player.year.toString(), otherPlayer.year.toString())
+        StatRow("Position", player.position, otherPlayer.position)
+        StatRow("Team", player.team, otherPlayer.team)
+        StatRow("Points", player.points.toString(), otherPlayer.points.toString())
+        StatRow("Assists", player.assists.toString(), otherPlayer.assists.toString())
+        StatRow("Steals", player.steals.toString(), otherPlayer.steals.toString())
+        StatRow("Blocks", player.blocks.toString(), otherPlayer.blocks.toString())
+        StatRow("Total Rebounds", player.totalRebounds.toString(), otherPlayer.totalRebounds.toString())
+        StatRow("Turnovers", player.turnovers.toString(), otherPlayer.turnovers.toString())
+        StatRow("Personal Fouls", player.personalFouls.toString(), otherPlayer.personalFouls.toString())
+        StatRow("Minutes Played", player.minutesPlayed.toString(), otherPlayer.minutesPlayed.toString())
+        StatRow("FG", player.fieldGoals.toString(), otherPlayer.fieldGoals.toString())
+        StatRow("FGA", player.fieldGoalAttempts.toString(), otherPlayer.fieldGoalAttempts.toString())
+        StatRow("FG%", player.fieldGoalPercent.toString(), otherPlayer.fieldGoalPercent.toString())
+        StatRow("3P ", player.threePointers.toString(), otherPlayer.threePointers.toString())
+        StatRow("3PA", player.threePointerAttempts.toString(), otherPlayer.threePointerAttempts.toString())
+        StatRow("3P%", player.threePointPercent.toString(), otherPlayer.threePointPercent.toString())
+        StatRow("2P", player.twoPointers.toString(), otherPlayer.twoPointers.toString())
+        StatRow("2PA", player.twoPointerAttempts.toString(), otherPlayer.twoPointerAttempts.toString())
+        StatRow("2P%", player.twoPointPercent.toString(), otherPlayer.twoPointPercent.toString())
+        StatRow("EFG%", player.effectiveFieldGoalPercent.toString(), otherPlayer.effectiveFieldGoalPercent.toString())
+        StatRow("ORB", player.offensiveRebounds.toString(), otherPlayer.offensiveRebounds.toString())
+        StatRow("DRB", player.defensiveRebounds.toString(), otherPlayer.defensiveRebounds.toString())
+    }
+}
+@Composable
+fun StatRow(label: String, playerValue: String, otherPlayerValue: String) {
+    val playerValueFloat = playerValue.toFloatOrNull()
+    val otherPlayerValueFloat = otherPlayerValue.toFloatOrNull()
+
+    val playerColor = when {
+        label == "Turnovers" || label == "Personal Fouls" -> {
+            if (playerValueFloat != null && otherPlayerValueFloat != null) {
+                if (playerValueFloat < otherPlayerValueFloat) Color.Green else Color.Red
+            } else Color.Black
+        }
+        playerValueFloat != null && otherPlayerValueFloat != null -> {
+            if (playerValueFloat > otherPlayerValueFloat) Color.Green else Color.Red
+        }
+        else -> Color.Black
+    }
+
+    val otherPlayerColor = when {
+        label == "Turnovers" || label == "Personal Fouls" -> {
+            if (playerValueFloat != null && otherPlayerValueFloat != null) {
+                if (otherPlayerValueFloat < playerValueFloat) Color.Green else Color.Red
+            } else Color.Black
+        }
+        playerValueFloat != null && otherPlayerValueFloat != null -> {
+            if (otherPlayerValueFloat > playerValueFloat) Color.Green else Color.Red
+        }
+        else -> Color.Black
+    }
+
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text = label,
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.weight(1f)
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(
+            text = playerValue,
+            fontSize = if (label == "Name") 14.sp else 18.sp, // Adjust the font size for player names
+            textAlign = TextAlign.End,
+            color = if (label == "Year") Color.Black else playerColor,
+            modifier = Modifier.weight(1f)
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(
+            text = otherPlayerValue,
+            fontSize = if (label == "Name") 14.sp else 18.sp, // Adjust the font size for player names
+            textAlign = TextAlign.End,
+            color = if (label == "Year") Color.Black else otherPlayerColor,
+            modifier = Modifier.weight(1f)
+        )
+    }
+}
+
+
+
+
