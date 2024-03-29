@@ -1,5 +1,6 @@
 package com.example.jetpacktest.navigation
 
+import SearchViewModel
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
@@ -10,6 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
@@ -28,6 +30,7 @@ import com.example.jetpacktest.screens.TeamProfileScreen
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
+    val searchViewModel = viewModel<SearchViewModel>()
     Scaffold(
         bottomBar = {
             NavigationBar {
@@ -79,6 +82,7 @@ fun AppNavigation() {
             }
             composable(route=Screens.SearchScreen.name) {
                 SearchScreen(
+                    searchViewModel = searchViewModel,
                     //Pass in a lambda that'll let us go to a player's profile on click
                     navigateToPlayerProfile = { playerName ->
                         navController.navigate("${Screens.ProfileScreen.route}/$playerName")
