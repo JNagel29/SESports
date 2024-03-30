@@ -22,6 +22,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 //Composable/UI
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -41,15 +42,24 @@ import com.example.jetpacktest.models.NbaTeam
 import com.example.jetpacktest.navigation.Screens
 
 @Composable
-fun SearchScreen(searchViewModel: SearchViewModel, // Receive the ViewModel instance as a parameter
+fun SearchScreen(searchText: State<String>,
+                 isSearching: State<Boolean>,
+                 playerResults: State<List<String>>,
+                 onSearchTextChange: (String) -> Unit,
+                 clearPlayerResults: () -> Unit,
                  navigateToPlayerProfile: (String) -> Unit,
                  navigateToTeamProfile: (String) -> Unit) {
     var selectedSearchType by remember {
         mutableStateOf("Player") // Default to player on launch
     }
-    val searchText by searchViewModel.searchText.collectAsState()
-    val isSearching by searchViewModel.isSearching.collectAsState()
-    val playerResults by searchViewModel.playerResults.collectAsState()
+    //val searchText by searchViewModel.searchText.collectAsState()
+    //val isSearching by searchViewModel.isSearching.collectAsState()
+    //val playerResults by searchViewModel.playerResults.collectAsState()
+    // Retrieve the values from the State objects
+    val searchTextValue = searchText.value
+    val isSearchingValue = isSearching.value
+    val playerResultsValue = playerResults.value
+
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -63,9 +73,9 @@ fun SearchScreen(searchViewModel: SearchViewModel, // Receive the ViewModel inst
                     selectedSearchType = searchType
                 },
                 onSearchTextChange = { newText ->
-                    searchViewModel.onSearchTextChange(newText)
+                    onSearchTextChange(newText)
                 },
-                onClearSearchResults = { searchViewModel.clearPlayerResults() }
+                onClearSearchResults = clearPlayerResults
             )
             //Add slight vertical space between radio buttons and search bar
             Spacer(modifier = Modifier.height(6.dp))
@@ -73,9 +83,9 @@ fun SearchScreen(searchViewModel: SearchViewModel, // Receive the ViewModel inst
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(8.dp)),
-                value = searchText,
+                value = searchTextValue,
                 singleLine = true,
-                onValueChange = { searchViewModel.onSearchTextChange(it) },
+                onValueChange = { onSearchTextChange(it) },
                 label = {
                     Text(if (selectedSearchType == "Player") "Search Players ..."
                     else "Search Teams...")
@@ -93,7 +103,7 @@ fun SearchScreen(searchViewModel: SearchViewModel, // Receive the ViewModel inst
             )
             //Add vertical space between search and list
             Spacer(modifier = Modifier.height(16.dp))
-            if (isSearching && searchText != "") { //Loading circle while searching
+            if (isSearchingValue && searchTextValue != "") { //Loading circle while searching
                 Box(modifier = Modifier.fillMaxSize()) {
                     CircularProgressIndicator(
                         modifier = Modifier.align(Alignment.Center)
@@ -101,7 +111,7 @@ fun SearchScreen(searchViewModel: SearchViewModel, // Receive the ViewModel inst
                 }
             }
             else { // Display results after search
-                SearchResultsDisplay(searchResults = playerResults) { nameArg ->
+                SearchResultsDisplay(searchResults = playerResultsValue) { nameArg ->
                     if (selectedSearchType == "Player") navigateToPlayerProfile(nameArg)
                     else if (selectedSearchType == "Team") navigateToTeamProfile(nameArg)
                 }
@@ -199,15 +209,5 @@ fun SearchScreenPreview() {
     //Dummy navController/view model for previewing
     val navController = rememberNavController()
     val searchViewModel = viewModel<SearchViewModel>()
-    SearchScreen(
-        searchViewModel = searchViewModel,
-        //Pass in a lambda that'll let us go to a player's profile on click
-        navigateToPlayerProfile = { playerName ->
-            navController.navigate("${Screens.ProfileScreen.route}/$playerName")
-        },
-        //Pass in lambda that'll let us go to a team's profile on click
-        navigateToTeamProfile = { teamName ->
-            navController.navigate("${Screens.TeamProfileScreen.route}/$teamName")
-        }
-    )
+    //SearchScreen()
 }

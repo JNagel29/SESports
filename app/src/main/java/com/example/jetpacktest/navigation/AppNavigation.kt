@@ -9,6 +9,7 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -82,12 +83,18 @@ fun AppNavigation() {
             }
             composable(route=Screens.SearchScreen.name) {
                 SearchScreen(
-                    searchViewModel = searchViewModel,
-                    //Pass in a lambda that'll let us go to a player's profile on click
+                    //States and lambdas from view model (we never want to pass entire VM)
+                    searchText = searchViewModel.searchText.collectAsState(),
+                    isSearching = searchViewModel.isSearching.collectAsState(),
+                    playerResults = searchViewModel.playerResults.collectAsState(),
+                    onSearchTextChange ={ newText ->
+                        searchViewModel.onSearchTextChange(newText)
+                    },
+                    clearPlayerResults = { searchViewModel.clearPlayerResults() },
+                    //Two more lambdas that will let us access team/player profiles on click
                     navigateToPlayerProfile = { playerName ->
                         navController.navigate("${Screens.ProfileScreen.route}/$playerName")
                     },
-                    //Pass in lambda that'll let us go to a team's profile on click
                     navigateToTeamProfile = { teamName ->
                         navController.navigate("${Screens.TeamProfileScreen.route}/$teamName")
                     }
