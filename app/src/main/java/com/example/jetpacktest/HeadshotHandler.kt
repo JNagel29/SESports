@@ -17,7 +17,22 @@ import com.android.volley.toolbox.JsonArrayRequest
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import org.json.JSONException
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import java.text.Normalizer
+
+//Small Data classes to hold retrofit data
+data class ActivePlayer(
+    val PlayerID: Int,
+    val FirstName: String,
+    val LastName: String,
+)
+data class PlayerInfo(
+    val NbaDotComPlayerID: Int
+)
 
 class HeadshotHandler {
     private val useBiggerImage: Boolean = true
@@ -25,7 +40,7 @@ class HeadshotHandler {
     private val apiKey = Keys.SportsDataAPIKey
     private val activePlayersUrl =
         "https://api.sportsdata.io/v3/nba/scores/json/PlayersActiveBasic?key=$apiKey"
-    private var matchingPlayerId = -1 // -1 means no match found and to not bother calling next request
+    private var matchingPlayerId = -1 // -1 means no match found and to not bother calling next req
     private var nbaDotComPlayerId = -1
     object Const { // We use object since only way to make var constant
         //Const tag for logging
@@ -33,6 +48,84 @@ class HeadshotHandler {
     }
     //Used in fetchPlayerId/fetchImageUrl to get active players and their ID
     private var imgUrl = "DEFAULT"
+
+
+    fun fetchImageId(playerName: String, onResult: (Int) -> Unit) {
+        val baseActivePlayersUrl = "https://api.sportsdata.io/v3/nba/scores/json/"
+        val basePlayerDetailsUrl = "https://api.sportsdata.io/v3/nba/scores/json/"
+
+        //Before anything else, we must remove accents in the passed name and split it
+        val noAccentPlayerName = removeAccents(playerName)
+        val nameParts =
+            noAccentPlayerName.split(" ".toRegex(), limit = 2)
+        val firstName = nameParts.getOrNull(0) ?: ""
+        val lastName = nameParts.getOrNull(1) ?: ""
+
+        val retrofitBuilder = Retrofit.Builder()
+            .addConverterFactory(GsonConverterFactory.create())
+            .baseUrl(baseActivePlayersUrl)
+            .build()
+            .create(ApiInterface::class.java)
+        val retrofitGames = retrofitBuilder.getActivePlayers(Keys.SportsDataAPIKey)
+
+        retrofitGames.enqueue(object : Callback<List<ActivePlayer>?> {
+            override fun onResponse(call: Call<List<ActivePlayer>?>,
+                                response: Response<List<ActivePlayer>?>) {
+                if (response.isSuccessful) {
+                    val responseBody = response.body()!!
+                    for (activePlayer in responseBody) {
+                        //Check for matching name
+                        if (firstName.equals(activePlayer.FirstName, ignoreCase = true) &&
+                        lastName.equals(activePlayer.LastName, ignoreCase = true)) {
+                            Log.d("HeadshotHandler", "Match Found: ${activePlayer.PlayerID}")
+                            //Make second retrofit request
+                            val retrofitBuilder2 = Retrofit.Builder()
+                                .addConverterFactory(GsonConverterFactory.create())
+                                .baseUrl(basePlayerDetailsUrl)
+                                .build()
+                                .create(ApiInterface::class.java)
+                            val retrofitPlayers = retrofitBuilder2.getPlayerById(
+                                playerId = activePlayer.PlayerID,
+                                apiKey = Keys.SportsDataAPIKey
+                            )
+                            retrofitPlayers.enqueue(object : Callback<PlayerInfo?> {
+                                override fun onResponse(
+                                    call2: Call<PlayerInfo?>,
+                                    response2: Response<PlayerInfo?>
+                                ) {
+                                    if (response2.isSuccessful) {
+                                        //No need to loop this time, since only one JSON object
+                                        val playerInfo = response2.body()!!
+                                        Log.d("HeadshotHandler", "${playerInfo.NbaDotComPlayerID}")
+                                        onResult(playerInfo.NbaDotComPlayerID)
+                                    }
+                                    else {
+                                        Log.d("HeadshotHandler",
+                                            "Retrofit failure, 2nd req.: Unsuccessful Response")
+                                    }
+                                }
+
+                                override fun onFailure(call2: Call<PlayerInfo?>, t2: Throwable) {
+                                    Log.d("HeadshotHandler",
+                                        "Retrofit failure, 2nd req: $t2")
+                                }
+                            })
+
+
+                        }
+                    }
+                }
+                else {
+                    Log.d("HeadshotHandler", "Retrofit failure: Unsuccessful Response")
+                }
+            }
+
+            override fun onFailure(call: Call<List<ActivePlayer>?>, t: Throwable) {
+                Log.d("HeadshotHandler", "Retrofit failure: $t")
+
+            }
+        })
+    }
 
     fun fetchImageUrl(playerName: String, context: Context, onResult: (String) -> Unit){
         imageUrlPrefix = if (useBiggerImage) "https://cdn.nba.com/headshots/nba/latest/1040x760/"

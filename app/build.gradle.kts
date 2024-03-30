@@ -80,6 +80,9 @@ dependencies {
     implementation("com.github.Rafsanjani:datepickertimeline:0.7.1")
     //For detecting leaks in notification of emulator
     debugImplementation("com.squareup.leakcanary:leakcanary-android:2.13")
+    //Retrofit API and GSON
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.1.0")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")

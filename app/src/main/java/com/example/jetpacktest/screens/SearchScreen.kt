@@ -1,13 +1,11 @@
 package com.example.jetpacktest.screens
 
 import SearchViewModel
-import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
 //Material 3
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
@@ -23,43 +21,30 @@ import androidx.compose.material3.TextFieldDefaults
 //Composable/UI
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.compose.rememberNavController
-import com.example.jetpacktest.DatabaseHandler
 import com.example.jetpacktest.models.NbaTeam
-import com.example.jetpacktest.navigation.Screens
 
 @Composable
 fun SearchScreen(searchText: State<String>,
                  isSearching: State<Boolean>,
                  playerResults: State<List<String>>,
+                 selectedSearchType: State<String>,
+                 teamResults: State<List<String>>,
                  onSearchTextChange: (String) -> Unit,
-                 clearPlayerResults: () -> Unit,
+                 onSearchTypeChange: (String) -> Unit,
+                 clearResults: () -> Unit,
                  navigateToPlayerProfile: (String) -> Unit,
                  navigateToTeamProfile: (String) -> Unit) {
-    var selectedSearchType by remember {
-        mutableStateOf("Player") // Default to player on launch
-    }
-    //val searchText by searchViewModel.searchText.collectAsState()
-    //val isSearching by searchViewModel.isSearching.collectAsState()
-    //val playerResults by searchViewModel.playerResults.collectAsState()
-    // Retrieve the values from the State objects
     val searchTextValue = searchText.value
     val isSearchingValue = isSearching.value
+    val selectedSearchTypeValue = selectedSearchType.value
     val playerResultsValue = playerResults.value
-
+    val teamResultsValue = teamResults.value
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -68,14 +53,14 @@ fun SearchScreen(searchText: State<String>,
         Column(modifier = Modifier.padding(10.dp)) {
             //First, we call function to display our radio buttons
             RadioButtonsDisplay(
-                selectedSearchType = selectedSearchType,
+                selectedSearchType = selectedSearchTypeValue,
                 onSearchTypeSelected = { searchType ->
-                    selectedSearchType = searchType
+                    onSearchTypeChange(searchType)
                 },
                 onSearchTextChange = { newText ->
                     onSearchTextChange(newText)
                 },
-                onClearSearchResults = clearPlayerResults
+                onClearSearchResults = clearResults
             )
             //Add slight vertical space between radio buttons and search bar
             Spacer(modifier = Modifier.height(6.dp))
@@ -87,7 +72,7 @@ fun SearchScreen(searchText: State<String>,
                 singleLine = true,
                 onValueChange = { onSearchTextChange(it) },
                 label = {
-                    Text(if (selectedSearchType == "Player") "Search Players ..."
+                    Text(if (selectedSearchType.value == "Player") "Search Players ..."
                     else "Search Teams...")
                 },
                 leadingIcon = {
@@ -111,9 +96,12 @@ fun SearchScreen(searchText: State<String>,
                 }
             }
             else { // Display results after search
-                SearchResultsDisplay(searchResults = playerResultsValue) { nameArg ->
-                    if (selectedSearchType == "Player") navigateToPlayerProfile(nameArg)
-                    else if (selectedSearchType == "Team") navigateToTeamProfile(nameArg)
+                SearchResultsDisplay(
+                    searchResults = if (selectedSearchTypeValue == "Player") playerResultsValue
+                                    else teamResultsValue
+                ) { nameArg ->
+                    if (selectedSearchTypeValue == "Player") navigateToPlayerProfile(nameArg)
+                    else if (selectedSearchTypeValue == "Team") navigateToTeamProfile(nameArg)
                 }
             }
         }
@@ -154,7 +142,6 @@ fun RadioButtonsDisplay(selectedSearchType: String, onSearchTypeSelected: (Strin
         RadioButton(
             //If var equals Team, then we know it's selected and so it gets a check on it
             selected = selectedSearchType == "Team",
-            //Set var to Team on click
             //We use the lambda that sets the searchTypeSelected from the caller function, to Team
             onClick = {handleClick("Team")
             },
@@ -171,11 +158,9 @@ fun RadioButtonsDisplay(selectedSearchType: String, onSearchTypeSelected: (Strin
 //This function actually displays our results
 @Composable
 fun SearchResultsDisplay(searchResults: List<String>, navigateToProfile: (String) -> (Unit)) {
-    //Now, our 'recyclerview' to display search results
     LazyColumn(modifier = Modifier.fillMaxSize()) {
-        //items is function that loops through our list of results and displays it
         items(searchResults) { itemName ->
-            Box( // We use Box wrapping text to make it so entire row is clickable, not just text
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 8.dp)
@@ -206,8 +191,4 @@ fun handleTeamSearch(searchedTeamName: String, onSearchResult: (List<String>) ->
 @Preview
 @Composable
 fun SearchScreenPreview() {
-    //Dummy navController/view model for previewing
-    val navController = rememberNavController()
-    val searchViewModel = viewModel<SearchViewModel>()
-    //SearchScreen()
 }

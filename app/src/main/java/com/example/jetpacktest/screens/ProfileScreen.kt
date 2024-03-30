@@ -22,6 +22,7 @@ import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -49,19 +50,28 @@ import com.example.jetpacktest.models.Player
 fun ProfileScreen(playerName: String, navigateBack: () -> Unit) {
     val headshotHandler = HeadshotHandler()
     val databaseHandler = DatabaseHandler()
+    //val context = LocalContext.current
     val apiHandler = ApiHandler()
-    val context = LocalContext.current
-    var imgUrl by remember { mutableStateOf("") }
+    //var imgUrl by remember { mutableStateOf("") }
+    var imgId by remember { mutableIntStateOf(-1) }
     var yearsList by remember { mutableStateOf<List<String>>(emptyList()) }
     var chosenYear by remember { mutableStateOf("") }
     var showExpandedData by remember { mutableStateOf(false) }
     var player by remember { mutableStateOf(Player()) }
 
     LaunchedEffect(Unit) {
+        headshotHandler.fetchImageId(playerName) { result ->
+            imgId = result
+        }
+
+        /*
         //On first launch, fetch the headshot and assign imgUrl to result using lambda callback
         headshotHandler.fetchImageUrl(playerName = playerName, context = context) { result ->
             imgUrl = result // Update img url with parameter result you pass via callback
         }
+
+         */
+
         //Also, fetch the list of years that we'll use to populate dropdown menu
         databaseHandler.executeYears(playerName = playerName) {result ->
             yearsList = result // Update years list with parameter result you pass via callback
@@ -86,7 +96,7 @@ fun ProfileScreen(playerName: String, navigateBack: () -> Unit) {
             Spacer(modifier = Modifier.height(15.dp))
             NameAndHeadshot(
                 playerName = playerName,
-                imgUrl = imgUrl,
+                imgUrl = "https://cdn.nba.com/headshots/nba/latest/1040x760/$imgId.png",
                 team =  player.team,
                 position = player.position,
                 headshotHandler = headshotHandler
@@ -116,7 +126,6 @@ fun ProfileScreen(playerName: String, navigateBack: () -> Unit) {
                                 player = data
                             }
                         )
-
                          */
                     }
                 }

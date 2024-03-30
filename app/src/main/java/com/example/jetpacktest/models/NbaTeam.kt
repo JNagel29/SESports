@@ -4,7 +4,7 @@ import com.example.jetpacktest.R
 
 //Used in TeamProfile and Standings
 //For fetching standings, fetching player names of team we wont use an object since its only name field)
-data class Team(
+data class TeamStanding(
     val city: String,
     val name: String,
     val conference: Conference,

@@ -86,11 +86,16 @@ fun AppNavigation() {
                     //States and lambdas from view model (we never want to pass entire VM)
                     searchText = searchViewModel.searchText.collectAsState(),
                     isSearching = searchViewModel.isSearching.collectAsState(),
+                    selectedSearchType = searchViewModel.selectedSearchType.collectAsState(),
                     playerResults = searchViewModel.playerResults.collectAsState(),
+                    teamResults = searchViewModel.teamResults.collectAsState(),
                     onSearchTextChange ={ newText ->
                         searchViewModel.onSearchTextChange(newText)
                     },
-                    clearPlayerResults = { searchViewModel.clearPlayerResults() },
+                    onSearchTypeChange = { newType ->
+                       searchViewModel.onSearchTypeChanged(newType)
+                    },
+                    clearResults = { searchViewModel.clearResults() },
                     //Two more lambdas that will let us access team/player profiles on click
                     navigateToPlayerProfile = { playerName ->
                         navController.navigate("${Screens.ProfileScreen.route}/$playerName")
