@@ -24,26 +24,27 @@ class SearchViewModel() : ViewModel() {
 
     //Niko: Used this video as a guide: https://www.youtube.com/watch?v=CfL6Dl2_dAE
     @OptIn(ExperimentalCoroutinesApi::class)
-    val playerResults = searchText
-        .debounce(1000L)
-        .onEach { _isSearching.update { true } }
-        .flatMapLatest { text ->
-            if (text.isBlank()) {
-                flowOf(_playerResults.value)
-            } else {
-                viewModelScope.launch {
-                    databaseHandler.executePlayerSearchResults(text) { results ->
-                        _playerResults.value = results
-                        _isSearching.value = false //Update isSearching after the search is complete
-                    }
+    val playerResults = combine(
+        _selectedSearchType,
+        searchText.debounce(500L)
+    ) { searchType, text ->
+        if (searchType == "Player" && text.isNotBlank()) {
+            _isSearching.value = true
+            viewModelScope.launch {
+                databaseHandler.executePlayerSearchResults(text) { results ->
+                    _playerResults.value = results
+                    _isSearching.value = false
                 }
-                _playerResults
             }
+            _playerResults
+        } else {
+            flowOf(emptyList())
         }
+    }.flattenMerge()
         .stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(5000),
-            _playerResults.value
+            emptyList()
         )
 
     private val _teamResults = MutableStateFlow<List<String>>(emptyList())
@@ -53,7 +54,7 @@ class SearchViewModel() : ViewModel() {
     val teamResults = searchText
         .flatMapLatest { text ->
             if (text.isBlank()) {
-                flowOf(emptyList())
+                flowOf(NbaTeam.names)
             } else {
                 flow {
                     val filteredTeams = NbaTeam.names.filter { teamName ->
@@ -63,12 +64,12 @@ class SearchViewModel() : ViewModel() {
                 }
             }
         }
-        .onEach { _isSearching.value = it.isNotEmpty() }
         .stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(5000),
             emptyList()
         )
+
 
     fun onSearchTextChange(text: String) {
         _searchText.value = text

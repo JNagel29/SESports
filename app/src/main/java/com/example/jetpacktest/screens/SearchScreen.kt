@@ -28,18 +28,21 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.jetpacktest.models.NbaTeam
+import com.example.jetpacktest.ui.theme.CircularLoadingIcon
 
 @Composable
-fun SearchScreen(searchText: State<String>,
-                 isSearching: State<Boolean>,
-                 playerResults: State<List<String>>,
-                 selectedSearchType: State<String>,
-                 teamResults: State<List<String>>,
-                 onSearchTextChange: (String) -> Unit,
-                 onSearchTypeChange: (String) -> Unit,
-                 clearResults: () -> Unit,
-                 navigateToPlayerProfile: (String) -> Unit,
-                 navigateToTeamProfile: (String) -> Unit) {
+fun SearchScreen(
+     searchText: State<String>,
+     isSearching: State<Boolean>,
+     playerResults: State<List<String>>,
+     selectedSearchType: State<String>,
+     teamResults: State<List<String>>,
+     onSearchTextChange: (String) -> Unit,
+     onSearchTypeChange: (String) -> Unit,
+     clearResults: () -> Unit,
+     navigateToPlayerProfile: (String) -> Unit,
+     navigateToTeamProfile: (String) -> Unit)
+{
     val searchTextValue = searchText.value
     val isSearchingValue = isSearching.value
     val selectedSearchTypeValue = selectedSearchType.value
@@ -88,12 +91,8 @@ fun SearchScreen(searchText: State<String>,
             )
             //Add vertical space between search and list
             Spacer(modifier = Modifier.height(16.dp))
-            if (isSearchingValue && searchTextValue != "") { //Loading circle while searching
-                Box(modifier = Modifier.fillMaxSize()) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.align(Alignment.Center)
-                    )
-                }
+            if (isSearchingValue && searchTextValue != "") {
+                CircularLoadingIcon()
             }
             else { // Display results after search
                 SearchResultsDisplay(

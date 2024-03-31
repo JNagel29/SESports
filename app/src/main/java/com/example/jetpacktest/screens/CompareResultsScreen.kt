@@ -1,5 +1,6 @@
 package com.example.jetpacktest.screens
 
+import ReturnToPreviousHeader
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -14,66 +15,52 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.jetpacktest.DatabaseHandler
 import com.example.jetpacktest.models.Player
+import com.example.jetpacktest.ui.theme.CircularLoadingIcon
+import com.example.jetpacktest.ui.theme.LargeDropdownMenu
 
 @Composable
-fun CompareResultsScreen(navigateBack: () -> Unit) {
-    // Define player objects with hardcoded data
-    val player1 = Player(
-        name = "Lebron James",
-        year = 2024,
-        position = "Forward",
-        team = "Lakers",
-        points = 25.4f,
-        assists = 8.1f,
-        steals = 1.2f,
-        blocks = 0.6f,
-        totalRebounds = 7.2f,
-        turnovers = 3.3f,
-        personalFouls = 1.2f,
-        minutesPlayed = 35.2f,
-        fieldGoals = 9.5f,
-        fieldGoalAttempts = 18.0f,
-        fieldGoalPercent = 53.0f,
-        threePointers = 2.2f,
-        threePointerAttempts = 5.3f,
-        threePointPercent = 40.6f,
-        twoPointers = 7.4f,
-        twoPointerAttempts = 12.7f,
-        twoPointPercent = 58.1f,
-        effectiveFieldGoalPercent = 59.0f,
-        offensiveRebounds = 0.8f,
-        defensiveRebounds = 6.3f
-    )
+fun CompareResultsScreen(playerName1: String, playerName2: String, navigateBack: () -> Unit) {
+    val databaseHandler = DatabaseHandler()
+    var player1 by remember { mutableStateOf(Player()) }
+    var player2 by remember { mutableStateOf(Player()) }
+    var chosenYear1 by remember { mutableStateOf("") }
+    var chosenYear2 by remember { mutableStateOf("") }
+    var yearsList1 by remember { mutableStateOf<List<String>>(emptyList()) }
+    var yearsList2 by remember { mutableStateOf<List<String>>(emptyList()) }
+    var isFetching1 by remember { mutableStateOf(false)}
+    var isFetching2 by remember { mutableStateOf(false)}
 
-    val player2 = Player(
-        name = "Stephen Curry",
-        year = 2024,
-        position = "Guard",
-        team = "Warriors",
-        points = 26.8f,
-        assists = 4.9f,
-        steals = 0.8f,
-        blocks = 0.3f,
-        totalRebounds = 4.5f,
-        turnovers = 2.9f,
-        personalFouls = 1.6f,
-        minutesPlayed = 32.7f,
-        fieldGoals = 8.8f,
-        fieldGoalAttempts = 19.7f,
-        fieldGoalPercent = 44.8f,
-        threePointers = 4.9f,
-        threePointerAttempts = 12.1f,
-        threePointPercent = 40.4f,
-        twoPointers = 4.0f,
-        twoPointerAttempts = 7.7f,
-        twoPointPercent = 51.8f,
-        effectiveFieldGoalPercent = 57.2f,
-        offensiveRebounds = 0.5f,
-        defensiveRebounds = 3.9f
-    )
 
-    // Display player information using com.example.jetpack test.screens.PlayerProfile
+
+    LaunchedEffect(Unit) {
+        isFetching1 = true
+        //Fetch player 1 years and data
+        databaseHandler.executeYears(playerName = playerName1) {result ->
+            yearsList1 = result
+            if (yearsList1.isNotEmpty()) {
+                chosenYear1 = yearsList1.first() //Default to most recent year
+                databaseHandler.executePlayerData(playerName1, chosenYear1) { data ->
+                    player1 = data
+                    isFetching1 = false
+                }
+            }
+        }
+        isFetching2 = true
+        //Same for player2
+        databaseHandler.executeYears(playerName = playerName2) {result ->
+            yearsList2 = result
+            if (yearsList2.isNotEmpty()) {
+                chosenYear2 = yearsList2.first() //Default to most recent year
+                databaseHandler.executePlayerData(playerName2, chosenYear2) { data ->
+                    player2 = data
+                    isFetching2 = false
+                }
+            }
+        }
+    }
+
     Surface(modifier = Modifier.fillMaxSize(), color = Color.White) {
         Column(
             modifier = Modifier
@@ -81,9 +68,40 @@ fun CompareResultsScreen(navigateBack: () -> Unit) {
                 .padding(16.dp)
                 .verticalScroll(rememberScrollState())
         ) {
-            ReturnToSearchHeader(navigateBack = navigateBack)
+            ReturnToPreviousHeader(navigateBack = navigateBack)
             Spacer(modifier = Modifier.height(15.dp))
-            PlayerProfile(players = listOf(player1, player2))
+            LargeDropdownMenu(
+                label = "Select ${player1.name}'s Year:",
+                items = yearsList1,
+                selectedIndex = yearsList1.indexOf(chosenYear1),
+                onItemSelected = { index, _ ->
+                    val year = yearsList1[index]
+                    //Check if newly selected stat is different from previous
+                    if (year != chosenYear1) {
+                        chosenYear1 = year
+                        databaseHandler.executePlayerData(playerName1, chosenYear1) { data ->
+                            player1 = data
+                        }
+                    }
+                }
+            )
+            LargeDropdownMenu(
+                label = "Select ${player2.name}'s Year:",
+                items = yearsList2,
+                selectedIndex = yearsList2.indexOf(chosenYear2),
+                onItemSelected = { index, _ ->
+                    val year = yearsList2[index]
+                    //Check if newly selected stat is different from previous
+                    if (year != chosenYear2) {
+                        chosenYear2 = year
+                        databaseHandler.executePlayerData(playerName2, chosenYear2) { data ->
+                            player2 = data
+                        }
+                    }
+                }
+            )
+            if (!isFetching1 && !isFetching2) PlayerProfile(players = listOf(player1, player2))
+            else CircularLoadingIcon()
             Spacer(modifier = Modifier.height(20.dp))
         }
     }
@@ -112,101 +130,102 @@ fun PlayerProfile(players: List<Player>) {
                 }
             }
         }
-        HorizontalDivider()
     }
 }
 
 @Composable
-fun PlayerStats(player: Player, otherPlayer: Player) {
+fun PlayerStats(player1: Player, player2: Player) {
     Column(
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        StatRow("Name", player.name, otherPlayer.name)
-        StatRow("Year", player.year.toString(), otherPlayer.year.toString())
-        StatRow("Position", player.position, otherPlayer.position)
-        StatRow("Team", player.team, otherPlayer.team)
-        StatRow("Points", player.points.toString(), otherPlayer.points.toString())
-        StatRow("Assists", player.assists.toString(), otherPlayer.assists.toString())
-        StatRow("Steals", player.steals.toString(), otherPlayer.steals.toString())
-        StatRow("Blocks", player.blocks.toString(), otherPlayer.blocks.toString())
-        StatRow("Total Rebounds", player.totalRebounds.toString(), otherPlayer.totalRebounds.toString())
-        StatRow("Turnovers", player.turnovers.toString(), otherPlayer.turnovers.toString())
-        StatRow("Personal Fouls", player.personalFouls.toString(), otherPlayer.personalFouls.toString())
-        StatRow("Minutes Played", player.minutesPlayed.toString(), otherPlayer.minutesPlayed.toString())
-        StatRow("FG", player.fieldGoals.toString(), otherPlayer.fieldGoals.toString())
-        StatRow("FGA", player.fieldGoalAttempts.toString(), otherPlayer.fieldGoalAttempts.toString())
-        StatRow("FG%", player.fieldGoalPercent.toString(), otherPlayer.fieldGoalPercent.toString())
-        StatRow("3P ", player.threePointers.toString(), otherPlayer.threePointers.toString())
-        StatRow("3PA", player.threePointerAttempts.toString(), otherPlayer.threePointerAttempts.toString())
-        StatRow("3P%", player.threePointPercent.toString(), otherPlayer.threePointPercent.toString())
-        StatRow("2P", player.twoPointers.toString(), otherPlayer.twoPointers.toString())
-        StatRow("2PA", player.twoPointerAttempts.toString(), otherPlayer.twoPointerAttempts.toString())
-        StatRow("2P%", player.twoPointPercent.toString(), otherPlayer.twoPointPercent.toString())
-        StatRow("EFG%", player.effectiveFieldGoalPercent.toString(), otherPlayer.effectiveFieldGoalPercent.toString())
-        StatRow("ORB", player.offensiveRebounds.toString(), otherPlayer.offensiveRebounds.toString())
-        StatRow("DRB", player.defensiveRebounds.toString(), otherPlayer.defensiveRebounds.toString())
+        StatRow("Name", player1.name, player2.name)
+        StatRow("Year", player1.year.toString(), player2.year.toString())
+        StatRow("Position", player1.position, player2.position)
+        StatRow("Team", player1.team, player2.team)
+        StatRow("Points", player1.points.toString(), player2.points.toString())
+        StatRow("Assists", player1.assists.toString(), player2.assists.toString())
+        StatRow("Steals", player1.steals.toString(), player2.steals.toString())
+        StatRow("Blocks", player1.blocks.toString(), player2.blocks.toString())
+        StatRow("Total Rebounds", player1.totalRebounds.toString(), player2.totalRebounds.toString())
+        StatRow("Turnovers", player1.turnovers.toString(), player2.turnovers.toString())
+        StatRow("Personal Fouls", player1.personalFouls.toString(), player2.personalFouls.toString())
+        StatRow("Minutes Played", player1.minutesPlayed.toString(), player2.minutesPlayed.toString())
+        StatRow("FG", player1.fieldGoals.toString(), player2.fieldGoals.toString())
+        StatRow("FGA", player1.fieldGoalAttempts.toString(), player2.fieldGoalAttempts.toString())
+        StatRow("FG%", player1.fieldGoalPercent.toString(), player2.fieldGoalPercent.toString())
+        StatRow("3P ", player1.threePointers.toString(), player2.threePointers.toString())
+        StatRow("3PA", player1.threePointerAttempts.toString(), player2.threePointerAttempts.toString())
+        StatRow("3P%", player1.threePointPercent.toString(), player2.threePointPercent.toString())
+        StatRow("2P", player1.twoPointers.toString(), player2.twoPointers.toString())
+        StatRow("2PA", player1.twoPointerAttempts.toString(), player2.twoPointerAttempts.toString())
+        StatRow("2P%", player1.twoPointPercent.toString(), player2.twoPointPercent.toString())
+        StatRow("EFG%", player1.effectiveFieldGoalPercent.toString(), player2.effectiveFieldGoalPercent.toString())
+        StatRow("ORB", player1.offensiveRebounds.toString(), player2.offensiveRebounds.toString())
+        StatRow("DRB", player1.defensiveRebounds.toString(), player2.defensiveRebounds.toString())
     }
 }
 @Composable
-fun StatRow(label: String, playerValue: String, otherPlayerValue: String) {
-    val playerValueFloat = playerValue.toFloatOrNull()
-    val otherPlayerValueFloat = otherPlayerValue.toFloatOrNull()
+fun StatRow(label: String, player1Value: String, player2Value: String) {
+    val playerValueFloat = player1Value.toFloatOrNull()
+    val player2ValueFloat = player2Value.toFloatOrNull()
 
-    val playerColor = when {
+    val player1Color = when {
+        //Lower is better
         label == "Turnovers" || label == "Personal Fouls" -> {
-            if (playerValueFloat != null && otherPlayerValueFloat != null) {
-                if (playerValueFloat < otherPlayerValueFloat) Color.Green else Color.Red
+            if (playerValueFloat != null && player2ValueFloat != null) {
+                if (playerValueFloat < player2ValueFloat) Color.Green else Color.Red
             } else Color.Black
         }
-        playerValueFloat != null && otherPlayerValueFloat != null -> {
-            if (playerValueFloat > otherPlayerValueFloat) Color.Green else Color.Red
+        //Higher is better
+        playerValueFloat != null && player2ValueFloat != null -> {
+            if (playerValueFloat > player2ValueFloat) Color.Green else Color.Red
+        }
+        else -> Color.Black //For non-stat values
+    }
+
+    val player2Color = when {
+        label == "Turnovers" || label == "Personal Fouls" -> {
+            if (playerValueFloat != null && player2ValueFloat != null) {
+                if (player2ValueFloat < playerValueFloat) Color.Green else Color.Red
+            } else Color.Black
+        }
+        playerValueFloat != null && player2ValueFloat != null -> {
+            if (player2ValueFloat > playerValueFloat) Color.Green else Color.Red
         }
         else -> Color.Black
     }
 
-    val otherPlayerColor = when {
-        label == "Turnovers" || label == "Personal Fouls" -> {
-            if (playerValueFloat != null && otherPlayerValueFloat != null) {
-                if (otherPlayerValueFloat < playerValueFloat) Color.Green else Color.Red
-            } else Color.Black
+    Column {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = label,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.weight(1f)
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = player1Value,
+                fontSize = if (label == "Name") 14.sp else 18.sp,
+                textAlign = TextAlign.End,
+                color = if (label == "Year") Color.Black else player1Color,
+                modifier = Modifier.weight(1f)
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = player2Value,
+                fontSize = if (label == "Name") 14.sp else 18.sp,
+                textAlign = TextAlign.End,
+                color = if (label == "Year") Color.Black else player2Color,
+                modifier = Modifier.weight(1f)
+            )
         }
-        playerValueFloat != null && otherPlayerValueFloat != null -> {
-            if (otherPlayerValueFloat > playerValueFloat) Color.Green else Color.Red
-        }
-        else -> Color.Black
-    }
-
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Text(
-            text = label,
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.weight(1f)
-        )
-        Spacer(modifier = Modifier.width(8.dp))
-        Text(
-            text = playerValue,
-            fontSize = if (label == "Name") 14.sp else 18.sp, // Adjust the font size for player names
-            textAlign = TextAlign.End,
-            color = if (label == "Year") Color.Black else playerColor,
-            modifier = Modifier.weight(1f)
-        )
-        Spacer(modifier = Modifier.width(8.dp))
-        Text(
-            text = otherPlayerValue,
-            fontSize = if (label == "Name") 14.sp else 18.sp, // Adjust the font size for player names
-            textAlign = TextAlign.End,
-            color = if (label == "Year") Color.Black else otherPlayerColor,
-            modifier = Modifier.weight(1f)
-        )
+        HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
     }
 }
-
-
-
 

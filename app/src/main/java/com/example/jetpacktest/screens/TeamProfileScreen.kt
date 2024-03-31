@@ -1,5 +1,6 @@
 package com.example.jetpacktest.screens
 
+import ReturnToPreviousHeader
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -61,7 +62,7 @@ fun TeamProfileScreen(teamName: String,
     //Wraps data inside column
     Column(modifier = Modifier.fillMaxSize()) {
         //Uses search header composable for back button from ProfileScreen.kt since same logic
-        ReturnToSearchHeader(navigateBack)
+        ReturnToPreviousHeader(navigateBack)
         //Adds space between header and actual data
         Spacer(modifier = Modifier.height(15.dp))
         //Team name and logo (will pass into own composable w/ teamName, contentDesc, width/height

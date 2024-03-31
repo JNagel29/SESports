@@ -1,5 +1,6 @@
 package com.example.jetpacktest.screens
 
+import ReturnToPreviousHeader
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -91,12 +92,12 @@ fun ProfileScreen(playerName: String, navigateBack: () -> Unit) {
         //Have to wrap inside column for Spacer to work
         Column(modifier = Modifier.fillMaxSize()) {
             //Calls composable that sets up our back header to go back to search
-            ReturnToSearchHeader(navigateBack = navigateBack)
+            ReturnToPreviousHeader(navigateBack = navigateBack)
             //Adds space between header and actual data
             Spacer(modifier = Modifier.height(15.dp))
             NameAndHeadshot(
                 playerName = playerName,
-                imgUrl = "https://cdn.nba.com/headshots/nba/latest/1040x760/$imgId.png",
+                imgId = imgId,
                 team =  player.team,
                 position = player.position,
                 headshotHandler = headshotHandler
@@ -144,7 +145,7 @@ fun ProfileScreen(playerName: String, navigateBack: () -> Unit) {
 @Composable
 fun NameAndHeadshot(
     playerName: String,
-    imgUrl: String,
+    imgId: Int,
     team: String,
     position: String,
     headshotHandler: HeadshotHandler
@@ -159,6 +160,8 @@ fun NameAndHeadshot(
             )
             .offset(y = 20.dp) //Move image down a bit
     ) {
+        val imgUrl = if (imgId == -1 || imgId == 0) "DEFAULT"
+        else "https://cdn.nba.com/headshots/nba/latest/1040x760/$imgId.png"
         //This row will hold the headshot and player name
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -292,53 +295,29 @@ fun PlayerDataTable(player: Player) {
 
 @Composable
 fun PlayerDataRow(label: String, value: String) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Center
-    ) {
-        //Prints label aligned to the left
-        Text(
-            label,
-            fontSize = 22.sp,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.weight(1f)
-        )
-        Spacer(modifier = Modifier.width(8.dp))
-        //Prints actual value aligned to the right
-        Text(
-            value,
-            fontSize = 22.sp,
-            textAlign = TextAlign.End,
-            modifier = Modifier.weight(1f)
-        )
-    }
-}
-
-@Composable
-fun ReturnToSearchHeader(navigateBack: () -> Unit) {
-    Column(
-        modifier = Modifier.padding(10.dp),
-        verticalArrangement = Arrangement.Top
-    ) {
+    Column {
         Row(
+            modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.clickable {
-                navigateBack()
-            }
+            horizontalArrangement = Arrangement.Center
         ) {
-            //Puts icon and back text on same row (one that is clickable b/c of modifier above)
-            Icon(
-                imageVector = ImageVector.vectorResource(R.drawable.baseline_arrow_back_ios_new_24),
-                contentDescription = "Back"
-            )
-            //Spacer between the icon and text
-            Spacer(modifier = Modifier.width(10.dp))
+            //Prints label aligned to the left
             Text(
-                text = "Return to Previous",
-                fontSize = 18.sp,
-                fontFamily = FontFamily.Serif
+                label,
+                fontSize = 22.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.weight(1f)
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            //Prints actual value aligned to the right
+            Text(
+                value,
+                fontSize = 22.sp,
+                textAlign = TextAlign.End,
+                modifier = Modifier.weight(1f)
             )
         }
+        HorizontalDivider()
     }
+
 }

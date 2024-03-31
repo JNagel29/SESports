@@ -107,10 +107,8 @@ fun AppNavigation() {
             }
             composable(route = Screens.CompareScreen.name) {
                 CompareScreen(
-                    navigateToPlayerProfile = { /* Implement */ },
-                    navController = navController,
-                    navigateToCompareResults = { playerNames ->
-                        navController.navigate("compareresultsscreen/${playerNames.joinToString(",")}")
+                    navigateToCompareResults = { playerName1, playerName2 ->
+                        navController.navigate("${Screens.CompareResultsScreen.route}/$playerName1/$playerName2")
                     }
                 )
             }
@@ -125,10 +123,11 @@ fun AppNavigation() {
                     }
                 )
             }
-            composable(route = Screens.CompareResultsScreen.name) {
-                //TODO: Will add parameters here to pass in playerName1, playerName2
-                CompareResultsScreen {
-                    //Used for back button
+            composable(route = "${Screens.CompareResultsScreen.route}/{playerName1}/{playerName2}")
+            { backStackEntry ->
+                val playerName1 = backStackEntry.arguments?.getString("playerName1") ?: ""
+                val playerName2 = backStackEntry.arguments?.getString("playerName2") ?: ""
+                CompareResultsScreen(playerName1, playerName2) {
                     navController.popBackStack()
                 }
             }

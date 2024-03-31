@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.sp
 import com.example.jetpacktest.GamesHandler
 import com.example.jetpacktest.models.Game
 import com.example.jetpacktest.models.NbaTeam
+import com.example.jetpacktest.ui.theme.CircularLoadingIcon
 import com.foreverrafs.datepicker.DatePickerTimeline
 import java.time.ZoneId
 import java.util.Date
@@ -88,13 +89,7 @@ fun GamesScreen(navigateToTeamProfile: (String) -> Unit) {
                 }
             }
         }
-        else {
-            Box(modifier = Modifier.fillMaxSize()) {
-                CircularProgressIndicator(
-                    modifier = Modifier.align(Alignment.Center)
-                )
-            }
-        }
+        else CircularLoadingIcon()
 
     }
 }

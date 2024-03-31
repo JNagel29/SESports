@@ -38,9 +38,7 @@ import com.example.jetpacktest.DatabaseHandler
 
 @Composable
 fun CompareScreen(
-    navigateToPlayerProfile: (String) -> Unit,
-    navController: NavHostController,
-    navigateToCompareResults: (List<String>) -> Unit
+    navigateToCompareResults: (String, String) -> Unit
 ) {
 
     var searchText by remember { mutableStateOf("") }
@@ -170,7 +168,7 @@ fun CompareScreen(
                     if (selectedPlayers.size < 2) {
                         showSelectionDialog = true
                     } else {
-                        navController.navigate("compareresultsscreen")
+                        navigateToCompareResults(selectedPlayers[0], selectedPlayers[1])
                     }
                 },
                 modifier = Modifier.padding(vertical = 16.dp)
