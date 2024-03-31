@@ -32,7 +32,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
 import com.example.jetpacktest.DatabaseHandler
 
 
