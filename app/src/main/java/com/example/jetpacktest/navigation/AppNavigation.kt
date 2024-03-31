@@ -1,6 +1,7 @@
 package com.example.jetpacktest.navigation
 
-import SearchViewModel
+import com.example.jetpacktest.viewmodels.HomeViewModel
+import com.example.jetpacktest.viewmodels.SearchViewModel
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
@@ -32,6 +33,7 @@ import com.example.jetpacktest.screens.TeamProfileScreen
 fun AppNavigation() {
     val navController = rememberNavController()
     val searchViewModel = viewModel<SearchViewModel>()
+    val homeViewModel = viewModel<HomeViewModel>()
     Scaffold(
         bottomBar = {
             NavigationBar {
@@ -75,6 +77,7 @@ fun AppNavigation() {
             //When passing navigation control, we pass lambdas instead of navController itself
             composable(route=Screens.HomeScreen.name) {
                 HomeScreen(
+                    homeViewModel = homeViewModel,
                     //Pass in a lambda that'll let us go to a stat leader's profile on click
                     navigateToPlayerProfile = { playerName ->
                         navController.navigate("${Screens.ProfileScreen.route}/$playerName")

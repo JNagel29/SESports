@@ -56,6 +56,41 @@ class DatabaseHandler {
         }
     }
 
+    fun executeRandomStat(onDataReceived: (String) -> Unit) {
+        executor.execute {
+            val randomStat = getRandomStat()
+            onDataReceived(randomStat)
+        }
+    }
+
+    private fun getRandomStat(): String {
+        var randomStat = ""
+        var myConn: Connection? = null
+        var statement: Statement? = null
+        var resultSet: ResultSet? = null
+        try {
+            Class.forName("com.mysql.jdbc.Driver")
+            myConn = DriverManager.getConnection(url, user, password)
+            statement = myConn.createStatement()
+            val sql = "SELECT statString FROM RANDOM_STAT ORDER BY RAND() LIMIT 1"
+            resultSet = statement.executeQuery(sql)
+            while (resultSet.next()) {
+                randomStat = resultSet.getString("statString")
+            }
+        } catch (e: SQLException) {
+            Log.d(Const.TAG, e.message!!)
+            e.printStackTrace()
+        } catch (e: ClassNotFoundException) {
+            e.printStackTrace()
+        } finally {
+            //Close resources
+            closeResources(myConn, resultSet, statement)
+        }
+        return randomStat
+    }
+
+
+
     private fun getPlayerSearchResults(searchResultName: String): MutableList<String> {
         val playerResultsList = mutableListOf<String>()
         var myConn: Connection? = null

@@ -78,6 +78,7 @@ dependencies {
     implementation("com.jakewharton.threetenabp:threetenabp:1.4.6")
     //For time picker on games screen, we needed to change repositories in settings.gradle.kts
     implementation("com.github.Rafsanjani:datepickertimeline:0.7.1")
+    implementation(files("libs\\mysql-connector-java-5.1.44-bin.jar"))
     //For detecting leaks in notification of emulator
     debugImplementation("com.squareup.leakcanary:leakcanary-android:2.13")
     //Retrofit API and GSON

@@ -44,34 +44,11 @@ fun CompareScreen(
     val focusManager = LocalFocusManager.current
     var searchResults by remember { mutableStateOf<List<String>>(emptyList()) }
     var selectedPlayers by remember { mutableStateOf<List<String>>(emptyList()) }
-    var selectedSearchType by remember { mutableStateOf("Player") }
     var showAlertDialog by remember { mutableStateOf(false) }
     var showSelectionDialog by remember { mutableStateOf(false) }
     val databaseHandler = DatabaseHandler()
 
     Column(modifier = Modifier.padding(10.dp)) {
-        RadioButtonsDisplay(
-            selectedSearchType = selectedSearchType,
-            onSearchTypeSelected = { searchType ->
-                selectedSearchType = searchType
-            },
-            onSearchTextChange = { newText ->
-                searchText = newText
-                if (selectedSearchType == "Team") {
-                    handleTeamSearch(searchText) { newResults ->
-                        searchResults = newResults.take(8)
-                    }
-                } else {
-                    databaseHandler.executePlayerSearchResults(searchText) { newResults ->
-                        searchResults = newResults.take(8)
-                    }
-                }
-            },
-            onClearSearchResults = {
-                searchResults = emptyList()
-            }
-        )
-        Spacer(modifier = Modifier.height(6.dp))
         TextField(
             modifier = Modifier
                 .fillMaxWidth()
@@ -80,19 +57,12 @@ fun CompareScreen(
             singleLine = true,
             onValueChange = {
                 searchText = it
-                if (selectedSearchType == "Player") {
-                    databaseHandler.executePlayerSearchResults(searchText) { newResults ->
-                        searchResults = newResults.take(5)
-                    }
-                } else {
-                    handleTeamSearch(searchText) { newResults ->
-                        searchResults = newResults.take(5)
-                    }
+                databaseHandler.executePlayerSearchResults(searchText) { newResults ->
+                    searchResults = newResults.take(5)
                 }
             },
             label = {
-                Text(if (selectedSearchType == "Player") "Search Players ..."
-                else "Search Teams...")
+                Text("Compare Players ...")
             },
             leadingIcon = {
                 Icon(
@@ -101,18 +71,7 @@ fun CompareScreen(
                 )
             },
             keyboardActions = KeyboardActions(
-                onDone = {
-                    if (selectedSearchType == "Player") {
-                        databaseHandler.executePlayerSearchResults(searchText) { newResults ->
-                            searchResults = newResults.take(5)
-                        }
-                    } else {
-                        handleTeamSearch(searchText) { newResults ->
-                            searchResults = newResults.take(5)
-                        }
-                    }
-                    focusManager.clearFocus()
-                }
+                onDone = { focusManager.clearFocus() }
             ),
             colors = TextFieldDefaults.colors(
                 cursorColor = Color.Blue,

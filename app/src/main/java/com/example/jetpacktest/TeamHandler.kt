@@ -53,6 +53,7 @@ class TeamHandler {
         )
         retrofitPlayers.enqueue(object : Callback<List<TeamPlayer>?> {
             override fun onResponse(call: Call<List<TeamPlayer>?>, response: Response<List<TeamPlayer>?>) {
+                Log.d("TeamHandler", "Fetching list of players...")
                 if (response.isSuccessful) {
                     val responseBody = response.body()!!
                     for (teamPlayer in responseBody) teamPlayersList.add(teamPlayer)

@@ -1,5 +1,7 @@
 package com.example.jetpacktest.screens
 
+import com.example.jetpacktest.viewmodels.HomeViewModel
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -18,74 +20,75 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.jetpacktest.DatabaseHandler
+import com.example.jetpacktest.R
 import com.example.jetpacktest.models.StatLeader
 import com.example.jetpacktest.ui.theme.JetpackTestTheme
 import com.example.jetpacktest.ui.theme.LargeDropdownMenu
 
 @Composable
-fun HomeScreen(navigateToPlayerProfile: (String) -> Unit) {
-    val databaseHandler = DatabaseHandler()
-    var statLeadersList by remember { mutableStateOf<List<StatLeader>>(emptyList()) } // Default to empty list
-    var chosenStat by remember { mutableStateOf("PTS") } //Default to pts
-    var chosenYear by remember { mutableStateOf("2024") } //Default to 2024
+fun HomeScreen(
+    homeViewModel: HomeViewModel,
+    navigateToPlayerProfile: (String) -> Unit)
+{
     val yearOptions = listOf("2009", "2010", "2011", "2012", "2013", "2014",
             "2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022",
             "2023", "2024").reversed()
     val statOptions = listOf("PTS", "AST", "TRB", "BLK", "STL")
+    //TODO:Change it so we pass just the states and lambdas, not entire Viewmodel
+    val randomStat by homeViewModel.randomStatFlow.collectAsState(initial  = "")
+    val statLeadersList by homeViewModel.statLeadersListFlow.collectAsState(initial = emptyList())
+    val chosenStat by homeViewModel.chosenStatFlow.collectAsState(initial = "PTS")
+    val chosenYear by homeViewModel.chosenYearFlow.collectAsState(initial = "2024")
 
     LaunchedEffect(Unit) {
-        //Fetch 2024 PTS on launch
-        databaseHandler.executeStatLeaders(chosenStat, chosenYear) { data ->
-            statLeadersList = data
+        Log.d("HomeScreen", "In Unit launched effect")
+        if (randomStat.isEmpty()) {
+            Log.d("HomeScreen", "In Unit  launched effect, stat fetching...")
+            homeViewModel.fetchRandomStat()
+        }
+        if (statLeadersList.isEmpty()) {
+            Log.d("HomeScreen", "In Unit  launched effect, leader fetching...")
+            homeViewModel.fetchStatLeaders()
         }
     }
-        /*
-        statLeadersList = listOf(StatLeader(rank = 5, name = "Jeff", statValue = 5.0f),
-            StatLeader(rank = 5, name = "Jeff", statValue = 5.0f),
-            StatLeader(rank = 5, name = "Jeff", statValue = 5.0f),
-            StatLeader(rank = 5, name = "Jeff", statValue = 5.0f),
-            StatLeader(rank = 5, name = "Jeff", statValue = 5.0f)
-        )
-
-         */
-
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.fillMaxWidth()
-                            .padding(20.dp)
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(20.dp)
     ) {
-        //Call header composable
-        Header()
-        //Spacer between header and menu
+        RandomStatCard(randomStat)
         Spacer(modifier = Modifier.height(8.dp))
-        //Custom Dropdown menus for each stat/year
+        Text(
+            text = "Stat Leaders",
+            fontSize = 20.sp,
+            fontFamily = FontFamily.Serif,
+            fontWeight = FontWeight.Bold
+        )
         LargeDropdownMenu(
             label = "Select Stat:",
             items = statOptions,
             selectedIndex = statOptions.indexOf(chosenStat),
             onItemSelected = { index, _ ->
                 val stat = statOptions[index]
-                //Check if newly selected stat is different from previous
                 if (stat != chosenStat) {
-                    chosenStat = stat
-                    databaseHandler.executeStatLeaders(stat, chosenYear) { data ->
-                        statLeadersList = data
-                    }
+                    homeViewModel.updateChosenStat(stat)
+                    homeViewModel.fetchStatLeaders()
                 }
             }
         )
@@ -95,39 +98,62 @@ fun HomeScreen(navigateToPlayerProfile: (String) -> Unit) {
             selectedIndex = yearOptions.indexOf(chosenYear),
             onItemSelected = { index, _ ->
                 val year = yearOptions[index]
-                //Check if newly selected year is different from previous
                 if (year != chosenYear) {
-                    chosenYear = year
-                    databaseHandler.executeStatLeaders(chosenStat, year) { data ->
-                        statLeadersList = data
-                    }
+                    homeViewModel.updateChosenYear(year)
+                    homeViewModel.fetchStatLeaders()
                 }
             }
         )
+        // Display Stat Leaders data
         LazyColumn(modifier = Modifier.padding(top = 16.dp)) {
-            items(statLeadersList) {statLeader ->
-                //Text("${statLeader.name} ${statLeader.rank} ${statLeader.statValue}\n")
+            items(statLeadersList) { statLeader ->
                 StatLeaderCard(
                     statLeader = statLeader,
                     chosenStat = chosenStat,
                     navigateToPlayerProfile = navigateToPlayerProfile
                 )
-
-
             }
         }
     }
 }
 
 @Composable
-fun Header() {
-    Text(
-        "Stat Leaders",
-        fontSize = 25.sp,
-        fontWeight = FontWeight.Bold,
-        textAlign = TextAlign.Center,
-        fontFamily = FontFamily.Serif
-    )
+fun RandomStatCard(randomStat: String) {
+    Card(
+        modifier = Modifier.padding(8.dp),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 10.dp //Adds a 'shadow' effect
+        ),
+        colors = CardDefaults.cardColors(
+            containerColor = colorResource(R.color.purple_lakers),
+            contentColor = Color.White
+        )
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Text(
+                text = "Random Stat of the Day",
+                style = TextStyle(
+                    textDecoration = TextDecoration.Underline,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 20.sp,
+                    textAlign = TextAlign.Center
+                ),
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = randomStat,
+                style = TextStyle(
+                    fontFamily = FontFamily.Serif,
+                    fontSize = 18.sp,
+                    textAlign = TextAlign.Center
+                ),
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+    }
 }
 
 @Composable
@@ -173,47 +199,6 @@ fun StatLeaderCard(statLeader: StatLeader, chosenStat: String,
                 fontSize = 16.sp,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
-        }
-
-    }
-
-}
-
-@Composable
-fun TopPlayerDisplay(statLeaderList: List<StatLeader>, chosenStat: String,
-                     navigateToPlayerProfile: (String) -> Unit) {
-    LazyColumn(
-        modifier = Modifier.padding(top = 16.dp)
-    ) {
-        //Loop through list, and for each player, make a text row with rank/name/stat val
-        items(statLeaderList) { player ->
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                //Rank and name on the left
-                Text(
-                    text = "${player.rank}: ${player.name}",
-                    fontSize = 20.sp,
-                    fontFamily = FontFamily.Serif,
-                    textAlign = TextAlign.Start,
-                    modifier = Modifier.clickable {
-                        // Navigate to that player's profile
-                        navigateToPlayerProfile(player.name)
-                    }
-
-                )
-                //Stat value on the right
-                Text(
-                    text = "${player.statValue} $chosenStat",
-                    fontSize = 20.sp,
-                    fontFamily = FontFamily.Serif,
-                    textAlign = TextAlign.End
-                )
-            }
-            //Spacer between each row for readability
-            Spacer(modifier = Modifier.height(40.dp))
         }
     }
 }

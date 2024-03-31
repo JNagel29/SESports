@@ -55,9 +55,12 @@ fun ProfileScreen(playerName: String, navigateBack: () -> Unit) {
     var player by remember { mutableStateOf(Player()) }
 
     LaunchedEffect(Unit) {
+        /*
+        //TODO: Commenting rn since blocked out anyway
         headshotHandler.fetchImageId(playerName) { result ->
             imgId = result
         }
+        */
 
         /*
         //On first launch, fetch the headshot and assign imgUrl to result using lambda callback

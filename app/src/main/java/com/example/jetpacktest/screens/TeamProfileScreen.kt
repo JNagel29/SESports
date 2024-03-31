@@ -46,18 +46,17 @@ fun TeamProfileScreen(teamName: String,
     LaunchedEffect(Unit) {
         //Before anything else, fetch team abbreviation using dictionary in NbaTeam.kt
         val teamAbbrev = NbaTeam.namesToAbbreviations[teamName]
+        //TODO: Cache these results in a TeamViewModel
+        /*
         //On first launch, fetch the list of teamPlayers and assign using our callback lambda
         if (teamAbbrev != null) {
             teamHandler.fetchCurrentRoster(teamAbbrev = teamAbbrev) { result ->
                 teamPlayersList = result
             }
-            /*
-            teamHandler.fetchTeamPlayers(teamAbbrev = teamAbbrev, context = context) { returnedPlayerList ->
-                teamPlayersList = returnedPlayerList
-            }
-             */
         }
         else Log.d("Team Profile Screen", "ERROR: namesToAbbreviations returned null")
+
+         */
     }
     //Wraps data inside column
     Column(modifier = Modifier.fillMaxSize()) {
