@@ -41,7 +41,7 @@ fun ExpandableCard(
     description: String,
     backgroundColorResource: Int
 ) {
-    //TODO: Might have to use HomeViewModel to save this state
+    //Savable used to persist state across diff screen swaps
     var isExpanded by rememberSaveable { mutableStateOf(false) }
 
     Card(

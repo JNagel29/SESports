@@ -54,6 +54,7 @@ fun ProfileScreen(playerName: String, navigateBack: () -> Unit) {
     var showExpandedData by remember { mutableStateOf(false) }
     var player by remember { mutableStateOf(Player()) }
 
+    //TODO: Add remember saveable instead of view model maybe??
     LaunchedEffect(Unit) {
         /*
         //TODO: Commenting rn since blocked out anyway

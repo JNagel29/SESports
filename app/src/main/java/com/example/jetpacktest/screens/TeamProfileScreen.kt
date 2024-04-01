@@ -48,7 +48,6 @@ fun TeamProfileScreen(teamName: String,
             /* //TODO: Commenting just in case honestly
             //Before anything else, fetch team abbreviation using dictionary in NbaTeam.kt
             val teamAbbrev = NbaTeam.namesToAbbreviations[teamName]
-            //TODO: Cache these results in a TeamViewModel
             if (teamAbbrev != null) {
                 Log.d("TeamProfile", "Fetching new roster...")
                 teamHandler.fetchCurrentRoster(teamAbbrev = teamAbbrev) { result ->
