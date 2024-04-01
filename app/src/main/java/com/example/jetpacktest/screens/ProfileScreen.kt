@@ -62,14 +62,6 @@ fun ProfileScreen(playerName: String, navigateBack: () -> Unit) {
         }
         */
 
-        /*
-        //On first launch, fetch the headshot and assign imgUrl to result using lambda callback
-        headshotHandler.fetchImageUrl(playerName = playerName, context = context) { result ->
-            imgUrl = result // Update img url with parameter result you pass via callback
-        }
-
-         */
-
         //Also, fetch the list of years that we'll use to populate dropdown menu
         databaseHandler.executeYears(playerName = playerName) {result ->
             yearsList = result // Update years list with parameter result you pass via callback

@@ -1,5 +1,6 @@
 package com.example.jetpacktest.screens
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -21,6 +22,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -44,17 +46,21 @@ import java.util.Date
 @Composable
 fun GamesScreen(navigateToTeamProfile: (String) -> Unit) {
     val gamesHandler = GamesHandler()
-    var selectedDate by remember { mutableStateOf(Date()) }
-    var gamesList by remember { mutableStateOf<List<Game>>(emptyList()) }
+    var selectedDate by rememberSaveable { mutableStateOf(Date()) }
+    var gamesList by rememberSaveable { mutableStateOf<List<Game>>(emptyList()) }
     var isFetching by remember { mutableStateOf(false)}
+    var lastFetchedDate by remember { mutableStateOf(selectedDate) }
 
-    //Will be called whenever selectedDate changes
     LaunchedEffect(selectedDate) {
-        isFetching = true
-        gamesList = emptyList()
-        gamesHandler.fetchGames(date = selectedDate) { data ->
-            gamesList = data
-            isFetching = false
+        if (gamesList.isEmpty() || selectedDate != lastFetchedDate) {
+            Log.d("GamesHandler", "Fetching new games...")
+            isFetching = true
+            gamesList = emptyList()
+            gamesHandler.fetchGames(date = selectedDate) { data ->
+                gamesList = data
+                isFetching = false
+                lastFetchedDate = selectedDate
+            }
         }
     }
 
@@ -119,10 +125,12 @@ fun GameCard(game: Game, navigateToTeamProfile: (String) -> Unit) {
                     modifier = Modifier
                         .size(50.dp)
                         //On click, nav to team profile, substituting e.g. Hawks with Atlanta Hawks
-                        .clickable { navigateToTeamProfile(
-                            NbaTeam.shortenedNamesToFullNames[game.home_team.name] ?:
-                                game.home_team.name
-                        ) }
+                        .clickable {
+                            navigateToTeamProfile(
+                                NbaTeam.shortenedNamesToFullNames[game.home_team.name]
+                                    ?: game.home_team.name
+                            )
+                        }
                 )
 
                 Text(
@@ -145,10 +153,12 @@ fun GameCard(game: Game, navigateToTeamProfile: (String) -> Unit) {
                     modifier = Modifier
                         .size(50.dp)
                         //On click, nav to team profile, substituting e.g. Hawks with Atlanta Hawks
-                        .clickable { navigateToTeamProfile(
-                            NbaTeam.shortenedNamesToFullNames[game.visitor_team.name] ?:
-                                game.visitor_team.name
-                        ) }
+                        .clickable {
+                            navigateToTeamProfile(
+                                NbaTeam.shortenedNamesToFullNames[game.visitor_team.name]
+                                    ?: game.visitor_team.name
+                            )
+                        }
                 )
             }
             //Spacer between rows

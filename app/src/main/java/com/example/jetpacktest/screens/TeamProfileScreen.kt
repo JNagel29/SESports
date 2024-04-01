@@ -21,7 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,22 +41,23 @@ fun TeamProfileScreen(teamName: String,
                       navigateBack: () -> Unit,
                       navigateToPlayerProfile: (String) -> Unit) {
     val teamHandler = TeamHandler()
-    var teamPlayersList by remember { mutableStateOf<List<TeamPlayer>>(emptyList()) }
+    var teamPlayersList by rememberSaveable { mutableStateOf<List<TeamPlayer>>(emptyList()) }
 
     LaunchedEffect(Unit) {
-        //Before anything else, fetch team abbreviation using dictionary in NbaTeam.kt
-        val teamAbbrev = NbaTeam.namesToAbbreviations[teamName]
-        //TODO: Cache these results in a TeamViewModel
-        /*
-        //On first launch, fetch the list of teamPlayers and assign using our callback lambda
-        if (teamAbbrev != null) {
-            teamHandler.fetchCurrentRoster(teamAbbrev = teamAbbrev) { result ->
-                teamPlayersList = result
+        if (teamPlayersList.isEmpty()) {
+            /* //TODO: Commenting just in case honestly
+            //Before anything else, fetch team abbreviation using dictionary in NbaTeam.kt
+            val teamAbbrev = NbaTeam.namesToAbbreviations[teamName]
+            //TODO: Cache these results in a TeamViewModel
+            if (teamAbbrev != null) {
+                Log.d("TeamProfile", "Fetching new roster...")
+                teamHandler.fetchCurrentRoster(teamAbbrev = teamAbbrev) { result ->
+                    teamPlayersList = result
+                }
             }
-        }
-        else Log.d("Team Profile Screen", "ERROR: namesToAbbreviations returned null")
 
-         */
+             */
+        }
     }
     //Wraps data inside column
     Column(modifier = Modifier.fillMaxSize()) {
