@@ -3,6 +3,10 @@ package com.example.jetpacktest
 import android.util.Log
 import com.example.jetpacktest.models.Player
 import com.example.jetpacktest.models.StatLeader
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.sql.Connection
 import java.sql.DriverManager
 import java.sql.ResultSet
@@ -56,14 +60,43 @@ class DatabaseHandler {
         }
     }
 
-    fun executeRandomStat(onDataReceived: (String) -> Unit) {
+    fun executeRandomStat(
+        randIndex: Int,
+        onDataReceived: (String) -> Unit) {
         executor.execute {
-            val randomStat = getRandomStat()
+            val randomStat = getRandomStat(randIndex)
             onDataReceived(randomStat)
         }
     }
 
-    private fun getRandomStat(): String {
+    private fun getRandomStat(randIndex: Int): String {
+        Log.d("DatabaseHandler", "Fetching new random stat")
+        var randomStat = ""
+        var myConn: Connection? = null
+        var statement: Statement? = null
+        var resultSet: ResultSet? = null
+        try {
+            Class.forName("com.mysql.jdbc.Driver")
+            myConn = DriverManager.getConnection(url, user, password)
+            statement = myConn.createStatement()
+            val sql = "SELECT statString FROM RANDOM_STAT WHERE statID = $randIndex";
+            resultSet = statement.executeQuery(sql)
+            while (resultSet.next()) {
+                randomStat = resultSet.getString("statString")
+            }
+        } catch (e: SQLException) {
+            Log.d(Const.TAG, e.message!!)
+            e.printStackTrace()
+        } catch (e: ClassNotFoundException) {
+            e.printStackTrace()
+        } finally {
+            //Close resources
+            closeResources(myConn, resultSet, statement)
+        }
+        return randomStat
+    }
+
+    private fun oldGetRandomStat(): String {
         var randomStat = ""
         var myConn: Connection? = null
         var statement: Statement? = null

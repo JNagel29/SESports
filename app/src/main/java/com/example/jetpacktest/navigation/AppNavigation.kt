@@ -30,7 +30,7 @@ import com.example.jetpacktest.screens.StandingsScreen
 import com.example.jetpacktest.screens.TeamProfileScreen
 
 @Composable
-fun AppNavigation() {
+fun AppNavigation(randomStat: String) {
     val navController = rememberNavController()
     val searchViewModel = viewModel<SearchViewModel>()
     val homeViewModel = viewModel<HomeViewModel>()
@@ -77,6 +77,7 @@ fun AppNavigation() {
             //When passing navigation control, we pass lambdas instead of navController itself
             composable(route=Screens.HomeScreen.name) {
                 HomeScreen(
+                    randomStat = randomStat,
                     homeViewModel = homeViewModel,
                     //Pass in a lambda that'll let us go to a stat leader's profile on click
                     navigateToPlayerProfile = { playerName ->

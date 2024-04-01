@@ -39,6 +39,7 @@ import com.example.jetpacktest.ui.theme.LargeDropdownMenu
 
 @Composable
 fun HomeScreen(
+    randomStat: String,
     homeViewModel: HomeViewModel,
     navigateToPlayerProfile: (String) -> Unit)
 {
@@ -47,19 +48,13 @@ fun HomeScreen(
             "2023", "2024").reversed()
     val statOptions = listOf("PTS", "AST", "TRB", "BLK", "STL")
     //TODO:Change it so we pass just the states and lambdas, not entire Viewmodel
-    val randomStat by homeViewModel.randomStatFlow.collectAsState(initial  = "")
     val statLeadersList by homeViewModel.statLeadersListFlow.collectAsState(initial = emptyList())
     val chosenStat by homeViewModel.chosenStatFlow.collectAsState(initial = "PTS")
     val chosenYear by homeViewModel.chosenYearFlow.collectAsState(initial = "2024")
 
     LaunchedEffect(Unit) {
-        Log.d("HomeScreen", "In Unit launched effect")
-        if (randomStat.isEmpty()) {
-            Log.d("HomeScreen", "In Unit  launched effect, stat fetching...")
-            homeViewModel.fetchRandomStat()
-        }
         if (statLeadersList.isEmpty()) {
-            Log.d("HomeScreen", "In Unit  launched effect, leader fetching...")
+            Log.d("HomeScreen", "Fetching new stat leads...")
             homeViewModel.fetchStatLeaders()
         }
     }

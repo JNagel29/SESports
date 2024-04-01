@@ -20,14 +20,6 @@ class HomeViewModel : ViewModel() {
     private val _statLeadersListFlow = MutableStateFlow<List<StatLeader>>(emptyList())
     val statLeadersListFlow: Flow<List<StatLeader>> = _statLeadersListFlow
 
-    private val _randomStatFlow = MutableStateFlow("")
-    val randomStatFlow: Flow<String> = _randomStatFlow
-
-    fun fetchRandomStat() {
-        databaseHandler.executeRandomStat { randomStat ->
-            _randomStatFlow.value = randomStat
-        }
-    }
     fun fetchStatLeaders() {
         val chosenStat = _chosenStatFlow.value
         val chosenYear = _chosenYearFlow.value
@@ -36,7 +28,6 @@ class HomeViewModel : ViewModel() {
             _statLeadersListFlow.value = statLeaders
         }
     }
-
     fun updateChosenStat(newStat: String) { _chosenStatFlow.value = newStat }
     fun updateChosenYear(newYear: String) { _chosenYearFlow.value = newYear }
 }

@@ -17,6 +17,8 @@ import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -31,7 +33,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.jetpacktest.DatabaseHandler
 
 
@@ -80,7 +87,7 @@ fun CompareScreen(
             )
         )
         Spacer(modifier = Modifier.height(16.dp))
-        LazyColumn(modifier = Modifier.weight(1f)) {
+        LazyColumn {
             items(searchResults) { itemName ->
                 Box(
                     modifier = Modifier
@@ -101,37 +108,72 @@ fun CompareScreen(
                 }
             }
         }
+        Spacer(modifier = Modifier.height(50.dp))
         if (selectedPlayers.isNotEmpty()) {
-            Text("Selected Players:")
-            LazyColumn {
-                items(selectedPlayers) { playerName ->
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(text = playerName)
-                        Spacer(modifier = Modifier.weight(1f))
-                        // Red X button to remove player
-                        Box(modifier = Modifier
-                            .clickable { selectedPlayers = selectedPlayers
-                                .filter { it != playerName } } ) {
-                            Icon(
-                                imageVector = Icons.Default.Clear,
-                                contentDescription = "Remove Player",
-                                tint = Color.Red
-                            )
+            Card(
+                modifier = Modifier.padding(8.dp),
+                elevation = CardDefaults.cardElevation(
+                    defaultElevation = 10.dp // Adds a 'shadow' effect
+                ),
+                colors = CardDefaults.cardColors(
+                    containerColor = Color.White,
+                    contentColor = Color.Black
+                )
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Selected Players",
+                            style = TextStyle(
+                                textDecoration = TextDecoration.Underline,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 20.sp,
+                            ),
+                        )
+                    }
+                    LazyColumn {
+                        items(selectedPlayers) { playerName ->
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(text = playerName)
+                                Spacer(modifier = Modifier.weight(1f))
+                                // Red X button to remove player
+                                Box(modifier = Modifier
+                                    .clickable {
+                                        selectedPlayers = selectedPlayers
+                                            .filter { it != playerName }
+                                    }) {
+                                    Icon(
+                                        imageVector = Icons.Default.Clear,
+                                        contentDescription = "Remove Player",
+                                        tint = Color.Red
+                                    )
+                                }
+                            }
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Button(
+                            onClick = {
+                                if (selectedPlayers.size < 2) {
+                                    showSelectionDialog = true
+                                } else {
+                                    navigateToCompareResults(selectedPlayers[0], selectedPlayers[1])
+                                }
+                            },
+                        ) {
+                            Text(text = "Compare", textAlign = TextAlign.Center)
                         }
                     }
                 }
-            }
-            Button(
-                onClick = {
-                    if (selectedPlayers.size < 2) {
-                        showSelectionDialog = true
-                    } else {
-                        navigateToCompareResults(selectedPlayers[0], selectedPlayers[1])
-                    }
-                },
-                modifier = Modifier.padding(vertical = 16.dp)
-            ) {
-                Text("Compare")
             }
         }
     }

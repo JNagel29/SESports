@@ -1,7 +1,7 @@
 package com.example.jetpacktest
 
+import android.content.SharedPreferences
 import android.os.Bundle
-import android.os.StrictMode
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,20 +10,41 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequest
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkInfo
+import androidx.work.WorkManager
 import com.example.jetpacktest.navigation.AppNavigation
 import com.example.jetpacktest.ui.theme.JetpackTestTheme
 import com.jakewharton.threetenabp.AndroidThreeTen
+import java.util.concurrent.ExecutionException
+import java.util.concurrent.TimeUnit
+
 
 class MainActivity : ComponentActivity() {
+    private lateinit var sharedPreferences: SharedPreferences
+    companion object {
+        private const val TAG = "RandomStatWork"
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        //This lets us debug memory leaks (like for database connections)
+        /*
+        //Debugs memory leaks
         StrictMode.setVmPolicy(
             StrictMode.VmPolicy.Builder()
                 .detectLeakedClosableObjects()
-                .penaltyLog() // Log detected violations to the system log
+                .penaltyLog()
                 .build()
         )
+         */
+        //Updates new randomStat value if new day has passed and fetches
+        if(!isWorkScheduled(TAG)) {
+            scheduleWork(TAG);
+        }
+        sharedPreferences = applicationContext.getSharedPreferences("prefs", MODE_PRIVATE)
+        val randomStat = sharedPreferences.getString(RandomStatWorker.KEY_RANDOM_STAT, "") ?: ""
+
         //Initializes timezone used in GamesScreen.kt
         AndroidThreeTen.init(this)
         setContent {
@@ -34,9 +55,43 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     //Instantiates nav bar (goes to Home too)
-                    AppNavigation()
+                    AppNavigation(randomStat)
                 }
             }
+        }
+    }
+
+    private fun scheduleWork(tag: String) {
+        //Sets up and submits work request, only runs every 24 hours
+        val randomStatRequest: PeriodicWorkRequest =
+            PeriodicWorkRequestBuilder<RandomStatWorker>(24, TimeUnit.HOURS)
+                .build()
+        val workManager = WorkManager.getInstance(applicationContext)
+        workManager.enqueueUniquePeriodicWork(
+            tag,
+            ExistingPeriodicWorkPolicy.KEEP,
+            randomStatRequest
+        )
+    }
+
+    private fun isWorkScheduled(tag: String): Boolean {
+        //Checks if there's not already an instance scheduled
+        val instance = WorkManager.getInstance(applicationContext)
+        val statuses = instance.getWorkInfosByTag(tag)
+        return try {
+            var running = false
+            val workInfoList = statuses.get()
+            for (workInfo in workInfoList) {
+                val state = workInfo.state
+                running = (state == WorkInfo.State.RUNNING) or (state == WorkInfo.State.ENQUEUED)
+            }
+            running
+        } catch (e: ExecutionException) {
+            e.printStackTrace()
+            false
+        } catch (e: InterruptedException) {
+            e.printStackTrace()
+            false
         }
     }
 }
@@ -45,5 +100,6 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MainPreview() {
     JetpackTestTheme {
+        AppNavigation(randomStat = "Placeholder")
     }
 }

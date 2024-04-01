@@ -60,7 +60,6 @@ fun ExpandableCard(
             containerColor = colorResource(backgroundColorResource),
             contentColor = Color.White
         )
-            //.clickable {}
     ) {
         Column(
             modifier = Modifier
