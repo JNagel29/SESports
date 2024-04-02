@@ -33,9 +33,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.jetpacktest.R
 import com.example.jetpacktest.models.StatLeader
-import com.example.jetpacktest.ui.theme.ExpandableCard
+import com.example.jetpacktest.ui.components.ExpandableCard
 import com.example.jetpacktest.ui.theme.JetpackTestTheme
-import com.example.jetpacktest.ui.theme.LargeDropdownMenu
+import com.example.jetpacktest.ui.components.LargeDropdownMenu
 
 @Composable
 fun HomeScreen(

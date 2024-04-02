@@ -26,7 +26,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.jetpacktest.models.NbaTeam
-import com.example.jetpacktest.ui.theme.CircularLoadingIcon
+import com.example.jetpacktest.ui.components.CircularLoadingIcon
 
 @Composable
 fun SearchScreen(

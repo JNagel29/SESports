@@ -37,7 +37,7 @@ import androidx.compose.ui.unit.sp
 import com.example.jetpacktest.GamesHandler
 import com.example.jetpacktest.models.Game
 import com.example.jetpacktest.models.NbaTeam
-import com.example.jetpacktest.ui.theme.CircularLoadingIcon
+import com.example.jetpacktest.ui.components.CircularLoadingIcon
 import com.foreverrafs.datepicker.DatePickerTimeline
 import java.time.ZoneId
 import java.util.Date
@@ -46,6 +46,7 @@ import java.util.Date
 @Composable
 fun GamesScreen(navigateToTeamProfile: (String) -> Unit) {
     val gamesHandler = GamesHandler()
+    //TODO: Make gamesList and list in TeamProfileScreen parcelable to work w/ savable
     var selectedDate by rememberSaveable { mutableStateOf(Date()) }
     var gamesList by rememberSaveable { mutableStateOf<List<Game>>(emptyList()) }
     var isFetching by remember { mutableStateOf(false)}

@@ -3,10 +3,6 @@ package com.example.jetpacktest
 import android.util.Log
 import com.example.jetpacktest.models.Player
 import com.example.jetpacktest.models.StatLeader
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.sql.Connection
 import java.sql.DriverManager
 import java.sql.ResultSet
@@ -79,7 +75,7 @@ class DatabaseHandler {
             Class.forName("com.mysql.jdbc.Driver")
             myConn = DriverManager.getConnection(url, user, password)
             statement = myConn.createStatement()
-            val sql = "SELECT statString FROM RANDOM_STAT WHERE statID = $randIndex";
+            val sql = "SELECT statString FROM RANDOM_STAT WHERE statID = $randIndex"
             resultSet = statement.executeQuery(sql)
             while (resultSet.next()) {
                 randomStat = resultSet.getString("statString")

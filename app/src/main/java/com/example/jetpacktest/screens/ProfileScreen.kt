@@ -38,7 +38,7 @@ import com.example.jetpacktest.DatabaseHandler
 import com.example.jetpacktest.R
 import com.example.jetpacktest.HeadshotHandler
 import com.example.jetpacktest.models.NbaTeam
-import com.example.jetpacktest.ui.theme.LargeDropdownMenu
+import com.example.jetpacktest.ui.components.LargeDropdownMenu
 import com.example.jetpacktest.models.Player
 
 @Composable

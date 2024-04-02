@@ -17,8 +17,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.jetpacktest.DatabaseHandler
 import com.example.jetpacktest.models.Player
-import com.example.jetpacktest.ui.theme.CircularLoadingIcon
-import com.example.jetpacktest.ui.theme.LargeDropdownMenu
+import com.example.jetpacktest.ui.components.CircularLoadingIcon
+import com.example.jetpacktest.ui.components.LargeDropdownMenu
 
 @Composable
 fun CompareResultsScreen(playerName1: String, playerName2: String, navigateBack: () -> Unit) {

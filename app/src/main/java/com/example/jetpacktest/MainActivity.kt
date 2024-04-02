@@ -39,9 +39,11 @@ class MainActivity : ComponentActivity() {
         )
          */
         //Updates new randomStat value if new day has passed and fetches
-        if(!isWorkScheduled(TAG)) {
-            scheduleWork(TAG);
+        //TODO: Might not need this helper, will test tomorrow, also need to make index async
+        if(!isWorkScheduled()) {
+            //scheduleWork()
         }
+        scheduleWork()
         sharedPreferences = applicationContext.getSharedPreferences("prefs", MODE_PRIVATE)
         val randomStat = sharedPreferences.getString(RandomStatWorker.KEY_RANDOM_STAT, "") ?: ""
 
@@ -61,23 +63,23 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun scheduleWork(tag: String) {
+    private fun scheduleWork() {
         //Sets up and submits work request, only runs every 24 hours
         val randomStatRequest: PeriodicWorkRequest =
             PeriodicWorkRequestBuilder<RandomStatWorker>(24, TimeUnit.HOURS)
                 .build()
         val workManager = WorkManager.getInstance(applicationContext)
         workManager.enqueueUniquePeriodicWork(
-            tag,
+            TAG,
             ExistingPeriodicWorkPolicy.KEEP,
             randomStatRequest
         )
     }
 
-    private fun isWorkScheduled(tag: String): Boolean {
+    private fun isWorkScheduled(): Boolean {
         //Checks if there's not already an instance scheduled
         val instance = WorkManager.getInstance(applicationContext)
-        val statuses = instance.getWorkInfosByTag(tag)
+        val statuses = instance.getWorkInfosByTag(TAG)
         return try {
             var running = false
             val workInfoList = statuses.get()
