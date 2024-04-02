@@ -23,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.jetpacktest.models.NbaTeam
@@ -41,6 +42,8 @@ fun SearchScreen(
      navigateToPlayerProfile: (String) -> Unit,
      navigateToTeamProfile: (String) -> Unit)
 {
+    val keyboardController = LocalSoftwareKeyboardController.current
+
     val searchTextValue = searchText.value
     val isSearchingValue = isSearching.value
     val selectedSearchTypeValue = selectedSearchType.value
@@ -95,11 +98,13 @@ fun SearchScreen(
             else { // Display results after search
                 SearchResultsDisplay(
                     searchResults = if (selectedSearchTypeValue == "Player") playerResultsValue
-                                    else teamResultsValue
-                ) { nameArg ->
-                    if (selectedSearchTypeValue == "Player") navigateToPlayerProfile(nameArg)
-                    else if (selectedSearchTypeValue == "Team") navigateToTeamProfile(nameArg)
-                }
+                                    else teamResultsValue,
+                    hideKeyboard = { keyboardController!!.hide() },
+                    navigateToProfile = { nameArg ->
+                        if (selectedSearchTypeValue == "Player") navigateToPlayerProfile(nameArg)
+                        else if (selectedSearchTypeValue == "Team") navigateToTeamProfile(nameArg)
+                    }
+                )
             }
         }
     }
@@ -154,7 +159,11 @@ fun RadioButtonsDisplay(selectedSearchType: String, onSearchTypeSelected: (Strin
 
 //This function actually displays our results
 @Composable
-fun SearchResultsDisplay(searchResults: List<String>, navigateToProfile: (String) -> (Unit)) {
+fun SearchResultsDisplay(
+    searchResults: List<String>,
+    hideKeyboard: () -> Unit,
+    navigateToProfile: (String) -> (Unit)
+    ) {
     LazyColumn(modifier = Modifier.fillMaxSize()) {
         items(searchResults) { itemName ->
             Box(
@@ -162,6 +171,7 @@ fun SearchResultsDisplay(searchResults: List<String>, navigateToProfile: (String
                     .fillMaxWidth()
                     .padding(vertical = 8.dp)
                     .clickable {
+                        hideKeyboard()
                         //Navigate using lambda that routes profile screen
                         navigateToProfile(itemName) // Pass in item (aka player/team name)
                     }

@@ -33,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -49,6 +50,7 @@ fun CompareScreen(
 
     var searchText by remember { mutableStateOf("") }
     val focusManager = LocalFocusManager.current
+    val keyboardController = LocalSoftwareKeyboardController.current
     var searchResults by remember { mutableStateOf<List<String>>(emptyList()) }
     var selectedPlayers by remember { mutableStateOf<List<String>>(emptyList()) }
     var showAlertDialog by remember { mutableStateOf(false) }
@@ -166,6 +168,7 @@ fun CompareScreen(
                                 if (selectedPlayers.size < 2) {
                                     showSelectionDialog = true
                                 } else {
+                                    keyboardController?.hide()
                                     navigateToCompareResults(selectedPlayers[0], selectedPlayers[1])
                                 }
                             },
