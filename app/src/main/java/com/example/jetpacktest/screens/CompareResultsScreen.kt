@@ -70,43 +70,46 @@ fun CompareResultsScreen(playerName1: String, playerName2: String, navigateBack:
         ) {
             ReturnToPreviousHeader(navigateBack = navigateBack)
             Spacer(modifier = Modifier.height(15.dp))
-            Row(modifier = Modifier.fillMaxWidth()) {
-                LargeDropdownMenu(
-                    label = "Select ${player1.name}'s Year:",
-                    items = yearsList1,
-                    selectedIndex = yearsList1.indexOf(chosenYear1),
-                    onItemSelected = { index, _ ->
-                        val year = yearsList1[index]
-                        //Check if newly selected stat is different from previous
-                        if (year != chosenYear1) {
-                            chosenYear1 = year
-                            databaseHandler.executePlayerData(playerName1, chosenYear1) { data ->
-                                player1 = data
-                            }
-                        }
-                    },
-                    modifier = Modifier.weight(1f)
-                )
-                LargeDropdownMenu(
-                    label = "Select ${player2.name}'s Year:",
-                    items = yearsList2,
-                    selectedIndex = yearsList2.indexOf(chosenYear2),
-                    onItemSelected = { index, _ ->
-                        val year = yearsList2[index]
-                        //Check if newly selected stat is different from previous
-                        if (year != chosenYear2) {
-                            chosenYear2 = year
-                            databaseHandler.executePlayerData(playerName2, chosenYear2) { data ->
-                                player2 = data
-                            }
-                        }
-                    },
-                    modifier = Modifier.weight(1f)
-                )
+            if (isFetching1 || isFetching2) {
+                CircularLoadingIcon()
             }
-            if (!isFetching1 && !isFetching2) PlayerProfile(players = listOf(player1, player2))
-            else CircularLoadingIcon()
-            Spacer(modifier = Modifier.height(20.dp))
+            else {
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    LargeDropdownMenu(
+                        label = "Select ${player1.name}'s Year:",
+                        items = yearsList1,
+                        selectedIndex = yearsList1.indexOf(chosenYear1),
+                        onItemSelected = { index, _ ->
+                            val year = yearsList1[index]
+                            //Check if newly selected stat is different from previous
+                            if (year != chosenYear1) {
+                                chosenYear1 = year
+                                databaseHandler.executePlayerData(playerName1, chosenYear1) { data ->
+                                    player1 = data
+                                }
+                            }
+                        },
+                        modifier = Modifier.weight(1f)
+                    )
+                    LargeDropdownMenu(
+                        label = "Select ${player2.name}'s Year:",
+                        items = yearsList2,
+                        selectedIndex = yearsList2.indexOf(chosenYear2),
+                        onItemSelected = { index, _ ->
+                            val year = yearsList2[index]
+                            //Check if newly selected stat is different from previous
+                            if (year != chosenYear2) {
+                                chosenYear2 = year
+                                databaseHandler.executePlayerData(playerName2, chosenYear2) { data ->
+                                    player2 = data
+                                }
+                            }
+                        },
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+                PlayerProfile(players = listOf(player1, player2))
+            }
         }
     }
 }

@@ -1,5 +1,9 @@
 package com.example.jetpacktest.navigation
 
+import androidx.compose.animation.core.FastOutLinearInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import com.example.jetpacktest.viewmodels.HomeViewModel
 import com.example.jetpacktest.viewmodels.SearchViewModel
 import androidx.compose.foundation.layout.fillMaxSize
@@ -127,8 +131,26 @@ fun AppNavigation(randomStat: String) {
                     }
                 )
             }
-            composable(route = "${Screens.CompareResultsScreen.route}/{playerName1}/{playerName2}")
-            { backStackEntry ->
+            composable(route = "${Screens.CompareResultsScreen.route}/{playerName1}/{playerName2}",
+                enterTransition = {
+                    slideInHorizontally(
+                        initialOffsetX = {it },
+                        animationSpec = tween(
+                            300,
+                            easing = FastOutLinearInEasing
+                        )
+                    )
+                },
+                exitTransition = {
+                    slideOutHorizontally(
+                        targetOffsetX = { -it },
+                        animationSpec = tween(
+                            300,
+                            easing = FastOutLinearInEasing
+                        )
+                    )
+                }
+            ) { backStackEntry ->
                 val playerName1 = backStackEntry.arguments?.getString("playerName1") ?: ""
                 val playerName2 = backStackEntry.arguments?.getString("playerName2") ?: ""
                 CompareResultsScreen(playerName1, playerName2) {
@@ -136,16 +158,52 @@ fun AppNavigation(randomStat: String) {
                 }
             }
             //Profile screens for player/team (we pass in player/team name as arg in route), not on nav bar
-            composable(route = "${Screens.ProfileScreen.route}/{playerName}")
-            { backStackEntry ->
+            composable(route = "${Screens.ProfileScreen.route}/{playerName}",
+                enterTransition = {
+                    slideInHorizontally(
+                        initialOffsetX = {it },
+                        animationSpec = tween(
+                            300,
+                            easing = FastOutLinearInEasing
+                        )
+                    )
+                },
+                exitTransition = {
+                    slideOutHorizontally(
+                        targetOffsetX = {-it},
+                        animationSpec = tween(
+                            300,
+                            easing = FastOutLinearInEasing
+                        )
+                    )
+                }
+            ) { backStackEntry ->
                 val playerName = backStackEntry.arguments?.getString("playerName") ?: ""
                 ProfileScreen(playerName) {
                     //Used for back button
                     navController.navigateUp()
                 }
             }
-            composable(route = "${Screens.TeamProfileScreen.route}/{teamName}")
-            { backStackEntry ->
+            composable(route = "${Screens.TeamProfileScreen.route}/{teamName}",
+                enterTransition = {
+                    slideInHorizontally(
+                        initialOffsetX = {it },
+                        animationSpec = tween(
+                            300,
+                            easing = FastOutLinearInEasing
+                        )
+                    )
+                },
+                exitTransition = {
+                    slideOutHorizontally(
+                        targetOffsetX = {-it},
+                        animationSpec = tween(
+                            300,
+                            easing = FastOutLinearInEasing
+                        )
+                    )
+                }
+            ) { backStackEntry ->
                 val teamName = backStackEntry.arguments?.getString("teamName") ?: ""
                 TeamProfileScreen(teamName = teamName,
                     //Used for back button

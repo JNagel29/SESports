@@ -40,6 +40,7 @@ import com.example.jetpacktest.HeadshotHandler
 import com.example.jetpacktest.models.NbaTeam
 import com.example.jetpacktest.ui.components.LargeDropdownMenu
 import com.example.jetpacktest.models.Player
+import com.example.jetpacktest.ui.components.CircularLoadingIcon
 
 @Composable
 fun ProfileScreen(playerName: String, navigateBack: () -> Unit) {
@@ -53,6 +54,7 @@ fun ProfileScreen(playerName: String, navigateBack: () -> Unit) {
     var chosenYear by remember { mutableStateOf("") }
     var showExpandedData by remember { mutableStateOf(false) }
     var player by remember { mutableStateOf(Player()) }
+    var isFetching by remember { mutableStateOf(true) }
 
     //TODO: Add remember saveable instead of view model maybe??
     LaunchedEffect(Unit) {
@@ -72,7 +74,7 @@ fun ProfileScreen(playerName: String, navigateBack: () -> Unit) {
                 //Then, fetch all our data for that most recent year
                 databaseHandler.executePlayerData(playerName, chosenYear) { data ->
                     player = data
-                    //showPlayerData = true // Show the player data table
+                    isFetching = false
                 }
             }
         }
@@ -85,48 +87,53 @@ fun ProfileScreen(playerName: String, navigateBack: () -> Unit) {
             ReturnToPreviousHeader(navigateBack = navigateBack)
             //Adds space between header and actual data
             Spacer(modifier = Modifier.height(15.dp))
-            NameAndHeadshot(
-                playerName = playerName,
-                imgId = imgId,
-                team =  player.team,
-                position = player.position,
-                headshotHandler = headshotHandler
-            )
-            HorizontalDivider(thickness = 2.dp, color = Color.White)
-            MainStatBoxes(player = player)
-            //Custom Dropdown menu for each year
-            LargeDropdownMenu(
-                label = "Select Year:",
-                items = yearsList,
-                selectedIndex = yearsList.indexOf(chosenYear),
-                onItemSelected = { index, _ ->
-                    chosenYear = yearsList[index]
-                    if (chosenYear != "2024") {
-                        databaseHandler.executePlayerData(playerName, chosenYear) { data ->
-                            player = data
-                        }
-                    }
-                    else {
-                        databaseHandler.executePlayerData(playerName, chosenYear) { data ->
-                            player = data
-                        }
-                        /*
-                        apiHandler.fetchPlayerData(
-                            context,
-                            onResult = {data ->
+            if (isFetching) {
+                CircularLoadingIcon()
+            }
+            else {
+                NameAndHeadshot(
+                    playerName = playerName,
+                    imgId = imgId,
+                    team =  player.team,
+                    position = player.position,
+                    headshotHandler = headshotHandler
+                )
+                HorizontalDivider(thickness = 2.dp, color = Color.White)
+                MainStatBoxes(player = player)
+                //Custom Dropdown menu for each year
+                LargeDropdownMenu(
+                    label = "Select Year:",
+                    items = yearsList,
+                    selectedIndex = yearsList.indexOf(chosenYear),
+                    onItemSelected = { index, _ ->
+                        chosenYear = yearsList[index]
+                        if (chosenYear != "2024") {
+                            databaseHandler.executePlayerData(playerName, chosenYear) { data ->
                                 player = data
                             }
-                        )
-                         */
+                        }
+                        else {
+                            databaseHandler.executePlayerData(playerName, chosenYear) { data ->
+                                player = data
+                            }
+                            /*
+                            apiHandler.fetchPlayerData(
+                                context,
+                                onResult = {data ->
+                                    player = data
+                                }
+                            )
+                             */
+                        }
                     }
+                )
+                //Now, compose our button that toggles the extra data in list
+                ToggleFurtherStats(showExpandedData = showExpandedData,
+                    onClick = { showExpandedData = !showExpandedData })
+                //Show the extra data only if user toggled via button above (and player has stats)
+                if (showExpandedData && player.points != -1.0f) {
+                    PlayerDataTable(player)
                 }
-            )
-            //Now, compose our button that toggles the extra data in list
-            ToggleFurtherStats(showExpandedData = showExpandedData,
-                                onClick = { showExpandedData = !showExpandedData })
-            //Show the extra data only if user toggled via button above (and player has stats)
-            if (showExpandedData && player.points != -1.0f) {
-                PlayerDataTable(player)
             }
         }
     }
@@ -144,9 +151,11 @@ fun NameAndHeadshot(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .background(color = colorResource(
-                //Split by / in case two teams
-                NbaTeam.teamColorsMap[team.split("/")[0]] ?: R.color.purple_lakers)
+            .background(
+                color = colorResource(
+                    //Split by / in case two teams
+                    NbaTeam.teamColorsMap[team.split("/")[0]] ?: R.color.purple_lakers
+                )
             )
             .offset(y = 20.dp) //Move image down a bit
     ) {
@@ -191,11 +200,13 @@ fun MainStatBoxes(player: Player) {
     //Horizontal bar with PPG, RPG, APG (most important stats)
     Row(
         modifier = Modifier
-                .fillMaxWidth()
-                .background(color = colorResource(
+            .fillMaxWidth()
+            .background(
+                color = colorResource(
                     NbaTeam.teamColorsMap[player.team.split("/")[0]]
-                        ?: R.color.purple_lakers)
-                ),
+                        ?: R.color.purple_lakers
+                )
+            ),
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically
     ) {

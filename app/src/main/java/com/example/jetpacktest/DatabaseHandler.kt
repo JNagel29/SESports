@@ -128,6 +128,7 @@ class DatabaseHandler {
         //We remove accents since searching DB requires none
         val searchResultsNameNoAccents = removeAccents(searchResultName)
         try {
+            Log.d("DatabaseHandler", "Fetching new search results")
             Class.forName("com.mysql.jdbc.Driver")
             myConn = DriverManager.getConnection(url, user, password)
             statement = myConn.createStatement()
