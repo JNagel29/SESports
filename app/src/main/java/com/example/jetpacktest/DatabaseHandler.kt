@@ -3,6 +3,10 @@ package com.example.jetpacktest
 import android.util.Log
 import com.example.jetpacktest.models.Player
 import com.example.jetpacktest.models.StatLeader
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.sql.Connection
 import java.sql.DriverManager
 import java.sql.ResultSet
@@ -21,47 +25,89 @@ class DatabaseHandler {
     }
     //Executor for the database requesting (used to run in background as its own thread)
     private val executor: Executor = Executors.newSingleThreadExecutor()
+    //Alternative to Executor
+    private val scope = CoroutineScope(Dispatchers.IO)
     //Variables and info to connect to DB
     private val url = "jdbc:mysql://nikoarak.cikeys.com:3306/nikoarak_SESports"
     private val user = Keys.DBUser
     private val password = Keys.DBPass
 
     fun executeStatLeaders(chosenStat: String, year: String,
-                            onDataReceived: (MutableList<StatLeader>) -> Unit) {
+                           onDataReceived: (MutableList<StatLeader>) -> Unit) {
+        /*
         executor.execute {
             val statLeadersList = getStatLeaders(chosenStat, year)
             onDataReceived(statLeadersList)
         }
+         */
+        scope.launch {
+            val statLeadersList = getStatLeaders(chosenStat, year)
+            withContext(Dispatchers.IO) {
+                onDataReceived(statLeadersList)
+            }
+        }
     }
     fun executeYears(playerName: String, onDataReceived: (MutableList<String>) -> Unit) {
+        /*
         executor.execute {
             val yearsList = getPlayerYears(playerName)
             onDataReceived(yearsList)
         }
+         */
+        scope.launch {
+            val yearsList = getPlayerYears(playerName)
+            withContext(Dispatchers.IO) {
+                onDataReceived(yearsList)
+            }
+        }
+
     }
     fun executePlayerData(playerName: String, year: String,
                           onDataReceived: (Player) -> Unit) {
+        /*
         executor.execute {
             val player = getPlayerData(playerName, year)
             onDataReceived(player)
         }
+         */
+        scope.launch {
+            val player = getPlayerData(playerName, year)
+            withContext(Dispatchers.IO) {
+                onDataReceived(player)
+            }
+        }
     }
 
     fun executePlayerSearchResults(searchResultName: String,
-                             onDataReceived: (MutableList<String>) -> Unit) {
+                                   onDataReceived: (MutableList<String>) -> Unit) {
+        /*
         executor.execute {
             val playerResultsList = getPlayerSearchResults(searchResultName)
             // After getting list of results, callback to calling function to send back the data
             onDataReceived(playerResultsList)
         }
+         */
+        scope.launch {
+            val playerResultsList = getPlayerSearchResults(searchResultName)
+            withContext(Dispatchers.IO) {
+                onDataReceived(playerResultsList)
+            }
+        }
     }
 
-    fun executeRandomStat(
-        randIndex: Int,
-        onDataReceived: (String) -> Unit) {
+    fun executeRandomStat(randIndex: Int,
+                          onDataReceived: (String) -> Unit) {
+        /*
         executor.execute {
             val randomStat = getRandomStat(randIndex)
             onDataReceived(randomStat)
+        }
+         */
+        scope.launch {
+            val randomStat = getRandomStat(randIndex)
+            withContext(Dispatchers.IO) {
+                onDataReceived(randomStat)
+            }
         }
     }
 
@@ -288,7 +334,7 @@ class DatabaseHandler {
                 if (!addedPlayers.contains(playerName)) {
                     val chosenStatValue = resultSet.getFloat(chosenStat)
                     val statLeader = StatLeader(rank = counter + 1, name = playerName,
-                                            statValue = chosenStatValue)
+                        statValue = chosenStatValue)
                     statLeadersList.add(statLeader)
                     addedPlayers.add(playerName) // add player name to the set
                     statData.append("Player Name: ").append(playerName).append(", ")
