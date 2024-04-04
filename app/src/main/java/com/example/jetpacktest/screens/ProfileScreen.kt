@@ -1,7 +1,6 @@
 package com.example.jetpacktest.screens
 
 import ReturnToPreviousHeader
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -64,7 +63,7 @@ fun ProfileScreen(playerName: String, navigateBack: () -> Unit) {
     var showExpandedData by rememberSaveable { mutableStateOf(false) }
     var isFetching by rememberSaveable { mutableStateOf(true) }
 
-    //TODO: Add remember savable instead of view model maybe??
+    //TODO: add favorite functionality and maybe switch to viewmodel?
     LaunchedEffect(Unit) {
         /*
         //TODO: Commenting rn since blocked out anyway
