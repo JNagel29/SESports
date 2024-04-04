@@ -1,7 +1,9 @@
 package com.example.jetpacktest.screens
 
 import ReturnToPreviousHeader
+import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,9 +14,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.StarBorder
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
@@ -24,6 +31,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -49,14 +57,14 @@ fun ProfileScreen(playerName: String, navigateBack: () -> Unit) {
     //val context = LocalContext.current
     val apiHandler = ApiHandler()
     //var imgUrl by remember { mutableStateOf("") }
-    var imgId by remember { mutableIntStateOf(-1) }
-    var yearsList by remember { mutableStateOf<List<String>>(emptyList()) }
-    var chosenYear by remember { mutableStateOf("") }
-    var showExpandedData by remember { mutableStateOf(false) }
-    var player by remember { mutableStateOf(Player()) }
-    var isFetching by remember { mutableStateOf(true) }
+    var imgId by rememberSaveable { mutableIntStateOf(-1) }
+    var yearsList by rememberSaveable { mutableStateOf<List<String>>(emptyList()) }
+    var chosenYear by rememberSaveable { mutableStateOf("") }
+    var player by rememberSaveable { mutableStateOf(Player()) }
+    var showExpandedData by rememberSaveable { mutableStateOf(false) }
+    var isFetching by rememberSaveable { mutableStateOf(true) }
 
-    //TODO: Add remember saveable instead of view model maybe??
+    //TODO: Add remember savable instead of view model maybe??
     LaunchedEffect(Unit) {
         /*
         //TODO: Commenting rn since blocked out anyway
@@ -64,17 +72,17 @@ fun ProfileScreen(playerName: String, navigateBack: () -> Unit) {
             imgId = result
         }
         */
-
-        //Also, fetch the list of years that we'll use to populate dropdown menu
-        databaseHandler.executeYears(playerName = playerName) {result ->
-            yearsList = result // Update years list with parameter result you pass via callback
-            //Also, default the chosenYear to the most recent year
-            if (yearsList.isNotEmpty()) {
-                chosenYear = yearsList.first()
-                //Then, fetch all our data for that most recent year
-                databaseHandler.executePlayerData(playerName, chosenYear) { data ->
-                    player = data
-                    isFetching = false
+        if (yearsList.isEmpty()) {
+            databaseHandler.executeYears(playerName = playerName) {result ->
+                yearsList = result // Update years list with parameter result you pass via callback
+                //Also, default the chosenYear to the most recent year
+                if (yearsList.isNotEmpty()) {
+                    chosenYear = yearsList.first()
+                    //Then, fetch all our data for that most recent year
+                    databaseHandler.executePlayerData(playerName, chosenYear) { data ->
+                        player = data
+                        isFetching = false
+                    }
                 }
             }
         }
@@ -147,6 +155,7 @@ fun NameAndHeadshot(
     position: String,
     headshotHandler: HeadshotHandler
 ) {
+    var isFavorite by remember { mutableStateOf(false) }
     //We use a box to color the background
     Box(
         modifier = Modifier
@@ -174,13 +183,24 @@ fun NameAndHeadshot(
             )
             //Spacer between headshot and text
             Spacer(modifier = Modifier.width(16.dp))
-            //Column to place position/team in small font over name
             Column {
-                Text(
-                    text = "$team | $position",
-                    fontSize = 14.sp,
-                    color = Color.White
-                )
+                Row(modifier = Modifier.padding(end = 8.dp)) {
+                    Text(
+                        text = "$team | $position",
+                        fontSize = 14.sp,
+                        color = Color.White
+                    )
+                    Spacer(modifier = Modifier.weight(1f))
+                    Icon(
+                        imageVector =  if (isFavorite) Icons.Filled.Star
+                        else Icons.Outlined.StarBorder,
+                        contentDescription = "Favorite",
+                        tint = if (isFavorite) Color.Yellow else Color.White,
+                        modifier = Modifier
+                            .size(24.dp)
+                            .clickable(onClick = { isFavorite = !isFavorite })
+                    )
+                }
                 Text(
                     text = playerName,
                     fontSize = 26.sp,

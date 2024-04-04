@@ -1,6 +1,9 @@
 package com.example.jetpacktest.models
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 
 //Data Class to hold data fetched from DB/API
+@Parcelize
 data class Player(
     val name: String,
     val year: Int,
@@ -26,7 +29,7 @@ data class Player(
     val effectiveFieldGoalPercent: Float,
     val offensiveRebounds: Float,
     val defensiveRebounds: Float,
-) {
+) : Parcelable {
     //Secondary constructor, default for ()
     constructor() : this("", -1, "", "", -1.0f, -1.0f, -1.0f,
         -1.0f, -1.0f, -1.0f, -1.0f, -1.0f, -1.0f,
