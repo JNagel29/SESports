@@ -16,7 +16,7 @@ class RandomStatWorker(appContext: Context, workerParams: WorkerParameters):
         Log.d("RandomStatWorker", "Fetching new random stat...")
 
         //Gets random index from 101-121
-        val randomIndex = (101 until 122).random()
+        val randomIndex = (101 until 108).random()
         databaseHandler.executeRandomStat(randomIndex) {data ->
             randomStat = data
             saveRandomStatToSharedPreferences(randomStat)
