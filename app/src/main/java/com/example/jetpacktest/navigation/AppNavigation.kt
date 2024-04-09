@@ -4,8 +4,8 @@ import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
-import com.example.jetpacktest.viewmodels.HomeViewModel
-import com.example.jetpacktest.viewmodels.SearchViewModel
+import com.example.jetpacktest.presentation.home.HomeViewModel
+import com.example.jetpacktest.presentation.search.SearchViewModel
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
@@ -24,14 +24,14 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.jetpacktest.screens.CompareResultsScreen
-import com.example.jetpacktest.screens.CompareScreen
-import com.example.jetpacktest.screens.HomeScreen
-import com.example.jetpacktest.screens.ProfileScreen
-import com.example.jetpacktest.screens.SearchScreen
-import com.example.jetpacktest.screens.GamesScreen
-import com.example.jetpacktest.screens.StandingsScreen
-import com.example.jetpacktest.screens.TeamProfileScreen
+import com.example.jetpacktest.presentation.compare.CompareResultsScreen
+import com.example.jetpacktest.presentation.compare.CompareScreen
+import com.example.jetpacktest.presentation.home.HomeScreen
+import com.example.jetpacktest.presentation.search.ProfileScreen
+import com.example.jetpacktest.presentation.search.SearchScreen
+import com.example.jetpacktest.presentation.games.GamesScreen
+import com.example.jetpacktest.presentation.standings.StandingsScreen
+import com.example.jetpacktest.presentation.search.TeamProfileScreen
 
 @Composable
 fun AppNavigation(randomStat: String) {

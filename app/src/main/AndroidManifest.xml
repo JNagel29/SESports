@@ -4,8 +4,10 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
 
-    <!-- Below property allows us to connect to REST API -->
+    <!-- clearText property allows us to connect to REST API -->
+    <!-- name .MyApplication property required for Hilt -->
     <application
+        android:name=".MyApplication"
         android:usesCleartextTraffic="true"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -17,7 +19,7 @@
         android:theme="@style/Theme.JetpackTest"
         tools:targetApi="31">
         <activity
-            android:name=".MainActivity"
+            android:name=".presentation.MainActivity"
             android:exported="true"
             android:theme="@style/Theme.JetpackTest">
             <intent-filter>

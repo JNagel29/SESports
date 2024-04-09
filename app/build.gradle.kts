@@ -4,6 +4,9 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("kotlin-parcelize") // Added for @Parcelize Annotation
+    //Hilt/Dagger
+    id("com.google.dagger.hilt.android")
+    kotlin("kapt")
 }
 
 android {
@@ -86,7 +89,7 @@ dependencies {
     //For loading images
     implementation("io.coil-kt:coil-compose:2.6.0")
     //For extra icons
-    implementation("androidx.compose.material:material-icons-extended:1.6.4")
+    implementation("androidx.compose.material:material-icons-extended:1.6.5")
     implementation("com.google.android.gms:play-services-dtdi:16.0.0-beta01")
     //For time operations
     implementation("com.jakewharton.threetenabp:threetenabp:1.4.6")
@@ -100,6 +103,13 @@ dependencies {
     implementation("com.squareup.retrofit2:converter-gson:2.1.0")
     //Work Manager, for fetching random stat daily
     implementation("androidx.work:work-runtime-ktx:2.9.0")
+
+    // Dagger - Hilt
+    implementation("com.google.dagger:hilt-android:2.51.1")
+    kapt("com.google.dagger:hilt-android-compiler:2.51.1")
+    kapt("androidx.hilt:hilt-compiler:1.2.0")
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
+
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")

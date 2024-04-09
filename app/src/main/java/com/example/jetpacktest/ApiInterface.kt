@@ -1,5 +1,6 @@
 package com.example.jetpacktest
 
+import com.example.jetpacktest.common.Keys
 import com.example.jetpacktest.models.GameResponse
 import com.example.jetpacktest.models.RestPlayer
 import retrofit2.Call
@@ -12,7 +13,7 @@ interface ApiInterface {
     @Headers("Authorization: ${Keys.BDLAPIKey}")
     @GET("games")
     fun getGames(@Query("dates[]") date: String): Call<GameResponse>
-f
+
     @GET("PlayersActiveBasic")
     fun getActivePlayers(@Query("key") apiKey: String): Call<List<ActivePlayer>>
 

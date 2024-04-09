@@ -8,7 +8,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import android.util.Log
 //Custom models/object
-import com.example.jetpacktest.models.Game
+import com.example.jetpacktest.models.Game_Old
 import com.example.jetpacktest.models.GameResponse
 import com.example.jetpacktest.models.NbaTeam
 //For date operations
@@ -24,11 +24,11 @@ class GamesHandler {
     //ApiInterface adds the 'games' endpoint, as well as the date query for us
     private val baseGameUrl = "https://api.balldontlie.io/v1/"
 
-    fun fetchGames(date: Date, onResult: (MutableList<Game>) -> Unit) {
+    fun fetchGames(date: Date, onResult: (MutableList<Game_Old>) -> Unit) {
         //We first must convert our date into a usable format
         val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         val formattedDate = dateFormat.format(date)
-        val gamesList = mutableListOf<Game>()
+        val gamesList = mutableListOf<Game_Old>()
         val retrofitBuilder = Retrofit.Builder()
             .addConverterFactory(GsonConverterFactory.create())
             .baseUrl(baseGameUrl)
