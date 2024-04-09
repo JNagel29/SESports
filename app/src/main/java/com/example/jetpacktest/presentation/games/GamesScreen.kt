@@ -33,8 +33,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.jetpacktest.models.Game_Old
-import com.example.jetpacktest.models.NbaTeam
 import com.example.jetpacktest.common.components.CircularLoadingIcon
 import com.example.jetpacktest.data.remote.dto.games.Game
 import com.foreverrafs.datepicker.DatePickerTimeline
