@@ -16,10 +16,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -198,9 +196,8 @@ fun NewGameCard(game: Game, navigateToTeamProfile: (String) -> Unit) {
 }
 
 
+/*
 
-
-    /*
     val gamesHandler = GamesHandler()
     //TODO: Make gamesList and list in TeamProfileScreen parcelable to work w/ savable
     var selectedDate by rememberSaveable { mutableStateOf(Date()) }
@@ -255,7 +252,7 @@ fun NewGameCard(game: Game, navigateToTeamProfile: (String) -> Unit) {
 
     }
 
-     */
+
 @Composable
 fun GameCard(gameOld: Game_Old, navigateToTeamProfile: (String) -> Unit) {
     Card(
@@ -349,4 +346,4 @@ fun GameCard(gameOld: Game_Old, navigateToTeamProfile: (String) -> Unit) {
             }
         }
     }
-}
+} */

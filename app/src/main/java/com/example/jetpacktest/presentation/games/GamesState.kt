@@ -1,6 +1,5 @@
 package com.example.jetpacktest.presentation.games
 
-import com.example.jetpacktest.data.remote.dto.games.Game
 import com.example.jetpacktest.domain.model.Games
 
 data class GamesState(

@@ -1,6 +1,5 @@
 package com.example.jetpacktest.domain.use_case
 
-import android.net.http.HttpException
 import com.example.jetpacktest.R
 import com.example.jetpacktest.common.Resource
 import com.example.jetpacktest.data.remote.dto.games.Game
