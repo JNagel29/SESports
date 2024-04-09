@@ -12,7 +12,7 @@ interface ApiInterface {
     @Headers("Authorization: ${Keys.BDLAPIKey}")
     @GET("games")
     fun getGames(@Query("dates[]") date: String): Call<GameResponse>
-
+f
     @GET("PlayersActiveBasic")
     fun getActivePlayers(@Query("key") apiKey: String): Call<List<ActivePlayer>>
 
