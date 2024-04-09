@@ -4,7 +4,9 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <!-- Below property allows us to connect to REST API -->
     <application
+        android:usesCleartextTraffic="true"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"

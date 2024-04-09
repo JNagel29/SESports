@@ -1,17 +1,21 @@
 package com.example.jetpacktest.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.jetpacktest.DatabaseHandler
+import com.example.jetpacktest.RestHandler
 import com.example.jetpacktest.models.NbaTeam
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import java.net.SocketTimeoutException
 
 
 @OptIn(FlowPreview::class)
 class SearchViewModel() : ViewModel() {
 
     private val databaseHandler = DatabaseHandler()
+    private val restHandler = RestHandler()
 
     private val _searchText = MutableStateFlow("")
     val searchText = _searchText.asStateFlow()
@@ -49,9 +53,41 @@ class SearchViewModel() : ViewModel() {
             emptyList()
         )
 
+    /* TODO: Was testing connecting via REST API and it worked, will implement more l8r
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val playerResults = combine(
+        _selectedSearchType,
+        searchText.debounce(500L)
+    ) { searchType, text ->
+        if (searchType == "Player" && text.isNotBlank()) {
+            _isSearching.value = true
+            viewModelScope.launch {
+                try {
+                    _playerResults.value = restHandler.getPlayerSearchResults(text)
+                } catch (e: SocketTimeoutException) {
+                    Log.e("SearchViewModel", "ERROR: ${e.message}. Check Server")
+                    _playerResults.value = emptyList()
+                }
+                finally {
+                    _isSearching.value = false
+                }
+            }
+            _playerResults
+        } else {
+            flowOf(emptyList())
+        }
+    }.flattenMerge()
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            emptyList()
+        )
+
+     */
+
+
     private val _teamResults = MutableStateFlow<List<String>>(emptyList())
 
-    //TODO: need to figure out how to not search for players when searching team
     @OptIn(ExperimentalCoroutinesApi::class)
     val teamResults = searchText
         .flatMapLatest { text ->
