@@ -49,7 +49,6 @@ fun GamesScreen(
 ) {
     val state = viewModel.state.value
 
-    //TODO: Make gamesList and list in TeamProfileScreen parcelable to work w/ savable
     var selectedDate by rememberSaveable { mutableStateOf(Date()) }
 
 
@@ -199,7 +198,6 @@ fun NewGameCard(game: Game, navigateToTeamProfile: (String) -> Unit) {
 /*
 
     val gamesHandler = GamesHandler()
-    //TODO: Make gamesList and list in TeamProfileScreen parcelable to work w/ savable
     var selectedDate by rememberSaveable { mutableStateOf(Date()) }
     var gamesList by rememberSaveable { mutableStateOf<List<Game_Old>>(emptyList()) }
     var isFetching by remember { mutableStateOf(false)}
