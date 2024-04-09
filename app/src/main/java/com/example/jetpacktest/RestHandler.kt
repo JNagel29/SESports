@@ -1,8 +1,5 @@
 package com.example.jetpacktest
 
-import android.util.Log
-import com.example.jetpacktest.models.Player
-import com.example.jetpacktest.models.RestPlayer
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
