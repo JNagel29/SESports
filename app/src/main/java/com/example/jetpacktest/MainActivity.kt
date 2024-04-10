@@ -45,7 +45,7 @@ class MainActivity : ComponentActivity() {
         }
         scheduleWork()
         sharedPreferences = applicationContext.getSharedPreferences("prefs", MODE_PRIVATE)
-        val randomStat = sharedPreferences.getString(RandomStatWorker.KEY_RANDOM_STAT, "") ?: ""
+        val randomStat = sharedPreferences.getString(RandomStatWorker.KEY_RANDOM_STAT, "test") ?: ""
 
         //Initializes timezone used in GamesScreen.kt
         AndroidThreeTen.init(this)

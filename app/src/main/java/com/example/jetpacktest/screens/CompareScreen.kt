@@ -110,7 +110,7 @@ fun CompareScreen(
                 }
             }
         }
-        Spacer(modifier = Modifier.height(50.dp))
+        Spacer(modifier = Modifier.height(25.dp))
         if (selectedPlayers.isNotEmpty()) {
             Card(
                 modifier = Modifier.padding(8.dp),
