@@ -7,4 +7,37 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="light_red">#ce1141</color>
+    <color name="purple_lakers">#552583</color>
+    <!-- Colors for NBA teams -->
+    <color name="lal">#552583</color>
+    <color name="lac">#1D428A</color>
+    <color name="atl">#E03A3E</color>
+    <color name="bos">#008348</color>
+    <color name="bkn">#000000</color>
+    <color name="cha">#00788C</color>
+    <color name="chi">#CE1141</color>
+    <color name="cle">#860038</color>
+    <color name="dal">#00538C</color>
+    <color name="den">#0E2240</color>
+    <color name="det">#C8102E</color>
+    <color name="gsw">#1D428A</color>
+    <color name="hou">#CE1141</color>
+    <color name="ind">#002D62</color>
+    <color name="mem">#5D76A9</color>
+    <color name="mia">#98002E</color>
+    <color name="mil">#00471B</color>
+    <color name="min">#0C2340</color>
+    <color name="nop">#0C2340</color>
+    <color name="nyk">#006BB6</color>
+    <color name="okc">#007AC1</color>
+    <color name="orl">#0077C0</color>
+    <color name="phi">#006BB6</color>
+    <color name="phx">#1D1160</color>
+    <color name="por">#E03A3E</color>
+    <color name="sac">#5A2D81</color>
+    <color name="sas">#C4CED4</color>
+    <color name="tor">#CE1141</color>
+    <color name="uta">#002B5C</color>
+    <color name="was">#E31837</color>
 </resources>

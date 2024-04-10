@@ -1,242 +1,251 @@
 package com.example.jetpacktest.screens
 
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.Icon
+import ReturnToPreviousHeader
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.jetpacktest.DatabaseHandler
-import com.example.jetpacktest.HeadshotHandler
 import com.example.jetpacktest.R
+import com.example.jetpacktest.models.NbaTeam
 import com.example.jetpacktest.models.Player
-
+import com.example.jetpacktest.ui.components.CircularLoadingIcon
+import com.example.jetpacktest.ui.components.LargeDropdownMenu
 
 @Composable
-fun CompareResultsScreen(playerName1: String, playerName2: String, navigateBack: () -> Unit) {
-    // Instantiate a headshot handler that we'll use to fetch url by name
-    val headshotHandler = HeadshotHandler()
-    // Context that we pass into fetchImageUrl for Volley
-    val context = LocalContext.current
-    // We instantiate imgUrl with mutableStateOf, so the screen recomposes automatically when it changes
-    var imgUrl1 by remember { mutableStateOf("") } // Default to ""
-    var imgUrl2 by remember { mutableStateOf("") } // Default to ""
-    // DatabaseHandler to fetch years for dropdown menu and fetch the actual data
-    val databaseHandler = remember { DatabaseHandler() }
-    // Variable to track if dropdown is expanded
-    var expandedYear by remember { mutableStateOf(false) }
-    // Variable we'll use to create dropdown, will need to fetch every year player has played thru DB
-    var yearsList1 by remember { mutableStateOf<List<String>>(emptyList()) } // Default to empty list
-    var yearsList2 by remember { mutableStateOf<List<String>>(emptyList()) } // Default to empty list
-    var chosenYear1 by remember { mutableStateOf("") } // Default to nothing since dynamic
-    var chosenYear2 by remember { mutableStateOf("") } // Default to nothing since dynamic
-    // Variable for Player objects that will hold the data about the players
-    var playerObj1 by remember { mutableStateOf(Player()) }
-    var playerObj2 by remember { mutableStateOf(Player()) }
-    // Variable to track whether to show the player data table
-    var showPlayerData1 by remember { mutableStateOf(false) }
-    var showPlayerData2 by remember { mutableStateOf(false) }
+fun CompareResultsScreen(playerName1: String, playerName2: String,navigateBack: () -> Unit,
+                         ) {
+    val databaseHandler = DatabaseHandler()
+    var player1 by remember { mutableStateOf(Player()) }
+    var player2 by remember { mutableStateOf(Player()) }
+    var chosenYear1 by remember { mutableStateOf("") }
+    var chosenYear2 by remember { mutableStateOf("") }
+    var yearsList1 by remember { mutableStateOf<List<String>>(emptyList()) }
+    var yearsList2 by remember { mutableStateOf<List<String>>(emptyList()) }
+    var isFetching1 by remember { mutableStateOf(false)}
+    var isFetching2 by remember { mutableStateOf(false)}
+
+
 
     LaunchedEffect(Unit) {
-        // On first launch, fetch the headshots and assign imgUrls to results using lambda callback
-        headshotHandler.fetchImageUrl(playerName = playerName1, context = context) { result ->
-            imgUrl1 = result
-        }
-        headshotHandler.fetchImageUrl(playerName = playerName2, context = context) { result ->
-            imgUrl2 = result
-        }
-        // Also, fetch the list of years that we'll use to populate dropdown menu
-        databaseHandler.executeYears(playerName = playerName1) { result ->
+        isFetching1 = true
+        //Fetch player 1 years and data
+        databaseHandler.executeYears(playerName = playerName1) {result ->
             yearsList1 = result
             if (yearsList1.isNotEmpty()) {
-                chosenYear1 = yearsList1.first()
-                // Fetch the player data for the chosen year
+                chosenYear1 = yearsList1.first() //Default to most recent year
                 databaseHandler.executePlayerData(playerName1, chosenYear1) { data ->
-                    playerObj1 = data
-                    showPlayerData1 = true
+                    player1 = data
+                    isFetching1 = false
                 }
             }
         }
-        databaseHandler.executeYears(playerName = playerName2) { result ->
+        isFetching2 = true
+        //Same for player2
+        databaseHandler.executeYears(playerName = playerName2) {result ->
             yearsList2 = result
             if (yearsList2.isNotEmpty()) {
-                chosenYear2 = yearsList2.first()
-                // Fetch the player data for the chosen year
+                chosenYear2 = yearsList2.first() //Default to most recent year
                 databaseHandler.executePlayerData(playerName2, chosenYear2) { data ->
-                    playerObj2 = data
-                    showPlayerData2 = true
+                    player2 = data
+                    isFetching2 = false
                 }
             }
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        // Player 1 data on the left
+    Surface(modifier = Modifier.fillMaxSize(), color = Color.White) {
         Column(
-            modifier = Modifier.fillMaxWidth(1f)
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
+                .verticalScroll(rememberScrollState())
         ) {
-            // Display player 1 name and headshot
-            NameAndHeadshotCompare(playerName1, imgUrl1, headshotHandler)
-            // Display player 1 data
-            if (showPlayerData1) {
-                PlayerDataTable(playerObj1)
+            ReturnToPreviousHeader(navigateBack = navigateBack)
+            Spacer(modifier = Modifier.height(15.dp))
+            if (isFetching1 || isFetching2) {
+                CircularLoadingIcon()
             }
-        }
-        // Player 2 data on the right
-        Column(
-            modifier = Modifier.fillMaxWidth(1f)
-        ) {
-            // Display player 2 name and headshot
-            NameAndHeadshotCompare(playerName2, imgUrl2, headshotHandler)
-            // Display player 2 data
-            if (showPlayerData2) {
-                PlayerDataTable(playerObj2)
+            else {
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    LargeDropdownMenu(
+                        label = "Select ${player1.name}'s Year:",
+                        items = yearsList1,
+                        selectedIndex = yearsList1.indexOf(chosenYear1),
+                        onItemSelected = { index, _ ->
+                            val year = yearsList1[index]
+                            //Check if newly selected stat is different from previous
+                            if (year != chosenYear1) {
+                                chosenYear1 = year
+                                databaseHandler.executePlayerData(playerName1, chosenYear1) { data ->
+                                    player1 = data
+                                }
+                            }
+                        },
+                        modifier = Modifier.weight(1f)
+                    )
+                    LargeDropdownMenu(
+                        label = "Select ${player2.name}'s Year:",
+                        items = yearsList2,
+                        selectedIndex = yearsList2.indexOf(chosenYear2),
+                        onItemSelected = { index, _ ->
+                            val year = yearsList2[index]
+                            //Check if newly selected stat is different from previous
+                            if (year != chosenYear2) {
+                                chosenYear2 = year
+                                databaseHandler.executePlayerData(playerName2, chosenYear2) { data ->
+                                    player2 = data
+                                }
+                            }
+                        },
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+                PlayerProfile(players = listOf(player1, player2))
             }
         }
     }
 }
 
 @Composable
-fun NameAndHeadshotCompare(playerName: String, imgUrl: String, headshotHandler: HeadshotHandler) {
-    Box(
-        modifier = Modifier.fillMaxWidth(),
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(
-                text = playerName,
-                fontSize = 26.sp,
-                fontFamily = FontFamily.Serif,
-                textAlign = TextAlign.Center,
-                fontWeight = FontWeight.ExtraBold
-            )
-            // Now use our headshot handler to compose the image using that URL
-            headshotHandler.ComposeImage(
-                imgToCompose = imgUrl,
-                contentDesc = playerName,
-                width = 200.dp,
-                height = 200.dp
-            )
-        }
-    }
+fun PlayerProfile(players: List<Player>) {
+    val player1 = players.getOrNull(0)
+    val player2 = players.getOrNull(1)
 
-
-    @Composable
-    fun PlayerDataTable(playerObj: Player) {
-        Box(modifier = Modifier.fillMaxWidth()) {
-            // Header
-            Text(
-                "Player Averages", fontSize = 25.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.align(Alignment.Center)
-            )
-        }
-        Spacer(modifier = Modifier.height(4.dp))
-        // List of values
-        LazyColumn(
-            modifier = Modifier.padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            item {
-                PlayerDataRow("Year", playerObj.year.toString())
-                PlayerDataRow("Position", playerObj.position)
-                PlayerDataRow("Team", playerObj.team)
-                PlayerDataRow("Points", playerObj.points.toString())
-                PlayerDataRow("Assists", playerObj.assists.toString())
-                PlayerDataRow("Steals", playerObj.steals.toString())
-                PlayerDataRow("Blocks", playerObj.blocks.toString())
-                PlayerDataRow("Rebounds", playerObj.totalRebounds.toString())
-                PlayerDataRow("Turnovers", playerObj.turnovers.toString())
-                PlayerDataRow("Fouls", playerObj.personalFouls.toString())
-                PlayerDataRow("Mins. Played", playerObj.minutesPlayed.toString())
-                PlayerDataRow("FG", playerObj.fieldGoals.toString())
-                PlayerDataRow("FGA", playerObj.fieldGoalAttempts.toString())
-                PlayerDataRow("FG%", playerObj.fieldGoalPercent.toString())
-                PlayerDataRow("3P ", playerObj.threePointers.toString())
-                PlayerDataRow("3PA", playerObj.threePointerAttempts.toString())
-                PlayerDataRow("3P%", playerObj.threePointPercent.toString())
-                PlayerDataRow("2P", playerObj.twoPointers.toString())
-                PlayerDataRow("2PA", playerObj.twoPointerAttempts.toString())
-                PlayerDataRow("2P%", playerObj.twoPointPercent.toString())
-                PlayerDataRow("EFG%", playerObj.effectiveFieldGoalPercent.toString())
-                PlayerDataRow("ORB", playerObj.offensiveRebounds.toString())
-                PlayerDataRow("DRB", playerObj.defensiveRebounds.toString())
-            }
-        }
-    }
-
-    @Composable
-    fun PlayerDataRow(label: String, value: String) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
-        ) {
-            Text(
-                label,
-                fontSize = 22.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.weight(1f)
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                value,
-                fontSize = 22.sp,
-                textAlign = TextAlign.End,
-                modifier = Modifier.weight(1f)
-            )
-        }
-    }
-
-    @Composable
-    fun ReturnToSearchHeader(navigateBack: () -> Unit) {
-        Column(
-            modifier = Modifier.padding(10.dp),
-            verticalArrangement = Arrangement.Top
+    HorizontalDivider()
+    player1?.let { player ->
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
         ) {
             Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.clickable {
-                    navigateBack()
-                }
+                modifier = Modifier.horizontalScroll(rememberScrollState())
             ) {
-                Icon(
-                    imageVector = ImageVector.vectorResource(R.drawable.baseline_arrow_back_ios_new_24),
-                    contentDescription = "Back"
-                )
-                Spacer(modifier = Modifier.width(10.dp))
-                Text(
-                    text = "Return to Previous",
-                    fontSize = 18.sp,
-                    fontFamily = FontFamily.Serif
-                )
+                Box(modifier = Modifier.padding(end = 16.dp)) {
+                    PlayerCard(player, player2!!)
+                }
+                Box(modifier = Modifier.padding(end = 16.dp)) {
+                    PlayerCard(player2!!, player1)
+                }
             }
         }
     }
 }
+
+
+
+
+
+@Composable
+fun PlayerStats(player1: Player, player2: Player) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        PlayerCard(player1, player2)
+        PlayerCard(player2, player1)
+    }
+}
+
+@Composable
+fun PlayerCard(player: Player, opponent: Player) {
+    val team = player.team
+    Box(
+        modifier = Modifier
+            .width(200.dp)
+            .shadow(elevation = 4.dp)
+            .border(width = 2.dp, color = Color.Gray, shape = RoundedCornerShape(8.dp)) // Border with rounded corners
+    ) {
+        Box(
+            modifier = Modifier
+                .background(Color(0xFFF5F5DC)) // Beige background color
+                .padding(16.dp)
+        ) {
+            Column {
+                Text(
+                    text = player.name,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                StatRow("Year", player.year.toString(), false)
+                StatRow("Position", player.position, false)
+                StatRow("Team", player.team, false)
+                StatRow("Points", player.points.toString(), player.points > opponent.points)
+                StatRow("Assists", player.assists.toString(), player.assists > opponent.assists)
+                StatRow("Steals", player.steals.toString(), player.steals > opponent.steals)
+                StatRow("Blocks", player.blocks.toString(), player.blocks > opponent.blocks)
+                StatRow("Total Rebounds", player.totalRebounds.toString(), player.totalRebounds > opponent.totalRebounds)
+                StatRow("Turnovers", player.turnovers.toString(), player.turnovers < opponent.turnovers)
+                StatRow("Personal Fouls", player.personalFouls.toString(), player.personalFouls < opponent.personalFouls)
+                StatRow("Minutes Played", player.minutesPlayed.toString(), player.minutesPlayed > opponent.minutesPlayed)
+                StatRow("FG", player.fieldGoals.toString(), player.fieldGoals > opponent.fieldGoals)
+                StatRow("FGA", player.fieldGoalAttempts.toString(), player.fieldGoalAttempts > opponent.fieldGoalAttempts)
+                StatRow("FG%", player.fieldGoalPercent.toString(), player.fieldGoalPercent > opponent.fieldGoalPercent)
+                StatRow("3P ", player.threePointers.toString(), player.threePointers > opponent.threePointers)
+                StatRow("3PA", player.threePointerAttempts.toString(), player.threePointerAttempts > opponent.threePointerAttempts)
+                StatRow("3P%", player.threePointPercent.toString(), player.threePointPercent > opponent.threePointPercent)
+                StatRow("2P", player.twoPointers.toString(), player.twoPointers > opponent.twoPointers)
+                StatRow("2PA", player.twoPointerAttempts.toString(), player.twoPointerAttempts > opponent.twoPointerAttempts)
+                StatRow("2P%", player.twoPointPercent.toString(), player.twoPointPercent > opponent.twoPointPercent)
+                StatRow("EFG%", player.effectiveFieldGoalPercent.toString(), player.effectiveFieldGoalPercent > opponent.effectiveFieldGoalPercent)
+                StatRow("ORB", player.offensiveRebounds.toString(), player.offensiveRebounds > opponent.offensiveRebounds)
+                StatRow("DRB", player.defensiveRebounds.toString(), player.defensiveRebounds > opponent.defensiveRebounds)
+            }
+        }
+    }
+}
+
+
+@Composable
+fun StatRow(label: String, value: String, playerHasHigherStat: Boolean) {
+
+    val statColor = if (playerHasHigherStat) Color(0xFF46923c) else Color(0xFFF5F5DC)
+    val borderColor = Color(0xFFF5F5DC)
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text = label,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.weight(1f)
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Box(
+            modifier = Modifier
+                .background(statColor, RoundedCornerShape(4.dp))
+                .padding(horizontal = 4.dp, vertical = 2.dp)
+        ) {
+            Text(
+                text = value,
+                fontSize = 16.sp,
+                textAlign = TextAlign.End,
+                color = Color.Black,
+                modifier = Modifier.padding(horizontal = 4.dp)
+            )
+        }
+    }
+}
+
+

@@ -2,7 +2,11 @@ package com.example.jetpacktest
 
 import android.util.Log
 import com.example.jetpacktest.models.Player
-import com.example.jetpacktest.models.TopPlayer
+import com.example.jetpacktest.models.StatLeader
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.sql.Connection
 import java.sql.DriverManager
 import java.sql.ResultSet
@@ -15,53 +19,188 @@ import java.util.concurrent.Executors
 class DatabaseHandler {
     object Const { // We use object since only way to make them constant
         //Tag for logging
-        const val TAG = "Stat Leaders Activity"
+        const val TAG = "DatabaseHandler"
         //Constant to hold how many players to grab (top 10, top 20, etc.)
         const val MAX_PLAYERS = 10
     }
     //Executor for the database requesting (used to run in background as its own thread)
     private val executor: Executor = Executors.newSingleThreadExecutor()
+    //Alternative to Executor
+    private val scope = CoroutineScope(Dispatchers.IO)
     //Variables and info to connect to DB
     private val url = "jdbc:mysql://nikoarak.cikeys.com:3306/nikoarak_SESports"
     private val user = Keys.DBUser
     private val password = Keys.DBPass
 
-    //This function will run the getStatLeaders fun in its own thread, using executor
     fun executeStatLeaders(chosenStat: String, year: String,
-                            onDataReceived: (MutableList<TopPlayer>) -> Unit) {
+                           onDataReceived: (MutableList<StatLeader>) -> Unit) {
+        /*
         executor.execute {
-            val topPlayerList = getStatLeaders(chosenStat, year)
-            // After getting list of top players, callback to calling function to send back the data
-            onDataReceived(topPlayerList)
+            val statLeadersList = getStatLeaders(chosenStat, year)
+            onDataReceived(statLeadersList)
+        }
+         */
+        scope.launch {
+            val statLeadersList = getStatLeaders(chosenStat, year)
+            withContext(Dispatchers.IO) {
+                onDataReceived(statLeadersList)
+            }
         }
     }
-    //Same as last function, but this one is for the years function
     fun executeYears(playerName: String, onDataReceived: (MutableList<String>) -> Unit) {
+        /*
         executor.execute {
             val yearsList = getPlayerYears(playerName)
-            // After getting list of years, callback to calling function to send back the data
             onDataReceived(yearsList)
         }
+         */
+        scope.launch {
+            val yearsList = getPlayerYears(playerName)
+            withContext(Dispatchers.IO) {
+                onDataReceived(yearsList)
+            }
+        }
+
     }
-    //Same as last function, but for grabbing entire pieces of data for players for profile
     fun executePlayerData(playerName: String, year: String,
                           onDataReceived: (Player) -> Unit) {
+        /*
         executor.execute {
-            val playerObj = getPlayerData(playerName, year)
-            // After getting data of player, callback to calling function to send back the data
-            onDataReceived(playerObj)
+            val player = getPlayerData(playerName, year)
+            onDataReceived(player)
+        }
+         */
+        scope.launch {
+            val player = getPlayerData(playerName, year)
+            withContext(Dispatchers.IO) {
+                onDataReceived(player)
+            }
         }
     }
 
-    //Same as last function, but for grabbing entire pieces of data for players for profile
     fun executePlayerSearchResults(searchResultName: String,
-                             onDataReceived: (MutableList<String>) -> Unit) {
+                                   onDataReceived: (MutableList<String>) -> Unit) {
+        /*
         executor.execute {
             val playerResultsList = getPlayerSearchResults(searchResultName)
             // After getting list of results, callback to calling function to send back the data
             onDataReceived(playerResultsList)
         }
+         */
+        scope.launch {
+            val playerResultsList = getPlayerSearchResults(searchResultName)
+            withContext(Dispatchers.IO) {
+                onDataReceived(playerResultsList)
+            }
+        }
     }
+
+    fun executeRandomStat(randIndex: Int,
+                          onDataReceived: (String) -> Unit) {
+        /*
+        executor.execute {
+            val randomStat = getRandomStat(randIndex)
+            onDataReceived(randomStat)
+        }
+         */
+        scope.launch {
+            val randomStat = getRandomStat(randIndex)
+            withContext(Dispatchers.IO) {
+                onDataReceived(randomStat)
+            }
+        }
+    }
+
+    fun executeNbaDotComId(playerName: String,
+                           onDataReceived: (Int) -> Unit) {
+        scope.launch {
+            val nbaDotComId = getNbaDotComId(playerName = playerName)
+            withContext(Dispatchers.IO) {
+                onDataReceived(nbaDotComId)
+            }
+        }
+    }
+
+    private fun getNbaDotComId(playerName: String): Int {
+        var id: Int = -1
+        var myConn: Connection? = null
+        var statement: Statement? = null
+        var resultSet: ResultSet? = null
+        try {
+            Class.forName("com.mysql.jdbc.Driver")
+            myConn = DriverManager.getConnection(url, user, password)
+            statement = myConn.createStatement()
+            val sql = "SELECT `NbaId` FROM NBA_PLAYER_ID WHERE `Name` = '$playerName'"
+            resultSet = statement.executeQuery(sql)
+            while (resultSet.next()) {
+                id = resultSet.getInt("NbaId")
+            }
+        } catch (e: SQLException) {
+            Log.d(Const.TAG, e.message!!)
+            e.printStackTrace()
+        } catch (e: ClassNotFoundException) {
+            e.printStackTrace()
+        } finally {
+            //Close resources
+            closeResources(myConn, resultSet, statement)
+        }
+        return id
+    }
+
+    private fun getRandomStat(randIndex: Int): String {
+        Log.d("DatabaseHandler", "Fetching new random stat")
+        var randomStat = ""
+        var myConn: Connection? = null
+        var statement: Statement? = null
+        var resultSet: ResultSet? = null
+        try {
+            Class.forName("com.mysql.jdbc.Driver")
+            myConn = DriverManager.getConnection(url, user, password)
+            statement = myConn.createStatement()
+            val sql = "SELECT statString FROM RANDOM_STAT WHERE statID = $randIndex"
+            resultSet = statement.executeQuery(sql)
+            while (resultSet.next()) {
+                randomStat = resultSet.getString("statString")
+            }
+        } catch (e: SQLException) {
+            Log.d(Const.TAG, e.message!!)
+            e.printStackTrace()
+        } catch (e: ClassNotFoundException) {
+            e.printStackTrace()
+        } finally {
+            //Close resources
+            closeResources(myConn, resultSet, statement)
+        }
+        return randomStat
+    }
+
+    private fun oldGetRandomStat(): String {
+        var randomStat = ""
+        var myConn: Connection? = null
+        var statement: Statement? = null
+        var resultSet: ResultSet? = null
+        try {
+            Class.forName("com.mysql.jdbc.Driver")
+            myConn = DriverManager.getConnection(url, user, password)
+            statement = myConn.createStatement()
+            val sql = "SELECT statString FROM RANDOM_STAT ORDER BY RAND() LIMIT 1"
+            resultSet = statement.executeQuery(sql)
+            while (resultSet.next()) {
+                randomStat = resultSet.getString("statString")
+            }
+        } catch (e: SQLException) {
+            Log.d(Const.TAG, e.message!!)
+            e.printStackTrace()
+        } catch (e: ClassNotFoundException) {
+            e.printStackTrace()
+        } finally {
+            //Close resources
+            closeResources(myConn, resultSet, statement)
+        }
+        return randomStat
+    }
+
+
 
     private fun getPlayerSearchResults(searchResultName: String): MutableList<String> {
         val playerResultsList = mutableListOf<String>()
@@ -71,6 +210,7 @@ class DatabaseHandler {
         //We remove accents since searching DB requires none
         val searchResultsNameNoAccents = removeAccents(searchResultName)
         try {
+            Log.d("DatabaseHandler", "Fetching new search results")
             Class.forName("com.mysql.jdbc.Driver")
             myConn = DriverManager.getConnection(url, user, password)
             statement = myConn.createStatement()
@@ -207,12 +347,12 @@ class DatabaseHandler {
 
 
     //This function is the one actually connecting to DB and giving us the data for stat leads
-    private fun getStatLeaders(chosenStat: String, year: String): MutableList<TopPlayer> {
+    private fun getStatLeaders(chosenStat: String, year: String): MutableList<StatLeader> {
         var myConn: Connection? = null
         var statement: Statement? = null
         var resultSet: ResultSet? = null
         val statData = StringBuilder()
-        val topPlayerList = mutableListOf<TopPlayer>()
+        val statLeadersList = mutableListOf<StatLeader>()
         //Used to keep track of added player names to prevent duplicates
         val addedPlayers = mutableSetOf<String>()
         try {
@@ -229,9 +369,9 @@ class DatabaseHandler {
                 //Makes sure player name doesn't already exists in the addedPlayers set
                 if (!addedPlayers.contains(playerName)) {
                     val chosenStatValue = resultSet.getFloat(chosenStat)
-                    val topPlayer = TopPlayer(rank = counter + 1, name = playerName,
-                                            stat = chosenStatValue)
-                    topPlayerList.add(topPlayer)
+                    val statLeader = StatLeader(rank = counter + 1, name = playerName,
+                        statValue = chosenStatValue)
+                    statLeadersList.add(statLeader)
                     addedPlayers.add(playerName) // add player name to the set
                     statData.append("Player Name: ").append(playerName).append(", ")
                         .append(chosenStat).append(": ").append(chosenStatValue).append("\n")
@@ -248,7 +388,7 @@ class DatabaseHandler {
             //Close resources
             closeResources(myConn, resultSet, statement)
         }
-        return topPlayerList
+        return statLeadersList
     }
 
     //This function will find us the years for which a player has stats for in our DB

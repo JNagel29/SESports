@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -18,9 +17,9 @@ import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -34,156 +33,150 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
+import androidx.compose.ui.unit.sp
 import com.example.jetpacktest.DatabaseHandler
 
 
 @Composable
 fun CompareScreen(
-    navigateToPlayerProfile: (String) -> Unit,
-    navController: NavHostController,
-    navigateToProfile2: (List<String>) -> Unit
+    navigateToCompareResults: (String, String) -> Unit
 ) {
+
     var searchText by remember { mutableStateOf("") }
     val focusManager = LocalFocusManager.current
+    val keyboardController = LocalSoftwareKeyboardController.current
     var searchResults by remember { mutableStateOf<List<String>>(emptyList()) }
     var selectedPlayers by remember { mutableStateOf<List<String>>(emptyList()) }
-    var selectedSearchType by remember { mutableStateOf("Player") }
     var showAlertDialog by remember { mutableStateOf(false) }
     var showSelectionDialog by remember { mutableStateOf(false) }
-
     val databaseHandler = DatabaseHandler()
 
-    Surface(
-        modifier = Modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background
-    ) {
-        Column(modifier = Modifier.padding(10.dp)) {
-            RadioButtonsDisplay(
-                selectedSearchType = selectedSearchType,
-                onSearchTypeSelected = { searchType ->
-                    selectedSearchType = searchType
-                },
-                onSearchTextChange = { newText ->
-                    searchText = newText
-                    if (selectedSearchType == "Team") {
-                        handleTeamSearch(searchText) { newResults ->
-                            searchResults = newResults.take(8)
-                        }
-                    } else {
-                        databaseHandler.executePlayerSearchResults(searchText) { newResults ->
-                            searchResults = newResults.take(8)
-                        }
-                    }
-                },
-                onClearSearchResults = {
-                    searchResults = emptyList()
+    Column(modifier = Modifier.padding(10.dp)) {
+        TextField(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(8.dp)),
+            value = searchText,
+            singleLine = true,
+            onValueChange = {
+                searchText = it
+                databaseHandler.executePlayerSearchResults(searchText) { newResults ->
+                    searchResults = newResults.take(5)
                 }
-            )
-            Spacer(modifier = Modifier.height(6.dp))
-            TextField(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(8.dp)),
-                value = searchText,
-                singleLine = true,
-                onValueChange = {
-                    searchText = it
-                    if (selectedSearchType == "Player") {
-                        databaseHandler.executePlayerSearchResults(searchText) { newResults ->
-                            searchResults = newResults.take(5)
-                        }
-                    } else {
-                        handleTeamSearch(searchText) { newResults ->
-                            searchResults = newResults.take(5)
-                        }
-                    }
-                },
-
-                label = {
-                    Text(if (selectedSearchType == "Player") "Search Players ..."
-                    else "Search Teams...")
-                },
-                leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Default.Search,
-                        contentDescription = "Search Icon"
-                    )
-                },
-                keyboardActions = KeyboardActions(
-                    onDone = {
-                        if (selectedSearchType == "Player") {
-                            databaseHandler.executePlayerSearchResults(searchText) { newResults ->
-                                searchResults = newResults.take(5)
-                            }
-                        } else {
-                            handleTeamSearch(searchText) { newResults ->
-                                searchResults = newResults.take(5)
-                            }
-                        }
-                        focusManager.clearFocus()
-                    }
-                ),
-                colors = TextFieldDefaults.colors(
-                    cursorColor = Color.Blue,
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent
+            },
+            label = {
+                Text("Compare Players ...")
+            },
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Default.Search,
+                    contentDescription = "Search Icon"
                 )
+            },
+            keyboardActions = KeyboardActions(
+                onDone = { focusManager.clearFocus() }
+            ),
+            colors = TextFieldDefaults.colors(
+                cursorColor = Color.Blue,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent
             )
-            Spacer(modifier = Modifier.height(16.dp))
-            LazyColumn(modifier = Modifier.weight(1f)) {
-                items(searchResults) { itemName ->
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp)
-                            .clickable {
-                                if (selectedPlayers.size < 2) {
-                                    selectedPlayers = selectedPlayers + itemName
-                                } else {
-                                    // Display warning or exception for selecting more than two players
-                                    // For now, just print a warning
-                                    showAlertDialog = true
-                                    println("Cannot select more than two players")
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        LazyColumn {
+            items(searchResults) { itemName ->
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp)
+                        .clickable {
+                            if (selectedPlayers.size < 2) {
+                                selectedPlayers = selectedPlayers + itemName
+                            } else {
+                                // Display warning or exception for selecting more than two players
+                                // For now, just print a warning
+                                showAlertDialog = true
+                                println("Cannot select more than two players")
+                            }
+                        }
+                ) {
+                    Text(text = itemName)
+                }
+            }
+        }
+        Spacer(modifier = Modifier.height(25.dp))
+        if (selectedPlayers.isNotEmpty()) {
+            Card(
+                modifier = Modifier.padding(8.dp),
+                elevation = CardDefaults.cardElevation(
+                    defaultElevation = 10.dp // Adds a 'shadow' effect
+                ),
+                colors = CardDefaults.cardColors(
+                    containerColor = Color.White,
+                    contentColor = Color.Black
+                )
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Selected Players",
+                            style = TextStyle(
+                                textDecoration = TextDecoration.Underline,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 20.sp,
+                            ),
+                        )
+                    }
+                    LazyColumn {
+                        items(selectedPlayers) { playerName ->
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(text = playerName)
+                                Spacer(modifier = Modifier.weight(1f))
+                                // Red X button to remove player
+                                Box(modifier = Modifier
+                                    .clickable {
+                                        selectedPlayers = selectedPlayers
+                                            .filter { it != playerName }
+                                    }) {
+                                    Icon(
+                                        imageVector = Icons.Default.Clear,
+                                        contentDescription = "Remove Player",
+                                        tint = Color.Red
+                                    )
                                 }
                             }
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(text = itemName)
+                        Button(
+                            onClick = {
+                                if (selectedPlayers.size < 2) {
+                                    showSelectionDialog = true
+                                } else {
+                                    keyboardController?.hide()
+                                    navigateToCompareResults(selectedPlayers[0], selectedPlayers[1])
+                                }
+                            },
+                        ) {
+                            Text(text = "Compare", textAlign = TextAlign.Center)
+                        }
                     }
                 }
-            }
-            if (selectedPlayers.isNotEmpty()) {
-                Text("Selected Players:")
-                LazyColumn {
-                    items(selectedPlayers) { playerName ->
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(text = playerName)
-                        Spacer(modifier = Modifier.weight(1f))
-                        // Red X button to remove player
-                        Box(modifier = Modifier.clickable {
-                            selectedPlayers = selectedPlayers.filter { it != playerName }
-                        }) {
-                            Icon(
-                                imageVector = Icons.Default.Clear,
-                                contentDescription = "Remove Player",
-                                tint = Color.Red
-                        )}
-                }
-                    }
-            }
-            Button(
-                onClick = {
-                    if (selectedPlayers.size < 2) {
-                        showSelectionDialog = true
-                    } else {
-                        // Navigate to profile2 screen with selected players
-                        navController.navigate("profile2Screen")
-                    }
-                },
-                modifier = Modifier.padding(vertical = 16.dp)
-            ) {
-                Text("Compare")
             }
         }
     }
@@ -215,5 +208,4 @@ fun CompareScreen(
             }
         )
     }
-
-}}
+}

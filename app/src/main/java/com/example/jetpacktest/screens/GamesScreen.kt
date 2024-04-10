@@ -1,6 +1,8 @@
 package com.example.jetpacktest.screens
 
 import android.util.Log
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,140 +12,235 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.jetpacktest.GamesHandler
 import com.example.jetpacktest.models.Game
-import java.util.Calendar
+import com.example.jetpacktest.models.NbaTeam
+import com.example.jetpacktest.ui.components.CircularLoadingIcon
+import com.foreverrafs.datepicker.DatePickerTimeline
+import java.time.ZoneId
+import java.util.Date
 
-
-//TODO: Playing around with view model to see if data can persist b/w navbar screen change
-class GamesViewModel: ViewModel() {
-    var gamesList: List<Game> by mutableStateOf(emptyList())
-}
-
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun GamesScreen(gamesViewModel: GamesViewModel = viewModel()) {
-    //Commenting out actual code for now since it's unfinished feature
-    Box(modifier = Modifier
-        .fillMaxSize(),
-        contentAlignment = Alignment.Center)
-    {
-        Text(text = "Games Screen",
-            fontFamily = FontFamily.Serif,
-            fontSize = 22.sp)
-    }
-
-    /*
-    //Instantiate a games handler that we'll use to fetch daily games
+fun GamesScreen(navigateToTeamProfile: (String) -> Unit) {
     val gamesHandler = GamesHandler()
-    //Also, instantiate empty list of games that we'll fetch on launch
-    var gamesList by remember { mutableStateOf<List<Game>>(emptyList()) }
-    //Context that we pass into fetchDailyGames for Volley
-    val context = LocalContext.current
+    //TODO: Make gamesList and list in TeamProfileScreen parcelable to work w/ savable
+    var selectedDate by rememberSaveable { mutableStateOf(Date()) }
+    var gamesList by rememberSaveable { mutableStateOf<List<Game>>(emptyList()) }
+    var isFetching by remember { mutableStateOf(false)}
+    var lastFetchedDate by remember { mutableStateOf(selectedDate) }
 
-    //TESTING
-    //var gamesList = gamesViewModel.gamesList
-
-    //Now, we use LaunchedEffect to fetch list of games when screen is up
-    LaunchedEffect(Unit) {
-        Log.d("GamesScreen", "Launched Effect has been activated")
-        //TODO: Not working correctly, gamesList resets when nav-barring away and back
-        //Only fetch data if the list is empty
-        if (gamesList.isEmpty()) {
-            Log.d("GamesScreen", "Games list is being fetched")
-            gamesHandler.fetchDailyGames(
-                currDate = Calendar.getInstance().time,
-                context = context,
-                onResult = { data ->
-                    gamesList = data // Use callback lambda to return results asynchronously
-                }
-            )
+    LaunchedEffect(selectedDate) {
+        if (gamesList.isEmpty() || selectedDate != lastFetchedDate) {
+            Log.d("GamesHandler", "Fetching new games...")
+            isFetching = true
+            gamesList = emptyList()
+            gamesHandler.fetchGames(date = selectedDate) { data ->
+                gamesList = data
+                isFetching = false
+                lastFetchedDate = selectedDate
+            }
         }
     }
 
-    //Lazy Column where each item is a game
-    LazyColumn {
-        items(gamesList) {game ->
-            //Represent each game as a card (see below composable)
-            GameCard(game = game)
+    Column(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        DatePickerTimeline(
+            backgroundColor = Color.LightGray,
+            onDateSelected = { selectedLocalDate ->
+                val newSelectedDate = Date.from(
+                    selectedLocalDate.atStartOfDay(ZoneId.systemDefault()).toInstant()
+                )
+                //Ensures we can't click same one
+                if (newSelectedDate != selectedDate) {
+                    selectedDate = newSelectedDate
+                }
+            },
+            todayLabel = {
+                Text(
+                    modifier = Modifier.padding(10.dp),
+                    text = "Today",
+                    color = Color.Black,
+                )
+            }
+        )
+        if (!isFetching) {
+            LazyColumn(modifier = Modifier.weight(1f)) {
+                items(gamesList) { game ->
+                    GameCard(game = game, navigateToTeamProfile)
+                }
+            }
         }
+        else CircularLoadingIcon()
+
     }
 }
-
 @Composable
-fun GameCard(game: Game) {
+fun GameCard(game: Game, navigateToTeamProfile: (String) -> Unit) {
     Card(
         modifier = Modifier.padding(8.dp),
         elevation = CardDefaults.cardElevation(
-            defaultElevation = 10.dp // Adds shadow effect
+            defaultElevation = 10.dp // Adds a 'shadow' effect
+        ),
+        colors = CardDefaults.cardColors(
+            // Sets background and text color of card
+            containerColor = Color.White,
+            contentColor = Color.Black
         )
     ) {
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
-            //Top row will have names and score
+            // Top Row that holds Home Logo, Home Score, Game Status, Away Score, Away Logo
             Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxWidth()
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(
-                    text = game.homeName,
-                    fontFamily = FontFamily.Serif,
-                    fontSize = 20.sp
+                Image(
+                    painter = painterResource(id = game.home_team.logo),
+                    contentDescription = "Home Team Logo",
+                    modifier = Modifier
+                        .size(50.dp)
+                        //On click, nav to team profile, substituting e.g. Hawks with Atlanta Hawks
+                        .clickable {
+                            navigateToTeamProfile(
+                                NbaTeam.shortenedNamesToFullNames[game.home_team.name]
+                                    ?: game.home_team.name
+                            )
+                        }
                 )
-                Text(
-                    text = game.homeScore,
-                    fontFamily = FontFamily.Serif,
-                    fontSize = 20.sp
-                )
-                Text(
-                    text = game.awayName,
-                    fontFamily = FontFamily.Serif,
-                    fontSize = 20.sp
-                )
-                Text(
-                    text = game.awayScore,
-                    fontFamily = FontFamily.Serif,
-                    fontSize = 20.sp
+                if (isGameUpcoming(game)) DisplayUpcomingInfo(game)
+                else DisplayOngoingOrPreviousInfo(game)
+                Image(
+                    painter = painterResource(id = game.visitor_team.logo),
+                    contentDescription = "Away Team Logo",
+                    modifier = Modifier
+                        .size(50.dp)
+                        //On click, nav to team profile, substituting e.g. Hawks with Atlanta Hawks
+                        .clickable {
+                            navigateToTeamProfile(
+                                NbaTeam.shortenedNamesToFullNames[game.visitor_team.name]
+                                    ?: game.visitor_team.name
+                            )
+                        }
                 )
             }
+            // Spacer between rows
             Spacer(modifier = Modifier.height(8.dp))
-            //Bottom row will have images and game time/status
+            // Bottom row that simply holds Home Name, Game Status, Away Name
             Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxWidth()
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = game.gameTime,
+                    text = game.home_team.name,
                     fontFamily = FontFamily.Serif,
+                    fontWeight = FontWeight.Bold,
                     fontSize = 16.sp
                 )
+                // Spacer to create gap between home and away team names
+                Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = game.gameStatus,
+                    text = game.visitor_team.name,
                     fontFamily = FontFamily.Serif,
+                    fontWeight = FontWeight.Bold,
                     fontSize = 16.sp
                 )
             }
         }
     }
+}
 
-     */
+@Composable
+fun DisplayUpcomingInfo(game: Game) {
+    Text(
+        text = game.status,
+        textAlign = TextAlign.Center,
+        fontFamily = FontFamily.Serif,
+        fontSize = 20.sp,
+        fontWeight = FontWeight.Bold,
+        modifier = Modifier.padding(vertical = 4.dp)
+    )
+}
+
+@Composable
+fun DisplayOngoingOrPreviousInfo(game: Game) {
+    Text(
+        text = game.home_team_score.toString(),
+        fontFamily = FontFamily.Serif,
+        fontSize = 24.sp,
+        fontWeight = FontWeight.Bold,
+        modifier = Modifier.padding(vertical = 4.dp)
+    )
+    Box {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            if (game.status == "Final" && game.home_team_score > game.visitor_team_score) {
+                Icon(
+                    Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Left team won",
+                    tint = Color.Black,
+                    modifier = Modifier.size(15.dp)
+                )
+            }
+            Text(
+                text = (if (game.time.isNullOrEmpty()) game.status else game.time)!!,
+                textAlign = TextAlign.Center,
+                fontFamily = FontFamily.Serif,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(vertical = 4.dp)
+            )
+            if (game.status == "Final" && game.visitor_team_score > game.home_team_score) {
+                Icon(
+                    Icons.AutoMirrored.Filled.ArrowForward,
+                    contentDescription = "Right team won",
+                    tint = Color.Black,
+                    modifier = Modifier.size(15.dp)
+                )
+            }
+        }
+    }
+    Text(
+        text = game.visitor_team_score.toString(),
+        fontFamily = FontFamily.Serif,
+        fontSize = 24.sp,
+        fontWeight = FontWeight.Bold,
+        modifier = Modifier.padding(vertical = 4.dp)
+    )
+}
+
+private fun isGameUpcoming(game: Game): Boolean {
+    return (game.status.contains("AM") || game.status.contains("PM"))
 }

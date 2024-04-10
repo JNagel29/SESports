@@ -1,8 +1,8 @@
 package com.example.jetpacktest.models
 
 //Data class used in Stat Leaders to hold data
-data class TopPlayer(
+data class StatLeader(
     val rank: Int,
     val name: String,
-    val stat: Float
+    val statValue: Float
 )
