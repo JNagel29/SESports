@@ -35,6 +35,7 @@ data class PlayerInfo(
 )
 
 class HeadshotHandler {
+    private val databaseHandler = DatabaseHandler()
     private val useBiggerImage: Boolean = true
     private var imageUrlPrefix: String? = null
     private val apiKey = Keys.SportsDataAPIKey
@@ -49,11 +50,25 @@ class HeadshotHandler {
     //Used in fetchPlayerId/fetchImageUrl to get active players and their ID
     private var imgUrl = "DEFAULT"
 
-
     fun fetchImageId(playerName: String, onResult: (Int) -> Unit) {
-        val baseActivePlayersUrl = "https://api.sportsdata.io/v3/nba/scores/json/"
-        val basePlayerDetailsUrl = "https://api.sportsdata.io/v3/nba/scores/json/"
+        //First, attempt fetching from the database
+        val noAccentPlayerName = removeAccents(playerName)
+        databaseHandler.executeNbaDotComId(noAccentPlayerName) { result ->
+            nbaDotComPlayerId = result
+            if (nbaDotComPlayerId != -1) onResult(nbaDotComPlayerId)
+            else {
+                Log.d(Const.TAG, "Database Miss, Fetching Headshot via API...")
+                fetchThroughApi(playerName) { apiResult ->
+                    nbaDotComPlayerId = apiResult
+                    onResult(nbaDotComPlayerId)
+                }
+            }
+        }
+    }
 
+    private fun fetchThroughApi(playerName: String, onResult: (Int) -> Unit) {
+        //TODO: This is rather slow when database misses, need to fix it in sprint 3
+        val baseUrl = "https://api.sportsdata.io/v3/nba/scores/json/"
         //Before anything else, we must remove accents in the passed name and split it
         val noAccentPlayerName = removeAccents(playerName)
         val nameParts =
@@ -63,7 +78,7 @@ class HeadshotHandler {
 
         val retrofitBuilder = Retrofit.Builder()
             .addConverterFactory(GsonConverterFactory.create())
-            .baseUrl(baseActivePlayersUrl)
+            .baseUrl(baseUrl)
             .build()
             .create(ApiInterface::class.java)
         val retrofitGames = retrofitBuilder.getActivePlayers(Keys.SportsDataAPIKey)
@@ -81,7 +96,7 @@ class HeadshotHandler {
                             //Make second retrofit request
                             val retrofitBuilder2 = Retrofit.Builder()
                                 .addConverterFactory(GsonConverterFactory.create())
-                                .baseUrl(basePlayerDetailsUrl)
+                                .baseUrl(baseUrl)
                                 .build()
                                 .create(ApiInterface::class.java)
                             val retrofitPlayers = retrofitBuilder2.getPlayerById(
@@ -98,20 +113,18 @@ class HeadshotHandler {
                                         val playerInfo = response2.body()!!
                                         Log.d("HeadshotHandler", "${playerInfo.NbaDotComPlayerID}")
                                         onResult(playerInfo.NbaDotComPlayerID)
+                                        return
                                     }
                                     else {
                                         Log.d("HeadshotHandler",
                                             "Retrofit failure, 2nd req.: Unsuccessful Response")
                                     }
                                 }
-
                                 override fun onFailure(call2: Call<PlayerInfo?>, t2: Throwable) {
                                     Log.d("HeadshotHandler",
                                         "Retrofit failure, 2nd req: $t2")
                                 }
                             })
-
-
                         }
                     }
                 }
@@ -119,7 +132,6 @@ class HeadshotHandler {
                     Log.d("HeadshotHandler", "Retrofit failure: Unsuccessful Response")
                 }
             }
-
             override fun onFailure(call: Call<List<ActivePlayer>?>, t: Throwable) {
                 Log.d("HeadshotHandler", "Retrofit failure: $t")
 
