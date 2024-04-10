@@ -66,15 +66,12 @@ fun ProfileScreen(playerName: String, navigateBack: () -> Unit) {
 
     //TODO: add favorite functionality and maybe switch to viewmodel?
     LaunchedEffect(Unit) {
-
-        /*
         if (imgId == -1) {
             Log.d("ProfileScreen", "Updating headshot")
             headshotHandler.fetchImageId(playerName) { result ->
                 imgId = result
             }
         }
-         */
 
         if (yearsList.isEmpty()) {
             Log.d("ProfileScreen", "Fetching new years")
