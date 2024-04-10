@@ -217,6 +217,7 @@ fun PlayerCard(player: Player, opponent: Player) {
 
 @Composable
 fun StatRow(label: String, value: String, playerHasHigherStat: Boolean) {
+
     val statColor = if (playerHasHigherStat) Color(0xFF46923c) else Color(0xFFF5F5DC)
     val borderColor = Color(0xFFF5F5DC)
     Row(
