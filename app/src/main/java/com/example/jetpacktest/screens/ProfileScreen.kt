@@ -55,25 +55,24 @@ fun ProfileScreen(playerName: String, navigateBack: () -> Unit) {
     val headshotHandler = HeadshotHandler()
     val databaseHandler = DatabaseHandler()
     //val context = LocalContext.current
-    val apiHandler = ApiHandler()
-    //var imgUrl by remember { mutableStateOf("") }
+    //val apiHandler = ApiHandler()
     var imgId by rememberSaveable { mutableIntStateOf(-1) }
     var yearsList by rememberSaveable { mutableStateOf<List<String>>(emptyList()) }
     var chosenYear by rememberSaveable { mutableStateOf("") }
     var player by rememberSaveable { mutableStateOf(Player()) }
     var showExpandedData by rememberSaveable { mutableStateOf(false) }
     var isFetching by rememberSaveable { mutableStateOf(true) }
+    var injuryStartDate by rememberSaveable { mutableStateOf("")}
 
     //TODO: add favorite functionality and maybe switch to viewmodel?
     LaunchedEffect(Unit) {
-
+        //We use conditionals to make sure these aren't re-fetched on screen swaps
         if (imgId == -1) {
             Log.d("ProfileScreen", "Updating headshot")
             headshotHandler.fetchImageId(playerName) { result ->
                 imgId = result
             }
         }
-
         if (yearsList.isEmpty()) {
             Log.d("ProfileScreen", "Fetching new years")
             databaseHandler.executeYears(playerName = playerName) {result ->
@@ -88,6 +87,12 @@ fun ProfileScreen(playerName: String, navigateBack: () -> Unit) {
                         isFetching = false
                     }
                 }
+            }
+        }
+        if (injuryStartDate == "") {
+            Log.d("ProfileScreen", "Checking if injured or not")
+            databaseHandler.executeCheckInjuredStartDate(playerName = playerName) { result ->
+                injuryStartDate = result
             }
         }
     }
@@ -108,6 +113,7 @@ fun ProfileScreen(playerName: String, navigateBack: () -> Unit) {
                     imgId = imgId,
                     team =  player.team,
                     position = player.position,
+                    injuryStartDate = injuryStartDate,
                     headshotHandler = headshotHandler
                 )
                 HorizontalDivider(thickness = 2.dp, color = Color.White)
@@ -125,17 +131,10 @@ fun ProfileScreen(playerName: String, navigateBack: () -> Unit) {
                             }
                         }
                         else {
+                            //TODO: Need to call upon API here later
                             databaseHandler.executePlayerData(playerName, chosenYear) { data ->
                                 player = data
                             }
-                            /*
-                            apiHandler.fetchPlayerData(
-                                context,
-                                onResult = {data ->
-                                    player = data
-                                }
-                            )
-                             */
                         }
                     }
                 )
@@ -157,6 +156,7 @@ fun NameAndHeadshot(
     imgId: Int,
     team: String,
     position: String,
+    injuryStartDate: String,
     headshotHandler: HeadshotHandler
 ) {
     var isFavorite by remember { mutableStateOf(false) }
@@ -212,6 +212,15 @@ fun NameAndHeadshot(
                     color = Color.White,
                     textAlign = TextAlign.Start
                 )
+                Spacer(modifier = Modifier.height(10.dp))
+                //Display injury notifier if so
+                if (injuryStartDate != "N/A") {
+                    Text(
+                        text = "Injured since ${injuryStartDate.dropLast(9)}",
+                        fontSize = 14.sp,
+                        color = Color.White
+                    )
+                }
             }
         }
     }

@@ -1,6 +1,7 @@
 package com.example.jetpacktest
 
 import com.example.jetpacktest.models.GameResponse
+import com.example.jetpacktest.models.InjuredPlayer
 import com.example.jetpacktest.models.RestPlayer
 import retrofit2.Call
 import retrofit2.http.GET
@@ -23,6 +24,9 @@ interface ApiInterface {
     @GET("PlayersBasic/{team}")
     fun getPlayersByTeam(@Path("team") team: String, @Query("key") apiKey: String) :
             Call<List<TeamPlayer>>
+
+    @GET("InjuredPlayers")
+    suspend fun getInjuredPlayers(@Query("key") apiKey: String) : List<InjuredPlayer>
 
     //Endpoints to fetch DB data from REST API
     @GET("player")

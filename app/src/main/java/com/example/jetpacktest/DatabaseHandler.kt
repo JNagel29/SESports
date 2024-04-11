@@ -1,6 +1,7 @@
 package com.example.jetpacktest
 
 import android.util.Log
+import com.example.jetpacktest.models.InjuredPlayer
 import com.example.jetpacktest.models.Player
 import com.example.jetpacktest.models.StatLeader
 import kotlinx.coroutines.CoroutineScope
@@ -121,6 +122,82 @@ class DatabaseHandler {
         }
     }
 
+    fun executeStoreInjured(injuredPlayers: List<InjuredPlayer>) {
+        scope.launch {
+            storeInjuredPlayers(injuredPlayers)
+        }
+    }
+
+    fun executeCheckInjuredStartDate(playerName: String, onDataReceived: (String) -> Unit) {
+        scope.launch {
+            val injuryStartDate: String = checkInjuredStartDate(playerName = playerName)
+            withContext(Dispatchers.IO) {
+                onDataReceived(injuryStartDate)
+            }
+        }
+    }
+
+    private fun checkInjuredStartDate(playerName: String): String {
+        var injuredStartDate = ""
+        var myConn: Connection? = null
+        var statement: Statement? = null
+        var resultSet: ResultSet? = null
+        try {
+            Class.forName("com.mysql.jdbc.Driver")
+            myConn = DriverManager.getConnection(url, user, password)
+            statement = myConn.createStatement()
+            val sql = "SELECT `InjuryStartDate` FROM INJURED_PLAYER WHERE `Name` = '$playerName'"
+            resultSet = statement.executeQuery(sql)
+            while (resultSet.next()) {
+                injuredStartDate = resultSet.getString("InjuryStartDate")
+                Log.d("DatabaseHandler", "Player was injured on $injuredStartDate")
+            }
+        } catch (e: SQLException) {
+            Log.d(Const.TAG, e.message!!)
+            e.printStackTrace()
+        } catch (e: ClassNotFoundException) {
+            e.printStackTrace()
+        } finally {
+            //Close resources
+            closeResources(myConn, resultSet, statement)
+        }
+        return if (injuredStartDate == "") "N/A"
+        else injuredStartDate
+    }
+
+    private fun storeInjuredPlayers(injuredPlayers: List<InjuredPlayer>) {
+        var myConn: Connection? = null
+        var statement: Statement? = null
+        try {
+            Log.d("DatabaseHandler", "Storing new list of injured players...")
+            Class.forName("com.mysql.jdbc.Driver")
+            myConn = DriverManager.getConnection(url, user, password)
+            statement = myConn.createStatement()
+            //Prevents previous injuries from displaying
+            statement.executeUpdate("DELETE FROM INJURED_PLAYER")
+            //PreparedStatement for re-usability
+            val preparedStatement = myConn.prepareStatement(
+                "INSERT INTO INJURED_PLAYER (`Name`, `InjuryStartDate`) VALUES (?, ?)"
+            )
+            injuredPlayers.forEach {injuredPlayer ->
+                val fullName = "${injuredPlayer.firstName} ${injuredPlayer.lastName}"
+                val injuryStartDate = injuredPlayer.injuryStartDate
+                preparedStatement.setString(1, fullName)
+                preparedStatement.setString(2, injuryStartDate)
+                preparedStatement.executeUpdate()
+            }
+            Log.d("DatabaseHandler", "Finished storing list...")
+        } catch (e: SQLException) {
+            Log.d(Const.TAG, e.message!!)
+            e.printStackTrace()
+        } catch (e: ClassNotFoundException) {
+            e.printStackTrace()
+        } finally {
+            //Close resources
+            closeResources(myConn, null, statement)
+        }
+    }
+
     private fun getNbaDotComId(playerName: String): Int {
         var id: Int = -1
         var myConn: Connection? = null
@@ -148,7 +225,6 @@ class DatabaseHandler {
     }
 
     private fun getRandomStat(randIndex: Int): String {
-        Log.d("DatabaseHandler", "Fetching new random stat")
         var randomStat = ""
         var myConn: Connection? = null
         var statement: Statement? = null
