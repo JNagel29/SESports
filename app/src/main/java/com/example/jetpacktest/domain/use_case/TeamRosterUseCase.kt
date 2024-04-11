@@ -1,6 +1,5 @@
 package com.example.jetpacktest.domain.use_case
 
-import android.util.Log
 import com.example.jetpacktest.common.Resource
 import com.example.jetpacktest.data.remote.dto.team_player.toTeamPlayer
 import com.example.jetpacktest.domain.model.TeamPlayer

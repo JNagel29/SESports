@@ -1,7 +1,5 @@
 package com.example.jetpacktest.domain.model
 
-import com.example.jetpacktest.data.remote.dto.team_player.toTeamPlayer
-
 data class TeamPlayer(
     val team: String,
     val jersey: Int?,
