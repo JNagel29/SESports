@@ -5,6 +5,6 @@ import com.example.jetpacktest.data.remote.dto.player_info.PlayerInfoDto
 
 interface HeadshotRepository {
 
-    suspend fun getActivePlayers(apiKey: String): List<ActivePlayerDto>
-    suspend fun getPlayerById(playerId: Int, apiKey: String): PlayerInfoDto
+    suspend fun getActivePlayers(): List<ActivePlayerDto>
+    suspend fun getPlayerById(playerId: Int): PlayerInfoDto
 }

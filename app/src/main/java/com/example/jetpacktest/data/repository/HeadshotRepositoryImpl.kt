@@ -10,12 +10,12 @@ class HeadshotRepositoryImpl @Inject constructor(
     private val api: SportsDataApi
 ) : HeadshotRepository {
 
-    override suspend fun getActivePlayers(apiKey: String): List<ActivePlayerDto> {
-        return api.getActivePlayers(apiKey = apiKey)
+    override suspend fun getActivePlayers(): List<ActivePlayerDto> {
+        return api.getActivePlayers()
     }
 
-    override suspend fun getPlayerById(playerId: Int, apiKey: String): PlayerInfoDto {
-        return api.getPlayerById(playerId = playerId, apiKey = apiKey)
+    override suspend fun getPlayerById(playerId: Int): PlayerInfoDto {
+        return api.getPlayerById(playerId = playerId)
     }
 
 }

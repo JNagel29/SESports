@@ -6,4 +6,7 @@ object Constants {
     const val SPORTS_DATA_BASE_URL = "https://api.sportsdata.io/v3/nba/scores/json/"
 
     const val REST_BASE_URL = "http://192.168.0.171:8080/"
+
+    //SavedStateHandle Keys
+    const val PARAM_TEAM_PROFILE_NAME = "teamName"
 }

@@ -11,17 +11,17 @@ import javax.inject.Inject
 class HeadshotUseCase @Inject constructor(
     private val repository: HeadshotRepository
 ) {
-    operator fun invoke(playerName: String, apiKey: String): Flow<Resource<Int>> = flow {
+    operator fun invoke(playerName: String): Flow<Resource<Int>> = flow {
         try {
             emit(Resource.Loading())
             val noAccentedPlayerName = removeAccents(playerName)
             val (firstName, lastName) = splitPlayerName(noAccentedPlayerName)
-            val activePlayersList = repository.getActivePlayers(apiKey)
+            val activePlayersList = repository.getActivePlayers()
             val matchingPlayer = activePlayersList.find {
                 it.firstName == firstName && it.lastName == lastName
             }
             val nbaDotComPlayerId = matchingPlayer?.let {
-                repository.getPlayerById(it.playerID, apiKey).nbaDotComPlayerID
+                repository.getPlayerById(it.playerID).nbaDotComPlayerID
             } ?: -1
             emit(Resource.Success(nbaDotComPlayerId))
         } catch(e: IOException) {

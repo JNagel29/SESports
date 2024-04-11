@@ -31,7 +31,7 @@ import com.example.jetpacktest.presentation.search.ProfileScreen
 import com.example.jetpacktest.presentation.search.SearchScreen
 import com.example.jetpacktest.presentation.games.GamesScreen
 import com.example.jetpacktest.presentation.standings.StandingsScreen
-import com.example.jetpacktest.presentation.search.TeamProfileScreen
+import com.example.jetpacktest.presentation.team.TeamProfileScreen
 
 @Composable
 fun AppNavigation(randomStat: String) {
@@ -204,8 +204,8 @@ fun AppNavigation(randomStat: String) {
                     )
                 }
             ) { backStackEntry ->
-                val teamName = backStackEntry.arguments?.getString("teamName") ?: ""
-                TeamProfileScreen(teamName = teamName,
+                //val teamName = backStackEntry.arguments?.getString("teamName") ?: ""
+                TeamProfileScreen(//teamName = teamName,
                     //Used for back button
                     navigateBack = { navController.popBackStack()},
                     //When user clicks on a current player of a team, we'll use this to switch over

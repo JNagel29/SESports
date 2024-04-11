@@ -1,5 +1,6 @@
 package com.example.jetpacktest.domain.use_case
 
+import android.util.Log
 import com.example.jetpacktest.common.Resource
 import com.example.jetpacktest.data.remote.dto.team_player.toTeamPlayer
 import com.example.jetpacktest.domain.model.TeamPlayer
@@ -12,14 +13,12 @@ import javax.inject.Inject
 class TeamRosterUseCase @Inject constructor(
     private val repository: TeamRepository
 ) {
-    operator fun invoke(teamAbbrev: String, apiKey: String):
+    operator fun invoke(teamAbbrev: String):
             Flow<Resource<List<TeamPlayer>>> = flow {
         try {
             emit(Resource.Loading())
-            val teamPlayers = repository.getPlayersByTeam(
-                team = teamAbbrev,
-                apiKey = apiKey
-            ).map { it.toTeamPlayer() }
+            val teamPlayers = repository.getPlayersByTeam(team = teamAbbrev)
+                .map { it.toTeamPlayer() }
             emit(Resource.Success(teamPlayers))
         } catch(e: IOException) {
             emit(Resource.Error("Couldn't reach server. Check internet connection"))

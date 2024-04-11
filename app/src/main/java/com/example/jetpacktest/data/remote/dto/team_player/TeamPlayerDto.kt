@@ -51,6 +51,8 @@ fun TeamPlayerDto.toTeamPlayer(): TeamPlayer {
         birthDate = this.birthDate,
         birthCity = this.birthCity,
         birthState = this.birthState,
-        birthCountry = this.birthCountry
+        birthCountry = this.birthCountry,
+        height = this.height,
+        weight = this.weight
     )
 }
