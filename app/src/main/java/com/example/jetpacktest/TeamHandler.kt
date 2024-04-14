@@ -35,7 +35,7 @@ data class TeamPlayer (
 
 class TeamHandler {
     //API Key and prefix of URL (we will append the team abbreviation, and key in fetchTeamPlayers)
-    private val apiKey = Keys.SportsDataAPIKey
+    private val apiKey = Keys.SPORTS_DATA_IO_KEY
     private val teamPlayersUrlPrefix = "https://api.sportsdata.io/v3/nba/scores/json/PlayersBasic/"
     private var playerRows = mutableListOf<String>()
 
@@ -49,7 +49,7 @@ class TeamHandler {
             .create(ApiInterface::class.java)
         val retrofitPlayers = retrofitBuilder.getPlayersByTeam(
             team = teamAbbrev,
-            apiKey = Keys.SportsDataAPIKey
+            apiKey = Keys.SPORTS_DATA_IO_KEY
         )
         retrofitPlayers.enqueue(object : Callback<List<TeamPlayer>?> {
             override fun onResponse(call: Call<List<TeamPlayer>?>, response: Response<List<TeamPlayer>?>) {

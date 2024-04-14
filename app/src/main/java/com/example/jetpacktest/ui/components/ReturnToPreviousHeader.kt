@@ -18,7 +18,10 @@ import androidx.compose.ui.unit.sp
 import com.example.jetpacktest.R
 
 @Composable
-fun ReturnToPreviousHeader(navigateBack: () -> Unit, label: String = "Previous") {
+fun ReturnToPreviousHeader(
+    navigateBack: () -> Unit,
+    label: String? = "Previous"
+) {
     Column(
         modifier = Modifier.padding(10.dp),
         verticalArrangement = Arrangement.Top

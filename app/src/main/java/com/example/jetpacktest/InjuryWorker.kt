@@ -2,10 +2,8 @@ package com.example.jetpacktest
 
 import android.content.Context
 import android.util.Log
-import androidx.lifecycle.lifecycleScope
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import kotlinx.coroutines.launch
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
@@ -21,7 +19,7 @@ class InjuryWorker(appContext: Context, workerParams: WorkerParameters):
             .create(ApiInterface::class.java)
         //Fetch list of injuredPlayers
         Log.d("InjuryWorker", "InjuryWorker is active, calling API")
-        val injuredPlayers = retrofitBuilder.getInjuredPlayers(Keys.SportsDataAPIKey)
+        val injuredPlayers = retrofitBuilder.getInjuredPlayers(Keys.SPORTS_DATA_IO_KEY)
         //Store in database if found
         injuredPlayers.let {
             databaseHandler.executeStoreInjured(injuredPlayers = injuredPlayers)

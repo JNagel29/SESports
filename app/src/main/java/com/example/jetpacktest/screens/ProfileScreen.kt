@@ -17,11 +17,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.StarBorder
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
@@ -39,6 +43,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.jetpacktest.ApiHandler
@@ -48,21 +53,27 @@ import com.example.jetpacktest.HeadshotHandler
 import com.example.jetpacktest.models.NbaTeam
 import com.example.jetpacktest.ui.components.LargeDropdownMenu
 import com.example.jetpacktest.models.Player
+import com.example.jetpacktest.models.PlayerPersonalInfo
 import com.example.jetpacktest.ui.components.CircularLoadingIcon
 
 @Composable
-fun ProfileScreen(playerName: String, navigateBack: () -> Unit) {
+fun ProfileScreen(
+    playerName: String,
+    navigateBack: () -> Unit,
+    getPreviousScreenName: () -> (String?)
+) {
     val headshotHandler = HeadshotHandler()
     val databaseHandler = DatabaseHandler()
-    //val context = LocalContext.current
-    //val apiHandler = ApiHandler()
+    val apiHandler = ApiHandler()
     var imgId by rememberSaveable { mutableIntStateOf(-1) }
     var yearsList by rememberSaveable { mutableStateOf<List<String>>(emptyList()) }
     var chosenYear by rememberSaveable { mutableStateOf("") }
     var player by rememberSaveable { mutableStateOf(Player()) }
     var showExpandedData by rememberSaveable { mutableStateOf(false) }
-    var isFetching by rememberSaveable { mutableStateOf(true) }
+    var isFetchingStats by rememberSaveable { mutableStateOf(true) }
+    var isFetchingInfo by rememberSaveable { mutableStateOf(true) }
     var injuryStartDate by rememberSaveable { mutableStateOf("")}
+    var playerPersonalInfo by rememberSaveable { mutableStateOf(PlayerPersonalInfo(emptyList())) }
 
     //TODO: add favorite functionality and maybe switch to viewmodel?
     LaunchedEffect(Unit) {
@@ -84,7 +95,7 @@ fun ProfileScreen(playerName: String, navigateBack: () -> Unit) {
                     //Then, fetch all our data for that most recent year
                     databaseHandler.executePlayerData(playerName, chosenYear) { data ->
                         player = data
-                        isFetching = false
+                        isFetchingStats = false
                     }
                 }
             }
@@ -95,16 +106,26 @@ fun ProfileScreen(playerName: String, navigateBack: () -> Unit) {
                 injuryStartDate = result
             }
         }
+        if (playerPersonalInfo.data.isEmpty()) {
+            Log.d("ProfileScreen", "Fetching personal info")
+            playerPersonalInfo = apiHandler.fetchPlayerInfo(playerName = playerName)
+            isFetchingInfo = false
+        }
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        //Have to wrap inside column for Spacer to work
         Column(modifier = Modifier.fillMaxSize()) {
             //Calls composable that sets up our back header to go back to search
-            ReturnToPreviousHeader(navigateBack = navigateBack)
+            ReturnToPreviousHeader(
+                navigateBack = navigateBack,
+                label = getPreviousScreenName()?.let { screenName ->
+                    if (screenName.contains("team")) "Team Profile"
+                    else screenName.dropLast(6)
+                } ?: ""
+            )
             //Adds space between header and actual data
             Spacer(modifier = Modifier.height(15.dp))
-            if (isFetching) {
+            if (isFetchingStats || isFetchingInfo) {
                 CircularLoadingIcon()
             }
             else {
@@ -113,11 +134,20 @@ fun ProfileScreen(playerName: String, navigateBack: () -> Unit) {
                     imgId = imgId,
                     team =  player.team,
                     position = player.position,
+                    jerseyNumber = playerPersonalInfo.data[0].jerseyNumber,
                     injuryStartDate = injuryStartDate,
                     headshotHandler = headshotHandler
                 )
                 HorizontalDivider(thickness = 2.dp, color = Color.White)
                 MainStatBoxes(player = player)
+                HorizontalDivider(thickness = 2.dp, color = Color.White)
+                InfoStatBoxes(
+                    playerPersonalInfo = playerPersonalInfo,
+                    color = colorResource(
+                        NbaTeam.teamColorsMap[player.team.split("/")[0]]
+                            ?: R.color.purple_lakers
+                    )
+                )
                 //Custom Dropdown menu for each year
                 LargeDropdownMenu(
                     label = "Select Year:",
@@ -139,11 +169,13 @@ fun ProfileScreen(playerName: String, navigateBack: () -> Unit) {
                     }
                 )
                 //Now, compose our button that toggles the extra data in list
-                ToggleFurtherStats(showExpandedData = showExpandedData,
-                    onClick = { showExpandedData = !showExpandedData })
-                //Show the extra data only if user toggled via button above (and player has stats)
+                ToggleFurtherStats(
+                    showExpandedData = showExpandedData,
+                    onClick = { showExpandedData = !showExpandedData }
+                )
+                //Only show if user clicked button
                 if (showExpandedData && player.points != -1.0f) {
-                    PlayerDataTable(player)
+                    PlayerStatisticTable(player)
                 }
             }
         }
@@ -156,6 +188,7 @@ fun NameAndHeadshot(
     imgId: Int,
     team: String,
     position: String,
+    jerseyNumber: String,
     injuryStartDate: String,
     headshotHandler: HeadshotHandler
 ) {
@@ -190,8 +223,8 @@ fun NameAndHeadshot(
             Column {
                 Row(modifier = Modifier.padding(end = 8.dp)) {
                     Text(
-                        text = "$team | $position",
-                        fontSize = 14.sp,
+                        text = "$team | $position | #$jerseyNumber",
+                        fontSize = 16.sp,
                         color = Color.White
                     )
                     Spacer(modifier = Modifier.weight(1f))
@@ -263,13 +296,18 @@ fun MainStatBoxes(player: Player) {
 }
 
 @Composable
-fun StatBox(label: String, value: String) {
+fun StatBox(
+    label: String,
+    value: String,
+    labelFontSize: TextUnit = 16.sp,
+    valueFontSize: TextUnit = 16.sp
+) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(label, fontSize = 16.sp, fontWeight = FontWeight.Bold,
+        Text(label, fontSize = labelFontSize,
             color = Color.White)
-        Text(value, fontSize = 16.sp, fontWeight = FontWeight.Bold,
+        Text(value, fontSize = valueFontSize, fontWeight = FontWeight.Bold,
             color = Color.White)
     }
 }
@@ -284,13 +322,13 @@ fun ToggleFurtherStats(onClick: () -> Unit, showExpandedData: Boolean) {
         OutlinedButton(
             onClick = onClick
         ) {
-            Text(if (showExpandedData) "Shrink Further Stats" else "Expand Further Stats")
+            Text(if (showExpandedData) "Shrink Stats" else "Expand Stats")
         }
     }
 }
 
 @Composable
-fun PlayerDataTable(player: Player) {
+fun PlayerStatisticTable(player: Player) {
     //Slight amount of vertical space
     Spacer(modifier = Modifier.height(4.dp))
     //Now the actual list of values
@@ -300,12 +338,6 @@ fun PlayerDataTable(player: Player) {
     ) {
         //Pass in list of rows with Label and Value
         item {
-            //PlayerDataRow("Year", player.year.toString())
-            //PlayerDataRow("Position", player.position)
-            //PlayerDataRow("Team", player.team)
-            //PlayerDataRow("Points", player.points.toString())
-            //PlayerDataRow("Assists", player.assists.toString())
-            //PlayerDataRow("Rebounds", player.totalRebounds.toString())
             PlayerDataRow("Steals", player.steals.toString())
             PlayerDataRow("Blocks", player.blocks.toString())
             PlayerDataRow("FG", player.fieldGoals.toString())
@@ -321,11 +353,62 @@ fun PlayerDataTable(player: Player) {
             PlayerDataRow("2PA", player.twoPointerAttempts.toString())
             PlayerDataRow("2P%", "%.1f%%".format(player.twoPointPercent * 100))
             PlayerDataRow("EFG%", "%.1f%%".format(player.effectiveFieldGoalPercent * 100))
-            //PlayerDataRow("ORB", player.offensiveRebounds.toString())
-            //PlayerDataRow("DRB", player.defensiveRebounds.toString())
         }
     }
 }
+
+@Composable
+fun InfoStatBoxes(playerPersonalInfo: PlayerPersonalInfo, color: Color) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(color = color),
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        StatBox(
+            label = "Height/Weight",
+            value = "${playerPersonalInfo.data[0].height} | " +
+                    playerPersonalInfo.data[0].weight,
+            labelFontSize = 14.sp,
+            valueFontSize = 16.sp
+        )
+        VerticalDivider(modifier = Modifier.height(50.dp),
+            thickness = 2.dp, color = Color.White)
+        StatBox(
+            label = "Draft",
+            value = "${playerPersonalInfo.data[0].draftYear} " +
+                "Round ${playerPersonalInfo.data[0].draftRound} " +
+                "Pick ${playerPersonalInfo.data[0].draftNumber}",
+            labelFontSize = 14.sp,
+            valueFontSize = 16.sp
+        )
+    }
+    HorizontalDivider(thickness = 2.dp, color = Color.White)
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(color = color),
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        StatBox(
+            label = "College",
+            value = playerPersonalInfo.data[0].college,
+            labelFontSize = 14.sp,
+            valueFontSize = 16.sp
+        )
+        VerticalDivider(modifier = Modifier.height(50.dp),
+            thickness = 2.dp, color = Color.White)
+        StatBox(
+            label = "Country",
+            value = playerPersonalInfo.data[0].country,
+            labelFontSize = 14.sp,
+            valueFontSize = 16.sp
+        )
+    }
+}
+
 
 @Composable
 fun PlayerDataRow(label: String, value: String) {

@@ -77,7 +77,7 @@ fun CompareResultsScreen(playerName1: String, playerName2: String,navigateBack: 
                 .padding(16.dp)
                 .verticalScroll(rememberScrollState())
         ) {
-            ReturnToPreviousHeader(navigateBack = navigateBack)
+            ReturnToPreviousHeader(navigateBack = navigateBack, label = "Compare")
             Spacer(modifier = Modifier.height(15.dp))
             if (isFetching1 || isFetching2) {
                 CircularLoadingIcon()

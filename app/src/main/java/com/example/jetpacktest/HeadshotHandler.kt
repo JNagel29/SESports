@@ -38,7 +38,7 @@ class HeadshotHandler {
     private val databaseHandler = DatabaseHandler()
     private val useBiggerImage: Boolean = true
     private var imageUrlPrefix: String? = null
-    private val apiKey = Keys.SportsDataAPIKey
+    private val apiKey = Keys.SPORTS_DATA_IO_KEY
     private val activePlayersUrl =
         "https://api.sportsdata.io/v3/nba/scores/json/PlayersActiveBasic?key=$apiKey"
     private var matchingPlayerId = -1 // -1 means no match found and to not bother calling next req
@@ -57,17 +57,20 @@ class HeadshotHandler {
             nbaDotComPlayerId = result
             if (nbaDotComPlayerId != -1) onResult(nbaDotComPlayerId)
             else {
+                Log.d(Const.TAG, "Database Miss, Player is likely a 2023 rookie...")
+                /*
                 Log.d(Const.TAG, "Database Miss, Fetching Headshot via API...")
                 fetchThroughApi(playerName) { apiResult ->
                     nbaDotComPlayerId = apiResult
                     onResult(nbaDotComPlayerId)
                 }
+                 */
             }
         }
     }
 
     private fun fetchThroughApi(playerName: String, onResult: (Int) -> Unit) {
-        //TODO: This is rather slow when database misses, need to fix it in sprint 3
+        //TODO: Useless now, since database covers everything up to this year, and this fails on this year, so commented out
         val baseUrl = "https://api.sportsdata.io/v3/nba/scores/json/"
         //Before anything else, we must remove accents in the passed name and split it
         val noAccentPlayerName = removeAccents(playerName)
@@ -81,7 +84,7 @@ class HeadshotHandler {
             .baseUrl(baseUrl)
             .build()
             .create(ApiInterface::class.java)
-        val retrofitGames = retrofitBuilder.getActivePlayers(Keys.SportsDataAPIKey)
+        val retrofitGames = retrofitBuilder.getActivePlayers(Keys.SPORTS_DATA_IO_KEY)
 
         retrofitGames.enqueue(object : Callback<List<ActivePlayer>?> {
             override fun onResponse(call: Call<List<ActivePlayer>?>,
@@ -101,7 +104,7 @@ class HeadshotHandler {
                                 .create(ApiInterface::class.java)
                             val retrofitPlayers = retrofitBuilder2.getPlayerById(
                                 playerId = activePlayer.PlayerID,
-                                apiKey = Keys.SportsDataAPIKey
+                                apiKey = Keys.SPORTS_DATA_IO_KEY
                             )
                             retrofitPlayers.enqueue(object : Callback<PlayerInfo?> {
                                 override fun onResponse(

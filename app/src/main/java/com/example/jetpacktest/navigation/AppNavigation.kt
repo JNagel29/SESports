@@ -38,6 +38,9 @@ fun AppNavigation(randomStat: String) {
     val navController = rememberNavController()
     val searchViewModel = viewModel<SearchViewModel>()
     val homeViewModel = viewModel<HomeViewModel>()
+    val getPreviousScreenName: () -> (String?) = {
+        navController.previousBackStackEntry?.destination?.route
+    }
     Scaffold(
         bottomBar = {
             NavigationBar {
@@ -179,10 +182,11 @@ fun AppNavigation(randomStat: String) {
                 }
             ) { backStackEntry ->
                 val playerName = backStackEntry.arguments?.getString("playerName") ?: ""
-                ProfileScreen(playerName) {
-                    //Used for back button
-                    navController.navigateUp()
-                }
+                ProfileScreen(
+                    playerName = playerName,
+                    navigateBack = { navController.navigateUp() },
+                    getPreviousScreenName = getPreviousScreenName
+                )
             }
             composable(route = "${Screens.TeamProfileScreen.route}/{teamName}",
                 enterTransition = {
@@ -210,7 +214,8 @@ fun AppNavigation(randomStat: String) {
                     navigateBack = { navController.popBackStack()},
                     //When user clicks on a current player of a team, we'll use this to switch over
                     navigateToPlayerProfile = { playerName ->
-                        navController.navigate("${Screens.ProfileScreen.route}/$playerName") }
+                        navController.navigate("${Screens.ProfileScreen.route}/$playerName") },
+                    getPreviousScreenName = getPreviousScreenName
                 )
             }
         }

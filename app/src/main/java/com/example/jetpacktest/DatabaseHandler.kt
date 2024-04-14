@@ -30,8 +30,8 @@ class DatabaseHandler {
     private val scope = CoroutineScope(Dispatchers.IO)
     //Variables and info to connect to DB
     private val url = "jdbc:mysql://nikoarak.cikeys.com:3306/nikoarak_SESports"
-    private val user = Keys.DBUser
-    private val password = Keys.DBPass
+    private val user = Keys.DB_USER
+    private val password = Keys.DB_PASS
 
     fun executeStatLeaders(chosenStat: String, year: String,
                            onDataReceived: (MutableList<StatLeader>) -> Unit) {

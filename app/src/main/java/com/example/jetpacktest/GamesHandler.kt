@@ -22,7 +22,7 @@ import org.threeten.bp.format.DateTimeFormatter
 
 class GamesHandler {
     //ApiInterface adds the 'games' endpoint, as well as the date query for us
-    private val baseGameUrl = "https://api.balldontlie.io/v1/"
+    private val baseGameUrl = Keys.BDL_BASE_URL
 
     fun fetchGames(date: Date, onResult: (MutableList<Game>) -> Unit) {
         //We first must convert our date into a usable format

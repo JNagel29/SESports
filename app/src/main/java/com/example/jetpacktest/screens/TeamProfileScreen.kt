@@ -37,9 +37,12 @@ import com.example.jetpacktest.TeamPlayer
 import com.example.jetpacktest.models.NbaTeam
 
 @Composable
-fun TeamProfileScreen(teamName: String,
-                      navigateBack: () -> Unit,
-                      navigateToPlayerProfile: (String) -> Unit) {
+fun TeamProfileScreen(
+    teamName: String,
+    navigateBack: () -> Unit,
+    navigateToPlayerProfile: (String) -> Unit,
+    getPreviousScreenName: () -> (String?)
+) {
     val teamHandler = TeamHandler()
     var teamPlayersList by rememberSaveable { mutableStateOf<List<TeamPlayer>>(emptyList()) }
 
@@ -57,11 +60,11 @@ fun TeamProfileScreen(teamName: String,
     }
     //Wraps data inside column
     Column(modifier = Modifier.fillMaxSize()) {
-        //Uses search header composable for back button from ProfileScreen.kt since same logic
-        ReturnToPreviousHeader(navigateBack)
-        //Adds space between header and actual data
+        ReturnToPreviousHeader(
+            navigateBack = navigateBack,
+            label = getPreviousScreenName()?.dropLast(6) ?: ""
+        )
         Spacer(modifier = Modifier.height(15.dp))
-        //Team name and logo (will pass into own composable w/ teamName, contentDesc, width/height
         //Wrap text in box to center it
         Box(modifier = Modifier.fillMaxWidth()) {
             Text(
