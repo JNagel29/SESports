@@ -236,12 +236,4 @@ class HeadshotHandler {
             )
         }
     }
-
-    //Niko: Helper function to remove accents from playerName, since API we use for headshots doesn't use accent
-    //Got it from https://stackoverflow.com/a/3322174
-    private fun removeAccents(input: String): String {
-        return Normalizer.normalize(input, Normalizer.Form.NFD)
-            .replace("\\p{InCombiningDiacriticalMarks}+".toRegex(), "")
-    }
-
 }

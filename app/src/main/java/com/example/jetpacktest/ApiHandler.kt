@@ -5,6 +5,7 @@ import com.example.jetpacktest.models.PlayerPersonalInfo
 import retrofit2.HttpException
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.text.Normalizer
 
 class ApiHandler {
     private val basePlayerUrl = Keys.BDL_BASE_URL
@@ -12,12 +13,13 @@ class ApiHandler {
     fun fetchPlayerData() {}
 
     suspend fun fetchPlayerInfo(playerName: String): PlayerPersonalInfo {
+        val noAccentPlayerName = removeAccents(playerName) // Remove accent for API
         val retrofitBuilder = Retrofit.Builder()
             .addConverterFactory(GsonConverterFactory.create())
             .baseUrl(basePlayerUrl)
             .build()
             .create(ApiInterface::class.java)
-        val nameParts = playerName.split(" ".toRegex(), limit = 2)
+        val nameParts = noAccentPlayerName.split(" ".toRegex(), limit = 2)
         return try {
             retrofitBuilder.getPersonalInfo(
                 firstName = nameParts[0],
