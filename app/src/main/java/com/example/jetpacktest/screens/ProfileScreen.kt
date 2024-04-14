@@ -373,9 +373,11 @@ fun InfoStatBoxes(playerPersonalInfo: PlayerPersonalInfo, color: Color) {
             thickness = 2.dp, color = Color.White)
         StatBox(
             label = "Draft",
-            value = "${playerPersonalInfo.data[0].draftYear} " +
-                "Round ${playerPersonalInfo.data[0].draftRound} " +
-                "Pick ${playerPersonalInfo.data[0].draftNumber}",
+            value = if (playerPersonalInfo.data[0].draftYear != 0)
+                        "${playerPersonalInfo.data[0].draftYear} " +
+                        "Round ${playerPersonalInfo.data[0].draftRound} " +
+                        "Pick ${playerPersonalInfo.data[0].draftNumber}"
+                    else "Undrafted",
             labelFontSize = 14.sp,
             valueFontSize = 16.sp
         )
