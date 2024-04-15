@@ -1,7 +1,9 @@
 package com.example.jetpacktest.screens
 
 import ReturnToPreviousHeader
+import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -36,6 +38,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -44,6 +47,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.jetpacktest.ApiHandler
 import com.example.jetpacktest.DatabaseHandler
+import com.example.jetpacktest.FavoritesHandler
 import com.example.jetpacktest.R
 import com.example.jetpacktest.HeadshotHandler
 import com.example.jetpacktest.models.NbaTeam
@@ -61,6 +65,8 @@ fun ProfileScreen(
     val headshotHandler = HeadshotHandler()
     val databaseHandler = DatabaseHandler()
     val apiHandler = ApiHandler()
+    val context = LocalContext.current
+    val favoritesHandler = FavoritesHandler(context)
     var imgId by rememberSaveable { mutableIntStateOf(-1) }
     var yearsList by rememberSaveable { mutableStateOf<List<String>>(emptyList()) }
     var chosenYear by rememberSaveable { mutableStateOf("") }
@@ -132,7 +138,9 @@ fun ProfileScreen(
                     position = player.position,
                     jerseyNumber = playerPersonalInfo.data[0].jerseyNumber,
                     injuryStartDate = injuryStartDate,
-                    headshotHandler = headshotHandler
+                    headshotHandler = headshotHandler,
+                    favoritesHandler = favoritesHandler,
+                    context = context
                 )
                 HorizontalDivider(thickness = 2.dp, color = Color.White)
                 MainStatBoxes(player = player)
@@ -186,10 +194,13 @@ fun NameAndHeadshot(
     position: String,
     jerseyNumber: String,
     injuryStartDate: String,
-    headshotHandler: HeadshotHandler
+    headshotHandler: HeadshotHandler,
+    favoritesHandler: FavoritesHandler,
+    context: Context
 ) {
-    var isFavorite by remember { mutableStateOf(false) }
-    //We use a box to color the background
+    var isFavorite by remember {
+        mutableStateOf(favoritesHandler.getFavoritePlayers().contains(playerName))
+    }
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -225,14 +236,33 @@ fun NameAndHeadshot(
                     )
                     Spacer(modifier = Modifier.weight(1f))
                     Icon(
-                        imageVector =  if (isFavorite) Icons.Filled.Star
-                        else Icons.Outlined.StarBorder,
+                        imageVector = if (isFavorite) Icons.Filled.Star
+                                      else Icons.Outlined.StarBorder,
                         contentDescription = "Favorite",
                         tint = if (isFavorite) Color.Yellow else Color.White,
                         modifier = Modifier
                             .size(24.dp)
-                            .clickable(onClick = { isFavorite = !isFavorite })
+                            .clickable(
+                                onClick = {
+                                    isFavorite = !isFavorite
+                                    if (isFavorite) {
+                                        val favoriteAdded = favoritesHandler.addFavoritePlayer(playerName)
+                                        if (!favoriteAdded) {
+                                            //TODO: Toast won't appear
+                                            Toast.makeText(
+                                                context,
+                                                "Favorite Limit Reached, Sorry!",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                            isFavorite = !isFavorite
+                                        }
+                                    } else {
+                                        favoritesHandler.removeFavoritePlayer(playerName)
+                                    }
+                                }
+                            )
                     )
+
                 }
                 Text(
                     text = playerName,
