@@ -13,12 +13,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequest
 import androidx.work.PeriodicWorkRequestBuilder
-import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.example.jetpacktest.navigation.AppNavigation
 import com.example.jetpacktest.ui.theme.JetpackTestTheme
 import com.jakewharton.threetenabp.AndroidThreeTen
-import java.util.concurrent.ExecutionException
 import java.util.concurrent.TimeUnit
 
 
