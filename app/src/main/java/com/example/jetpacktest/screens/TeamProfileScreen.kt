@@ -65,20 +65,9 @@ fun TeamProfileScreen(
             label = getPreviousScreenName()?.dropLast(6) ?: ""
         )
         Spacer(modifier = Modifier.height(15.dp))
-        //Wrap text in box to center it
-        Box(modifier = Modifier.fillMaxWidth()) {
-            Text(
-                text = teamName,
-                fontSize = 26.sp,
-                fontFamily = FontFamily.Serif,
-                fontWeight = FontWeight.ExtraBold,
-                modifier = Modifier.align(Alignment.Center)
-            )
-        }
-        //Add space between team name and logo
+        TeamNameHeader(teamName = teamName)
         Spacer(modifier = Modifier.height(8.dp))
-        //We get the logo from NbaTeam.logos map (String to resource id)
-        //The "?:" means if we get null, then just use default, else use left side
+        //Elvis operator uses fallback if it teamName maps to no logo ID
         val teamLogo = NbaTeam.logos[teamName] ?: R.drawable.fallback
         Image(
             painter = painterResource(id = teamLogo),
@@ -89,6 +78,19 @@ fun TeamProfileScreen(
                 .align(Alignment.CenterHorizontally)
         )
         CurrentRosterDisplay(teamPlayersList, navigateToPlayerProfile)
+    }
+}
+
+@Composable
+fun TeamNameHeader(teamName: String) {
+    Box(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            text = teamName,
+            fontSize = 26.sp,
+            fontFamily = FontFamily.Serif,
+            fontWeight = FontWeight.ExtraBold,
+            modifier = Modifier.align(Alignment.Center)
+        )
     }
 }
 
