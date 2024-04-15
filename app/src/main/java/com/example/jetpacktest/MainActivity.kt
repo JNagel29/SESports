@@ -93,27 +93,6 @@ class MainActivity : ComponentActivity() {
             injuredPlayerRequest
         )
     }
-
-    private fun isWorkScheduled(): Boolean {
-        //Checks if there's not already an instance scheduled
-        val instance = WorkManager.getInstance(applicationContext)
-        val statuses = instance.getWorkInfosByTag(RANDOM_STAT_TAG)
-        return try {
-            var running = false
-            val workInfoList = statuses.get()
-            for (workInfo in workInfoList) {
-                val state = workInfo.state
-                running = (state == WorkInfo.State.RUNNING) or (state == WorkInfo.State.ENQUEUED)
-            }
-            running
-        } catch (e: ExecutionException) {
-            e.printStackTrace()
-            false
-        } catch (e: InterruptedException) {
-            e.printStackTrace()
-            false
-        }
-    }
 }
 
 @Preview(showBackground = true)
