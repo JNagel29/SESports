@@ -19,7 +19,7 @@ import java.util.concurrent.Executors
 class DatabaseHandler {
     object Const { // We use object since only way to make them constant
         //Tag for logging
-        const val TAG = "Stat Leaders Activity"
+        const val TAG = "DatabaseHandler"
         //Constant to hold how many players to grab (top 10, top 20, etc.)
         const val MAX_PLAYERS = 10
     }
@@ -109,6 +109,42 @@ class DatabaseHandler {
                 onDataReceived(randomStat)
             }
         }
+    }
+
+    fun executeNbaDotComId(playerName: String,
+                           onDataReceived: (Int) -> Unit) {
+        scope.launch {
+            val nbaDotComId = getNbaDotComId(playerName = playerName)
+            withContext(Dispatchers.IO) {
+                onDataReceived(nbaDotComId)
+            }
+        }
+    }
+
+    private fun getNbaDotComId(playerName: String): Int {
+        var id: Int = -1
+        var myConn: Connection? = null
+        var statement: Statement? = null
+        var resultSet: ResultSet? = null
+        try {
+            Class.forName("com.mysql.jdbc.Driver")
+            myConn = DriverManager.getConnection(url, user, password)
+            statement = myConn.createStatement()
+            val sql = "SELECT `NbaId` FROM NBA_PLAYER_ID WHERE `Name` = '$playerName'"
+            resultSet = statement.executeQuery(sql)
+            while (resultSet.next()) {
+                id = resultSet.getInt("NbaId")
+            }
+        } catch (e: SQLException) {
+            Log.d(Const.TAG, e.message!!)
+            e.printStackTrace()
+        } catch (e: ClassNotFoundException) {
+            e.printStackTrace()
+        } finally {
+            //Close resources
+            closeResources(myConn, resultSet, statement)
+        }
+        return id
     }
 
     private fun getRandomStat(randIndex: Int): String {

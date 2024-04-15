@@ -1,8 +1,12 @@
 package com.example.jetpacktest.screens
 
 import ReturnToPreviousHeader
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Surface
@@ -10,18 +14,23 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.jetpacktest.DatabaseHandler
+import com.example.jetpacktest.R
+import com.example.jetpacktest.models.NbaTeam
 import com.example.jetpacktest.models.Player
 import com.example.jetpacktest.ui.components.CircularLoadingIcon
 import com.example.jetpacktest.ui.components.LargeDropdownMenu
 
 @Composable
-fun CompareResultsScreen(playerName1: String, playerName2: String, navigateBack: () -> Unit) {
+fun CompareResultsScreen(playerName1: String, playerName2: String,navigateBack: () -> Unit,
+                         ) {
     val databaseHandler = DatabaseHandler()
     var player1 by remember { mutableStateOf(Player()) }
     var player2 by remember { mutableStateOf(Player()) }
@@ -126,113 +135,117 @@ fun PlayerProfile(players: List<Player>) {
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp)
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+            Row(
+                modifier = Modifier.horizontalScroll(rememberScrollState())
             ) {
-                player2?.let { otherPlayer ->
-                    PlayerStats(player, otherPlayer)
+                Box(modifier = Modifier.padding(end = 16.dp)) {
+                    PlayerCard(player, player2!!)
+                }
+                Box(modifier = Modifier.padding(end = 16.dp)) {
+                    PlayerCard(player2!!, player1)
                 }
             }
         }
     }
 }
 
+
+
+
+
 @Composable
 fun PlayerStats(player1: Player, player2: Player) {
-    Column(
+    Row(
         modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(4.dp)
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        StatRow("Name", player1.name, player2.name)
-        StatRow("Year", player1.year.toString(), player2.year.toString())
-        StatRow("Position", player1.position, player2.position)
-        StatRow("Team", player1.team, player2.team)
-        StatRow("Points", player1.points.toString(), player2.points.toString())
-        StatRow("Assists", player1.assists.toString(), player2.assists.toString())
-        StatRow("Steals", player1.steals.toString(), player2.steals.toString())
-        StatRow("Blocks", player1.blocks.toString(), player2.blocks.toString())
-        StatRow("Total Rebounds", player1.totalRebounds.toString(), player2.totalRebounds.toString())
-        StatRow("Turnovers", player1.turnovers.toString(), player2.turnovers.toString())
-        StatRow("Personal Fouls", player1.personalFouls.toString(), player2.personalFouls.toString())
-        StatRow("Minutes Played", player1.minutesPlayed.toString(), player2.minutesPlayed.toString())
-        StatRow("FG", player1.fieldGoals.toString(), player2.fieldGoals.toString())
-        StatRow("FGA", player1.fieldGoalAttempts.toString(), player2.fieldGoalAttempts.toString())
-        StatRow("FG%", player1.fieldGoalPercent.toString(), player2.fieldGoalPercent.toString())
-        StatRow("3P ", player1.threePointers.toString(), player2.threePointers.toString())
-        StatRow("3PA", player1.threePointerAttempts.toString(), player2.threePointerAttempts.toString())
-        StatRow("3P%", player1.threePointPercent.toString(), player2.threePointPercent.toString())
-        StatRow("2P", player1.twoPointers.toString(), player2.twoPointers.toString())
-        StatRow("2PA", player1.twoPointerAttempts.toString(), player2.twoPointerAttempts.toString())
-        StatRow("2P%", player1.twoPointPercent.toString(), player2.twoPointPercent.toString())
-        StatRow("EFG%", player1.effectiveFieldGoalPercent.toString(), player2.effectiveFieldGoalPercent.toString())
-        StatRow("ORB", player1.offensiveRebounds.toString(), player2.offensiveRebounds.toString())
-        StatRow("DRB", player1.defensiveRebounds.toString(), player2.defensiveRebounds.toString())
+        PlayerCard(player1, player2)
+        PlayerCard(player2, player1)
     }
 }
+
 @Composable
-fun StatRow(label: String, player1Value: String, player2Value: String) {
-    val playerValueFloat = player1Value.toFloatOrNull()
-    val player2ValueFloat = player2Value.toFloatOrNull()
-
-    val player1Color = when {
-        //Lower is better
-        label == "Turnovers" || label == "Personal Fouls" -> {
-            if (playerValueFloat != null && player2ValueFloat != null) {
-                if (playerValueFloat < player2ValueFloat) Color.Green else Color.Red
-            } else Color.Black
+fun PlayerCard(player: Player, opponent: Player) {
+    val team = player.team
+    Box(
+        modifier = Modifier
+            .width(200.dp)
+            .shadow(elevation = 4.dp)
+            .border(width = 2.dp, color = Color.Gray, shape = RoundedCornerShape(8.dp)) // Border with rounded corners
+    ) {
+        Box(
+            modifier = Modifier
+                .background(Color(0xFFF5F5DC)) // Beige background color
+                .padding(16.dp)
+        ) {
+            Column {
+                Text(
+                    text = player.name,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                StatRow("Year", player.year.toString(), false)
+                StatRow("Position", player.position, false)
+                StatRow("Team", player.team, false)
+                StatRow("Points", player.points.toString(), player.points > opponent.points)
+                StatRow("Assists", player.assists.toString(), player.assists > opponent.assists)
+                StatRow("Steals", player.steals.toString(), player.steals > opponent.steals)
+                StatRow("Blocks", player.blocks.toString(), player.blocks > opponent.blocks)
+                StatRow("Total Rebounds", player.totalRebounds.toString(), player.totalRebounds > opponent.totalRebounds)
+                StatRow("Turnovers", player.turnovers.toString(), player.turnovers < opponent.turnovers)
+                StatRow("Personal Fouls", player.personalFouls.toString(), player.personalFouls < opponent.personalFouls)
+                StatRow("Minutes Played", player.minutesPlayed.toString(), player.minutesPlayed > opponent.minutesPlayed)
+                StatRow("FG", player.fieldGoals.toString(), player.fieldGoals > opponent.fieldGoals)
+                StatRow("FGA", player.fieldGoalAttempts.toString(), player.fieldGoalAttempts > opponent.fieldGoalAttempts)
+                StatRow("FG%", player.fieldGoalPercent.toString(), player.fieldGoalPercent > opponent.fieldGoalPercent)
+                StatRow("3P ", player.threePointers.toString(), player.threePointers > opponent.threePointers)
+                StatRow("3PA", player.threePointerAttempts.toString(), player.threePointerAttempts > opponent.threePointerAttempts)
+                StatRow("3P%", player.threePointPercent.toString(), player.threePointPercent > opponent.threePointPercent)
+                StatRow("2P", player.twoPointers.toString(), player.twoPointers > opponent.twoPointers)
+                StatRow("2PA", player.twoPointerAttempts.toString(), player.twoPointerAttempts > opponent.twoPointerAttempts)
+                StatRow("2P%", player.twoPointPercent.toString(), player.twoPointPercent > opponent.twoPointPercent)
+                StatRow("EFG%", player.effectiveFieldGoalPercent.toString(), player.effectiveFieldGoalPercent > opponent.effectiveFieldGoalPercent)
+                StatRow("ORB", player.offensiveRebounds.toString(), player.offensiveRebounds > opponent.offensiveRebounds)
+                StatRow("DRB", player.defensiveRebounds.toString(), player.defensiveRebounds > opponent.defensiveRebounds)
+            }
         }
-        //Higher is better
-        playerValueFloat != null && player2ValueFloat != null -> {
-            if (playerValueFloat > player2ValueFloat) Color.Green else Color.Red
-        }
-        else -> Color.Black //For non-stat values
     }
+}
 
-    val player2Color = when {
-        label == "Turnovers" || label == "Personal Fouls" -> {
-            if (playerValueFloat != null && player2ValueFloat != null) {
-                if (player2ValueFloat < playerValueFloat) Color.Green else Color.Red
-            } else Color.Black
-        }
-        playerValueFloat != null && player2ValueFloat != null -> {
-            if (player2ValueFloat > playerValueFloat) Color.Green else Color.Red
-        }
-        else -> Color.Black
-    }
 
-    Column {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+@Composable
+fun StatRow(label: String, value: String, playerHasHigherStat: Boolean) {
+
+    val statColor = if (playerHasHigherStat) Color(0xFF46923c) else Color(0xFFF5F5DC)
+    val borderColor = Color(0xFFF5F5DC)
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text = label,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.weight(1f)
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Box(
+            modifier = Modifier
+                .background(statColor, RoundedCornerShape(4.dp))
+                .padding(horizontal = 4.dp, vertical = 2.dp)
         ) {
             Text(
-                text = label,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.weight(1f)
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                text = player1Value,
-                fontSize = if (label == "Name") 14.sp else 18.sp,
+                text = value,
+                fontSize = 16.sp,
                 textAlign = TextAlign.End,
-                color = if (label == "Year") Color.Black else player1Color,
-                modifier = Modifier.weight(1f)
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                text = player2Value,
-                fontSize = if (label == "Name") 14.sp else 18.sp,
-                textAlign = TextAlign.End,
-                color = if (label == "Year") Color.Black else player2Color,
-                modifier = Modifier.weight(1f)
+                color = Color.Black,
+                modifier = Modifier.padding(horizontal = 4.dp)
             )
         }
-        HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
     }
 }
+
 

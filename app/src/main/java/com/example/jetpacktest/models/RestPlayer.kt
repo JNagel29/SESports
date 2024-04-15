@@ -1,0 +1,32 @@
+package com.example.jetpacktest.models
+
+data class RestPlayer(
+    val playerId: RestPlayerId,
+    val position: String,
+    val age: Int,
+    val gamesPlayed: Int,
+    val gamesStarted: Int,
+    val assists: Double,
+    val blocks: Double,
+    val defensiveRebounds: Double,
+    val effectiveFieldGoalPercentage: Double,
+    val fieldGoalPercentage: Double,
+    val fieldGoals: Double,
+    val fieldGoalsAttempted: Double,
+    val freeThrowPercentage: Double,
+    val freeThrows: Double,
+    val freeThrowsAttempted: Double,
+    val minutesPlayed: Double,
+    val offensiveRebounds: Double,
+    val personalFouls: Double,
+    val points: Double,
+    val steals: Double,
+    val threePointPercentage: Double,
+    val threePointers: Double,
+    val threePointersAttempted: Double,
+    val totalRebounds: Double,
+    val turnovers: Double,
+    val twoPointPercentage: Double,
+    val twoPointers: Double,
+    val twoPointersAttempted: Double
+)

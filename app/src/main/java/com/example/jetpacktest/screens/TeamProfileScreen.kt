@@ -1,6 +1,7 @@
 package com.example.jetpacktest.screens
 
 import ReturnToPreviousHeader
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -44,7 +45,6 @@ fun TeamProfileScreen(teamName: String,
 
     LaunchedEffect(Unit) {
         if (teamPlayersList.isEmpty()) {
-            /* //TODO: Commenting just in case honestly
             //Before anything else, fetch team abbreviation using dictionary in NbaTeam.kt
             val teamAbbrev = NbaTeam.namesToAbbreviations[teamName]
             if (teamAbbrev != null) {
@@ -53,8 +53,6 @@ fun TeamProfileScreen(teamName: String,
                     teamPlayersList = result
                 }
             }
-
-             */
         }
     }
     //Wraps data inside column

@@ -1,6 +1,7 @@
 package com.example.jetpacktest.screens
 
 import ReturnToPreviousHeader
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -65,17 +66,21 @@ fun ProfileScreen(playerName: String, navigateBack: () -> Unit) {
 
     //TODO: add favorite functionality and maybe switch to viewmodel?
     LaunchedEffect(Unit) {
-        /*
-        //TODO: Commenting rn since blocked out anyway
-        headshotHandler.fetchImageId(playerName) { result ->
-            imgId = result
+
+        if (imgId == -1) {
+            Log.d("ProfileScreen", "Updating headshot")
+            headshotHandler.fetchImageId(playerName) { result ->
+                imgId = result
+            }
         }
-        */
+
         if (yearsList.isEmpty()) {
+            Log.d("ProfileScreen", "Fetching new years")
             databaseHandler.executeYears(playerName = playerName) {result ->
                 yearsList = result // Update years list with parameter result you pass via callback
                 //Also, default the chosenYear to the most recent year
                 if (yearsList.isNotEmpty()) {
+                    Log.d("ProfileScreen", "Fetching new profile data")
                     chosenYear = yearsList.first()
                     //Then, fetch all our data for that most recent year
                     databaseHandler.executePlayerData(playerName, chosenYear) { data ->

@@ -1,6 +1,7 @@
 package com.example.jetpacktest
 
 import com.example.jetpacktest.models.GameResponse
+import com.example.jetpacktest.models.RestPlayer
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Headers
@@ -17,8 +18,16 @@ interface ApiInterface {
 
     @GET("Player/{playerId}")
     fun getPlayerById(@Path("playerId") playerId: Int, @Query("key") apiKey: String)
-        :Call<PlayerInfo>
+            :Call<PlayerInfo>
 
     @GET("PlayersBasic/{team}")
-    fun getPlayersByTeam(@Path("team") team: String, @Query("key") apiKey: String) : Call<List<TeamPlayer>>
+    fun getPlayersByTeam(@Path("team") team: String, @Query("key") apiKey: String) :
+            Call<List<TeamPlayer>>
+
+    //Endpoints to fetch DB data from REST API
+    @GET("player")
+    suspend fun getPlayerByNameAndYear(@Query("name") name: String, @Query("year") year: Int)
+            : List<RestPlayer>
+    @GET("search-players")
+    suspend fun getPlayerSearchResults(@Query("name") name: String): List<String>
 }

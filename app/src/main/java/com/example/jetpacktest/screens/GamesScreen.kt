@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,10 +13,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -114,7 +121,7 @@ fun GameCard(game: Game, navigateToTeamProfile: (String) -> Unit) {
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
-            //Top Row that holds Home Logo, Home Score, Away Score, Away Logo
+            // Top Row that holds Home Logo, Home Score, Game Status, Away Score, Away Logo
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth(),
@@ -133,21 +140,8 @@ fun GameCard(game: Game, navigateToTeamProfile: (String) -> Unit) {
                             )
                         }
                 )
-
-                Text(
-                    text = game.home_team_score.toString(),
-                    fontFamily = FontFamily.Serif,
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(vertical = 4.dp)
-                )
-                Text(
-                    text = game.visitor_team_score.toString(),
-                    fontFamily = FontFamily.Serif,
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(vertical = 4.dp)
-                )
+                if (isGameUpcoming(game)) DisplayUpcomingInfo(game)
+                else DisplayOngoingOrPreviousInfo(game)
                 Image(
                     painter = painterResource(id = game.visitor_team.logo),
                     contentDescription = "Away Team Logo",
@@ -162,11 +156,11 @@ fun GameCard(game: Game, navigateToTeamProfile: (String) -> Unit) {
                         }
                 )
             }
-            //Spacer between rows
+            // Spacer between rows
             Spacer(modifier = Modifier.height(8.dp))
-            //Bottom row that simply holds Home Name, Game Status, Away Name
+            // Bottom row that simply holds Home Name, Game Status, Away Name
             Row(
-                verticalAlignment = Alignment.Bottom,
+                verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
@@ -176,12 +170,8 @@ fun GameCard(game: Game, navigateToTeamProfile: (String) -> Unit) {
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp
                 )
-                Text(
-                    text = (if (game.time.isNullOrEmpty()) game.status else game.time)!!,
-                    textAlign = TextAlign.Center,
-                    fontFamily = FontFamily.Serif,
-                    fontSize = 16.sp,
-                )
+                // Spacer to create gap between home and away team names
+                Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = game.visitor_team.name,
                     fontFamily = FontFamily.Serif,
@@ -191,4 +181,66 @@ fun GameCard(game: Game, navigateToTeamProfile: (String) -> Unit) {
             }
         }
     }
+}
+
+@Composable
+fun DisplayUpcomingInfo(game: Game) {
+    Text(
+        text = game.status,
+        textAlign = TextAlign.Center,
+        fontFamily = FontFamily.Serif,
+        fontSize = 20.sp,
+        fontWeight = FontWeight.Bold,
+        modifier = Modifier.padding(vertical = 4.dp)
+    )
+}
+
+@Composable
+fun DisplayOngoingOrPreviousInfo(game: Game) {
+    Text(
+        text = game.home_team_score.toString(),
+        fontFamily = FontFamily.Serif,
+        fontSize = 24.sp,
+        fontWeight = FontWeight.Bold,
+        modifier = Modifier.padding(vertical = 4.dp)
+    )
+    Box {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            if (game.status == "Final" && game.home_team_score > game.visitor_team_score) {
+                Icon(
+                    Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Left team won",
+                    tint = Color.Black,
+                    modifier = Modifier.size(15.dp)
+                )
+            }
+            Text(
+                text = (if (game.time.isNullOrEmpty()) game.status else game.time)!!,
+                textAlign = TextAlign.Center,
+                fontFamily = FontFamily.Serif,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(vertical = 4.dp)
+            )
+            if (game.status == "Final" && game.visitor_team_score > game.home_team_score) {
+                Icon(
+                    Icons.AutoMirrored.Filled.ArrowForward,
+                    contentDescription = "Right team won",
+                    tint = Color.Black,
+                    modifier = Modifier.size(15.dp)
+                )
+            }
+        }
+    }
+    Text(
+        text = game.visitor_team_score.toString(),
+        fontFamily = FontFamily.Serif,
+        fontSize = 24.sp,
+        fontWeight = FontWeight.Bold,
+        modifier = Modifier.padding(vertical = 4.dp)
+    )
+}
+
+private fun isGameUpcoming(game: Game): Boolean {
+    return (game.status.contains("AM") || game.status.contains("PM"))
 }
