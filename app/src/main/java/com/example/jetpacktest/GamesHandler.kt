@@ -24,7 +24,7 @@ class GamesHandler {
     //ApiInterface adds the 'games' endpoint, as well as the date query for us
     private val baseGameUrl = Keys.BDL_BASE_URL
 
-    fun fetchGames(date: Date, onResult: (MutableList<Game>) -> Unit) {
+    fun fetchGames(date: Date, onResult: (MutableList<Game>?) -> Unit) {
         //We first must convert our date into a usable format
         val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         val formattedDate = dateFormat.format(date)
@@ -54,7 +54,8 @@ class GamesHandler {
                         }
                         gamesList.add(game)
                     }
-                    onResult(gamesList)
+                    if (gamesList.isNotEmpty()) onResult(gamesList)
+                    else onResult(null)
                 }
                 else { Log.d("GamesHandler", "Retrofit: Unsuccessful Response") }
             }

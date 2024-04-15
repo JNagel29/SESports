@@ -19,7 +19,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -53,14 +52,13 @@ import java.util.Date
 @Composable
 fun GamesScreen(navigateToTeamProfile: (String) -> Unit) {
     val gamesHandler = GamesHandler()
-    //TODO: Make gamesList and list in TeamProfileScreen parcelable to work w/ savable
     var selectedDate by rememberSaveable { mutableStateOf(Date()) }
-    var gamesList by rememberSaveable { mutableStateOf<List<Game>>(emptyList()) }
-    var isFetching by remember { mutableStateOf(false)}
+    var gamesList by rememberSaveable { mutableStateOf<List<Game>?>(emptyList()) }
+    var isFetching by rememberSaveable { mutableStateOf(false)}
     var lastFetchedDate by remember { mutableStateOf(selectedDate) }
 
     LaunchedEffect(selectedDate) {
-        if (gamesList.isEmpty() || selectedDate != lastFetchedDate) {
+        if ( (gamesList != null && gamesList?.isEmpty()!!) || selectedDate != lastFetchedDate) {
             Log.d("GamesHandler", "Fetching new games...")
             isFetching = true
             gamesList = emptyList()
@@ -95,9 +93,21 @@ fun GamesScreen(navigateToTeamProfile: (String) -> Unit) {
             }
         )
         if (!isFetching) {
-            LazyColumn(modifier = Modifier.weight(1f)) {
-                items(gamesList) { game ->
-                    GameCard(game = game, navigateToTeamProfile)
+            if (gamesList != null) {
+                LazyColumn(modifier = Modifier.weight(1f)) {
+                    items(gamesList!!) { game ->
+                        GameCard(game = game, navigateToTeamProfile)
+                    }
+                }
+            }
+            else {
+                Box(modifier = Modifier.fillMaxSize()) {
+                    Text(
+                        text = "Sorry! No games today",
+                        textAlign = TextAlign.Center,
+                        fontFamily = FontFamily.Serif,
+                        modifier = Modifier.align(Alignment.Center)
+                    )
                 }
             }
         }

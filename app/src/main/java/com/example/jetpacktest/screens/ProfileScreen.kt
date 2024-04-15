@@ -4,6 +4,7 @@ import ReturnToPreviousHeader
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -56,6 +57,7 @@ import com.example.jetpacktest.models.Player
 import com.example.jetpacktest.models.PlayerPersonalInfo
 import com.example.jetpacktest.ui.components.CircularLoadingIcon
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ProfileScreen(
     playerName: String,
@@ -77,7 +79,6 @@ fun ProfileScreen(
     var injuryStartDate by rememberSaveable { mutableStateOf("")}
     var playerPersonalInfo by rememberSaveable { mutableStateOf(PlayerPersonalInfo(emptyList())) }
 
-    //TODO: add favorite functionality and maybe switch to viewmodel?
     LaunchedEffect(Unit) {
         //We use conditionals to make sure these aren't re-fetched on screen swaps
         if (imgId == -1) {
@@ -115,9 +116,9 @@ fun ProfileScreen(
         }
     }
 
+
     LazyColumn(modifier = Modifier.fillMaxSize()) {
-        //TODO: Make this sticky header, tried it but bg wasn't white
-        item {
+        stickyHeader {
             ReturnToPreviousHeader(
                 navigateBack = navigateBack,
                 label = getPreviousScreenName()?.let { screenName ->
@@ -125,6 +126,9 @@ fun ProfileScreen(
                     else screenName.dropLast(6)
                 } ?: ""
             )
+        }
+        //TODO: Make this sticky header, tried it but bg wasn't white
+        item {
             Spacer(modifier = Modifier.height(15.dp))
         }
 
