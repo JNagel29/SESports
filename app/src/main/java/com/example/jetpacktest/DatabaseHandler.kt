@@ -355,6 +355,42 @@ class DatabaseHandler {
         return statLeadersList
     }
 
+    // Fetches standings data from the database for the specified year
+    fun executeStandings(year: String, onDataReceived: (MutableList<String>) -> Unit) {
+        executor.execute {
+            val standingsList = getStandings(year)
+            onDataReceived(standingsList)
+        }
+    }
+
+    private fun getStandings(year: String): MutableList<String> {
+        var myConn: Connection? = null
+        var statement: Statement? = null
+        var resultSet: ResultSet? = null
+        val standingsList = mutableListOf<String>()
+        try {
+            Class.forName("com.mysql.jdbc.Driver")
+            myConn = DriverManager.getConnection(url, user, password)
+            statement = myConn.createStatement()
+            val sql = "SELECT * FROM Standings WHERE Year = $year"
+            resultSet = statement.executeQuery(sql)
+            while (resultSet.next()) {
+                val standingsData = "${resultSet.getString("Team")} - ${resultSet.getInt("Wins")}-${resultSet.getInt("Losses")}"
+                standingsList.add(standingsData)
+            }
+        } catch (e: SQLException) {
+            Log.d(Const.TAG, e.message!!)
+            e.printStackTrace()
+        } catch (e: ClassNotFoundException) {
+            e.printStackTrace()
+        } finally {
+            //Close resources
+            closeResources(myConn, resultSet, statement)
+        }
+        return standingsList
+    }
+
+
     //This function will find us the years for which a player has stats for in our DB
     private fun getPlayerYears(playerName: String): MutableList<String> {
         var myConn: Connection? = null
