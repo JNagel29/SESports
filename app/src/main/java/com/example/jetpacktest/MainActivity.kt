@@ -37,13 +37,6 @@ class MainActivity : ComponentActivity() {
                 .build()
         )
          */
-        //Updates new randomStat value if new day has passed and fetches
-        //TODO: Might not need this helper, will test tomorrow, also need to make index async
-        /*
-        if(!isWorkScheduled()) {
-            //scheduleRandomStatWork()
-        }
-         */
         //For obtaining random stat (if new day has passed)
         scheduleRandomStatWork()
         sharedPreferences = applicationContext.getSharedPreferences("prefs", MODE_PRIVATE)
