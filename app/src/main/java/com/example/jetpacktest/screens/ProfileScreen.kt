@@ -127,7 +127,6 @@ fun ProfileScreen(
                 } ?: ""
             )
         }
-        //TODO: Make this sticky header, tried it but bg wasn't white
         item {
             Spacer(modifier = Modifier.height(15.dp))
         }
