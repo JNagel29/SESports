@@ -115,9 +115,9 @@ fun ProfileScreen(
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        Column(modifier = Modifier.fillMaxSize()) {
-            //Calls composable that sets up our back header to go back to search
+    LazyColumn(modifier = Modifier.fillMaxSize()) {
+        //TODO: Make this sticky header, tried it but bg wasn't white
+        item {
             ReturnToPreviousHeader(
                 navigateBack = navigateBack,
                 label = getPreviousScreenName()?.let { screenName ->
@@ -125,16 +125,17 @@ fun ProfileScreen(
                     else screenName.dropLast(6)
                 } ?: ""
             )
-            //Adds space between header and actual data
             Spacer(modifier = Modifier.height(15.dp))
-            if (isFetchingStats || isFetchingInfo) {
-                CircularLoadingIcon()
-            }
-            else {
+        }
+
+        if (isFetchingStats || isFetchingInfo) {
+            item { CircularLoadingIcon() }
+        } else {
+            item {
                 NameAndHeadshot(
                     playerName = playerName,
                     imgId = imgId,
-                    team =  player.team,
+                    team = player.team,
                     position = player.position,
                     jerseyNumber = playerPersonalInfo.data[0].jerseyNumber,
                     injuryStartDate = injuryStartDate,
@@ -142,9 +143,21 @@ fun ProfileScreen(
                     favoritesHandler = favoritesHandler,
                     context = context
                 )
+            }
+
+            item {
                 HorizontalDivider(thickness = 2.dp, color = Color.White)
+            }
+
+            item {
                 MainStatBoxes(player = player)
+            }
+
+            item {
                 HorizontalDivider(thickness = 2.dp, color = Color.White)
+            }
+
+            item {
                 InfoStatBoxes(
                     playerPersonalInfo = playerPersonalInfo,
                     color = colorResource(
@@ -152,7 +165,9 @@ fun ProfileScreen(
                             ?: R.color.purple_lakers
                     )
                 )
-                //Custom Dropdown menu for each year
+            }
+
+            item {
                 LargeDropdownMenu(
                     label = "Select Year:",
                     items = yearsList,
@@ -160,25 +175,34 @@ fun ProfileScreen(
                     onItemSelected = { index, _ ->
                         chosenYear = yearsList[index]
                         if (chosenYear != "2024") {
-                            databaseHandler.executePlayerData(playerName, chosenYear) { data ->
+                            databaseHandler.executePlayerData(
+                                playerName,
+                                chosenYear
+                            ) { data ->
                                 player = data
                             }
-                        }
-                        else {
-                            //TODO: Need to call upon API here later
-                            databaseHandler.executePlayerData(playerName, chosenYear) { data ->
+                        } else {
+                            //TODO: Call upon API later for 2024 data
+                            databaseHandler.executePlayerData(
+                                playerName,
+                                chosenYear
+                            ) { data ->
                                 player = data
                             }
                         }
                     }
                 )
-                //Now, compose our button that toggles the extra data in list
+            }
+
+            item {
                 ToggleFurtherStats(
                     showExpandedData = showExpandedData,
                     onClick = { showExpandedData = !showExpandedData }
                 )
-                //Only show if user clicked button
-                if (showExpandedData && player.points != -1.0f) {
+            }
+
+            if (showExpandedData && player.points != -1.0f) {
+                item {
                     PlayerStatisticTable(player)
                 }
             }
@@ -246,14 +270,17 @@ fun NameAndHeadshot(
                                 onClick = {
                                     isFavorite = !isFavorite
                                     if (isFavorite) {
-                                        val favoriteAdded = favoritesHandler.addFavoritePlayer(playerName)
+                                        val favoriteAdded =
+                                            favoritesHandler.addFavoritePlayer(playerName)
                                         if (!favoriteAdded) {
                                             //TODO: Toast won't appear
-                                            Toast.makeText(
-                                                context,
-                                                "Favorite Limit Reached, Sorry!",
-                                                Toast.LENGTH_SHORT
-                                            ).show()
+                                            Toast
+                                                .makeText(
+                                                    context,
+                                                    "Favorite Limit Reached, Sorry!",
+                                                    Toast.LENGTH_SHORT
+                                                )
+                                                .show()
                                             isFavorite = !isFavorite
                                         }
                                     } else {
@@ -358,12 +385,11 @@ fun PlayerStatisticTable(player: Player) {
     //Slight amount of vertical space
     Spacer(modifier = Modifier.height(4.dp))
     //Now the actual list of values
-    LazyColumn(
+    Column(
         modifier = Modifier.padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         //Pass in list of rows with Label and Value
-        item {
             PlayerDataRow("Steals", player.steals.toString())
             PlayerDataRow("Blocks", player.blocks.toString())
             PlayerDataRow("FG", player.fieldGoals.toString())
@@ -379,7 +405,6 @@ fun PlayerStatisticTable(player: Player) {
             PlayerDataRow("2PA", player.twoPointerAttempts.toString())
             PlayerDataRow("2P%", "%.1f%%".format(player.twoPointPercent * 100))
             PlayerDataRow("EFG%", "%.1f%%".format(player.effectiveFieldGoalPercent * 100))
-        }
     }
 }
 
