@@ -127,7 +127,7 @@ fun TeamPlayerRow(teamPlayer: TeamPlayer, navigateToPlayerProfile: (String) -> U
         .fillMaxWidth()
         .padding(vertical = 8.dp)
         .clickable {
-            val fullTeamPlayerName = "${teamPlayer.FirstName} ${teamPlayer.LastName}"
+            val fullTeamPlayerName = "${teamPlayer.firstName} ${teamPlayer.lastName}"
             navigateToPlayerProfile(fullTeamPlayerName)
         }
     ) {
@@ -137,16 +137,16 @@ fun TeamPlayerRow(teamPlayer: TeamPlayer, navigateToPlayerProfile: (String) -> U
             horizontalAlignment = Alignment.Start
         ) {
             Text(
-                text = "${teamPlayer.FirstName} ${teamPlayer.LastName}",
+                text = "${teamPlayer.firstName} ${teamPlayer.lastName}",
                 fontSize = 22.sp,
                 fontFamily = FontFamily.Serif,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 4.dp)
             )
             Text(
-                text = "${teamPlayer.Position} | #${teamPlayer.Jersey} | " +
-                        "${inchesToFeet(teamPlayer.Height)} | ${teamPlayer.Weight} lbs | " +
-                        teamPlayer.BirthCity,
+                text = "${teamPlayer.position} | #${teamPlayer.jersey} | " +
+                        "${inchesToFeet(teamPlayer.height)} | ${teamPlayer.weight} lbs | " +
+                        teamPlayer.birthCity,
                 fontSize = 16.sp,
                 fontFamily = FontFamily.Serif,
                 modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 4.dp)

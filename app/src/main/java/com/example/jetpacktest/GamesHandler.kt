@@ -42,9 +42,9 @@ class GamesHandler {
                     val responseBody = response.body()!!
                     for (game in responseBody.data) {
                         //Set the logos that weren't in JSON.
-                        game.home_team.logo = TeamMaps.xmlLogos[game.home_team.name] ?:
+                        game.homeTeam.logo = TeamMaps.xmlLogos[game.homeTeam.name] ?:
                                 R.drawable.baseline_arrow_back_ios_new_24
-                        game.visitor_team.logo = TeamMaps.xmlLogos[game.visitor_team.name] ?:
+                        game.visitorTeam.logo = TeamMaps.xmlLogos[game.visitorTeam.name] ?:
                                 R.drawable.baseline_arrow_back_ios_new_24
                         //gameTime set to Final means game ended, null means hasn't started
                         if (game.time.isNullOrEmpty() || game.time == "Final") game.time = ""

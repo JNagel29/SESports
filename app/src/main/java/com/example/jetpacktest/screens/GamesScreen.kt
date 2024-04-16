@@ -138,30 +138,30 @@ fun GameCard(game: Game, navigateToTeamProfile: (String) -> Unit) {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Image(
-                    painter = painterResource(id = game.home_team.logo),
+                    painter = painterResource(id = game.homeTeam.logo),
                     contentDescription = "Home Team Logo",
                     modifier = Modifier
                         .size(50.dp)
                         //On click, nav to team profile, substituting e.g. Hawks with Atlanta Hawks
                         .clickable {
                             navigateToTeamProfile(
-                                TeamMaps.shortenedNamesToFullNames[game.home_team.name]
-                                    ?: game.home_team.name
+                                TeamMaps.shortenedNamesToFullNames[game.homeTeam.name]
+                                    ?: game.homeTeam.name
                             )
                         }
                 )
                 if (isGameUpcoming(game)) DisplayUpcomingInfo(game)
                 else DisplayOngoingOrPreviousInfo(game)
                 Image(
-                    painter = painterResource(id = game.visitor_team.logo),
+                    painter = painterResource(id = game.visitorTeam.logo),
                     contentDescription = "Away Team Logo",
                     modifier = Modifier
                         .size(50.dp)
                         //On click, nav to team profile, substituting e.g. Hawks with Atlanta Hawks
                         .clickable {
                             navigateToTeamProfile(
-                                TeamMaps.shortenedNamesToFullNames[game.visitor_team.name]
-                                    ?: game.visitor_team.name
+                                TeamMaps.shortenedNamesToFullNames[game.visitorTeam.name]
+                                    ?: game.visitorTeam.name
                             )
                         }
                 )
@@ -175,7 +175,7 @@ fun GameCard(game: Game, navigateToTeamProfile: (String) -> Unit) {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = game.home_team.name,
+                    text = game.homeTeam.name,
                     fontFamily = FontFamily.Serif,
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp
@@ -183,7 +183,7 @@ fun GameCard(game: Game, navigateToTeamProfile: (String) -> Unit) {
                 // Spacer to create gap between home and away team names
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = game.visitor_team.name,
+                    text = game.visitorTeam.name,
                     fontFamily = FontFamily.Serif,
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp
@@ -208,7 +208,7 @@ fun DisplayUpcomingInfo(game: Game) {
 @Composable
 fun DisplayOngoingOrPreviousInfo(game: Game) {
     Text(
-        text = game.home_team_score.toString(),
+        text = game.homeTeamScore.toString(),
         fontFamily = FontFamily.Serif,
         fontSize = 24.sp,
         fontWeight = FontWeight.Bold,
@@ -216,7 +216,7 @@ fun DisplayOngoingOrPreviousInfo(game: Game) {
     )
     Box {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            if (game.status == "Final" && game.home_team_score > game.visitor_team_score) {
+            if (game.status == "Final" && game.homeTeamScore > game.visitorTeamScore) {
                 Icon(
                     Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Left team won",
@@ -232,7 +232,7 @@ fun DisplayOngoingOrPreviousInfo(game: Game) {
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(vertical = 4.dp)
             )
-            if (game.status == "Final" && game.visitor_team_score > game.home_team_score) {
+            if (game.status == "Final" && game.visitorTeamScore > game.homeTeamScore) {
                 Icon(
                     Icons.AutoMirrored.Filled.ArrowForward,
                     contentDescription = "Right team won",
@@ -243,7 +243,7 @@ fun DisplayOngoingOrPreviousInfo(game: Game) {
         }
     }
     Text(
-        text = game.visitor_team_score.toString(),
+        text = game.visitorTeamScore.toString(),
         fontFamily = FontFamily.Serif,
         fontSize = 24.sp,
         fontWeight = FontWeight.Bold,

@@ -11,6 +11,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
+import com.google.gson.annotations.SerializedName
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -19,29 +20,25 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 //Small Data classes to hold retrofit data
 data class ActivePlayer(
-    val PlayerID: Int,
-    val FirstName: String,
-    val LastName: String,
+    @SerializedName("PlayerID")
+    val playerId: Int,
+    @SerializedName("FirstName")
+    val firstName: String,
+    @SerializedName("LastName")
+    val lastName: String,
 )
 data class PlayerInfo(
-    val NbaDotComPlayerID: Int
+    @SerializedName("NbaDotComPlayerID")
+    val nbaDotComPlayerId: Int
 )
 
 class HeadshotHandler {
     private val databaseHandler = DatabaseHandler()
-    private val useBiggerImage: Boolean = true
-    private var imageUrlPrefix: String? = null
-    private val apiKey = Keys.SPORTS_DATA_IO_KEY
-    private val activePlayersUrl =
-        "https://api.sportsdata.io/v3/nba/scores/json/PlayersActiveBasic?key=$apiKey"
-    private var matchingPlayerId = -1 // -1 means no match found and to not bother calling next req
+    //private val apiKey = Keys.SPORTS_DATA_IO_KEY
     private var nbaDotComPlayerId = -1
-    object Const { // We use object since only way to make var constant
-        //Const tag for logging
+    object Const {
         const val TAG = "Headshot Handler"
     }
-    //Used in fetchPlayerId/fetchImageUrl to get active players and their ID
-    private var imgUrl = "DEFAULT"
 
     fun fetchImageId(playerName: String, onResult: (Int) -> Unit) {
         //First, attempt fetching from the database
@@ -74,7 +71,6 @@ class HeadshotHandler {
                             crossfade(true)
                         }).build()
                 ),
-                //Change desc/width/height based off params
                 contentDescription = contentDesc,
                 modifier = Modifier
                     .width(width)
@@ -116,9 +112,9 @@ class HeadshotHandler {
                     val responseBody = response.body()!!
                     for (activePlayer in responseBody) {
                         //Check for matching name
-                        if (firstName.equals(activePlayer.FirstName, ignoreCase = true) &&
-                        lastName.equals(activePlayer.LastName, ignoreCase = true)) {
-                            Log.d("HeadshotHandler", "Match Found: ${activePlayer.PlayerID}")
+                        if (firstName.equals(activePlayer.firstName, ignoreCase = true) &&
+                        lastName.equals(activePlayer.lastName, ignoreCase = true)) {
+                            Log.d("HeadshotHandler", "Match Found: ${activePlayer.playerId}")
                             //Make second retrofit request
                             val retrofitBuilder2 = Retrofit.Builder()
                                 .addConverterFactory(GsonConverterFactory.create())
@@ -126,7 +122,7 @@ class HeadshotHandler {
                                 .build()
                                 .create(ApiInterface::class.java)
                             val retrofitPlayers = retrofitBuilder2.getPlayerById(
-                                playerId = activePlayer.PlayerID,
+                                playerId = activePlayer.playerId,
                                 apiKey = Keys.SPORTS_DATA_IO_KEY
                             )
                             retrofitPlayers.enqueue(object : Callback<PlayerInfo?> {
@@ -137,8 +133,8 @@ class HeadshotHandler {
                                     if (response2.isSuccessful) {
                                         //No need to loop this time, since only one JSON object
                                         val playerInfo = response2.body()!!
-                                        Log.d("HeadshotHandler", "${playerInfo.NbaDotComPlayerID}")
-                                        onResult(playerInfo.NbaDotComPlayerID)
+                                        Log.d("HeadshotHandler", "${playerInfo.nbaDotComPlayerId}")
+                                        onResult(playerInfo.nbaDotComPlayerId)
                                         return
                                     }
                                     else {
@@ -160,7 +156,6 @@ class HeadshotHandler {
             }
             override fun onFailure(call: Call<List<ActivePlayer>?>, t: Throwable) {
                 Log.d("HeadshotHandler", "Retrofit failure: $t")
-
             }
         })
     }
