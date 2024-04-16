@@ -1,9 +1,7 @@
 package com.example.jetpacktest.screens
 
 import ReturnToPreviousHeader
-import android.content.Context
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -145,7 +143,6 @@ fun ProfileScreen(
                     injuryStartDate = injuryStartDate,
                     headshotHandler = headshotHandler,
                     favoritesHandler = favoritesHandler,
-                    context = context,
                     showSnackBar = showSnackBar
                 )
             }
@@ -225,7 +222,6 @@ fun NameAndHeadshot(
     injuryStartDate: String,
     headshotHandler: HeadshotHandler,
     favoritesHandler: FavoritesHandler,
-    context: Context,
     showSnackBar: (String) -> Unit
 ) {
     var isFavorite by remember {
