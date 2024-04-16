@@ -42,7 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.jetpacktest.GamesHandler
 import com.example.jetpacktest.models.Game
-import com.example.jetpacktest.models.NbaTeam
+import com.example.jetpacktest.models.TeamMaps
 import com.example.jetpacktest.ui.components.CircularLoadingIcon
 import com.foreverrafs.datepicker.DatePickerTimeline
 import java.time.ZoneId
@@ -145,7 +145,7 @@ fun GameCard(game: Game, navigateToTeamProfile: (String) -> Unit) {
                         //On click, nav to team profile, substituting e.g. Hawks with Atlanta Hawks
                         .clickable {
                             navigateToTeamProfile(
-                                NbaTeam.shortenedNamesToFullNames[game.home_team.name]
+                                TeamMaps.shortenedNamesToFullNames[game.home_team.name]
                                     ?: game.home_team.name
                             )
                         }
@@ -160,7 +160,7 @@ fun GameCard(game: Game, navigateToTeamProfile: (String) -> Unit) {
                         //On click, nav to team profile, substituting e.g. Hawks with Atlanta Hawks
                         .clickable {
                             navigateToTeamProfile(
-                                NbaTeam.shortenedNamesToFullNames[game.visitor_team.name]
+                                TeamMaps.shortenedNamesToFullNames[game.visitor_team.name]
                                     ?: game.visitor_team.name
                             )
                         }

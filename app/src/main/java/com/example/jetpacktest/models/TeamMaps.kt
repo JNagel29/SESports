@@ -2,21 +2,7 @@ package com.example.jetpacktest.models
 
 import com.example.jetpacktest.R
 
-//Used in TeamProfile and Standings
-//For fetching standings, fetching player names of team we wont use an object since its only name field)
-data class TeamStanding(
-    val city: String,
-    val name: String,
-    val conference: Conference,
-    val wins: Int,
-    val losses: Int,
-    val percentage: Double
-)
-enum class Conference {
-    WESTERN,
-    EASTERN
-}
-object NbaTeam { // We use object so it's a singleton that we don't have to instantiate like a class
+object TeamMaps {
     //Team Names, used in SearchScreen.kt when searching for teams
     val names = listOf(
         "Atlanta Hawks",

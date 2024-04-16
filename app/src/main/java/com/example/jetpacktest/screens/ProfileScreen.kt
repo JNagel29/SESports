@@ -51,7 +51,7 @@ import com.example.jetpacktest.DatabaseHandler
 import com.example.jetpacktest.FavoritesHandler
 import com.example.jetpacktest.R
 import com.example.jetpacktest.HeadshotHandler
-import com.example.jetpacktest.models.NbaTeam
+import com.example.jetpacktest.models.TeamMaps
 import com.example.jetpacktest.ui.components.LargeDropdownMenu
 import com.example.jetpacktest.models.Player
 import com.example.jetpacktest.models.PlayerPersonalInfo
@@ -164,7 +164,7 @@ fun ProfileScreen(
                 InfoStatBoxes(
                     playerPersonalInfo = playerPersonalInfo,
                     color = colorResource(
-                        NbaTeam.teamColorsMap[player.team.split("/")[0]]
+                        TeamMaps.teamColorsMap[player.team.split("/")[0]]
                             ?: R.color.purple_lakers
                     )
                 )
@@ -234,7 +234,7 @@ fun NameAndHeadshot(
             .background(
                 color = colorResource(
                     //Split by / in case two teams
-                    NbaTeam.teamColorsMap[team.split("/")[0]] ?: R.color.purple_lakers
+                    TeamMaps.teamColorsMap[team.split("/")[0]] ?: R.color.purple_lakers
                 )
             )
             .offset(y = 20.dp) //Move image down a bit
@@ -325,7 +325,7 @@ fun MainStatBoxes(player: Player) {
             .fillMaxWidth()
             .background(
                 color = colorResource(
-                    NbaTeam.teamColorsMap[player.team.split("/")[0]]
+                    TeamMaps.teamColorsMap[player.team.split("/")[0]]
                         ?: R.color.purple_lakers
                 )
             ),

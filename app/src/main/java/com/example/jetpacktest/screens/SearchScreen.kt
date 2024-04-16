@@ -33,7 +33,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.jetpacktest.FavoritesHandler
-import com.example.jetpacktest.models.NbaTeam
+import com.example.jetpacktest.models.TeamMaps
 import com.example.jetpacktest.ui.components.CircularLoadingIcon
 
 @Composable
@@ -203,7 +203,7 @@ fun SearchResultsDisplay(
 fun handleTeamSearch(searchedTeamName: String, onSearchResult: (List<String>) -> Unit) {
     val teamNames = mutableListOf<String>() // Instantiate an empty list for matching team names
     //Loop through each team name that we have in NbaTeam model object
-    for (nbaTeamName in NbaTeam.names) {
+    for (nbaTeamName in TeamMaps.names) {
         //If name contains search text as a substring (ignoring case), then add it to list
         if (nbaTeamName.contains(other = searchedTeamName, ignoreCase = true)) {
             teamNames.add(nbaTeamName)

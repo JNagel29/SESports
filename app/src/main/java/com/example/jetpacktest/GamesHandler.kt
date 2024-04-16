@@ -10,7 +10,7 @@ import android.util.Log
 //Custom models/object
 import com.example.jetpacktest.models.Game
 import com.example.jetpacktest.models.GameResponse
-import com.example.jetpacktest.models.NbaTeam
+import com.example.jetpacktest.models.TeamMaps
 //For date operations
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -42,9 +42,9 @@ class GamesHandler {
                     val responseBody = response.body()!!
                     for (game in responseBody.data) {
                         //Set the logos that weren't in JSON.
-                        game.home_team.logo = NbaTeam.xmlLogos[game.home_team.name] ?:
+                        game.home_team.logo = TeamMaps.xmlLogos[game.home_team.name] ?:
                                 R.drawable.baseline_arrow_back_ios_new_24
-                        game.visitor_team.logo = NbaTeam.xmlLogos[game.visitor_team.name] ?:
+                        game.visitor_team.logo = TeamMaps.xmlLogos[game.visitor_team.name] ?:
                                 R.drawable.baseline_arrow_back_ios_new_24
                         //gameTime set to Final means game ended, null means hasn't started
                         if (game.time.isNullOrEmpty() || game.time == "Final") game.time = ""

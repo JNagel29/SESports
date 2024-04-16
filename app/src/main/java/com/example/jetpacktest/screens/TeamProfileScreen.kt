@@ -34,7 +34,7 @@ import androidx.compose.ui.unit.sp
 import com.example.jetpacktest.R
 import com.example.jetpacktest.TeamHandler
 import com.example.jetpacktest.TeamPlayer
-import com.example.jetpacktest.models.NbaTeam
+import com.example.jetpacktest.models.TeamMaps
 
 @Composable
 fun TeamProfileScreen(
@@ -49,7 +49,7 @@ fun TeamProfileScreen(
     LaunchedEffect(Unit) {
         if (teamPlayersList.isEmpty()) {
             //Before anything else, fetch team abbreviation using dictionary in NbaTeam.kt
-            val teamAbbrev = NbaTeam.namesToAbbreviations[teamName]
+            val teamAbbrev = TeamMaps.namesToAbbreviations[teamName]
             if (teamAbbrev != null) {
                 Log.d("TeamProfile", "Fetching new roster...")
                 teamHandler.fetchCurrentRoster(teamAbbrev = teamAbbrev) { result ->
@@ -68,7 +68,7 @@ fun TeamProfileScreen(
         TeamNameHeader(teamName = teamName)
         Spacer(modifier = Modifier.height(8.dp))
         //Elvis operator uses fallback if it teamName maps to no logo ID
-        val teamLogo = NbaTeam.logos[teamName] ?: R.drawable.fallback
+        val teamLogo = TeamMaps.logos[teamName] ?: R.drawable.fallback
         Image(
             painter = painterResource(id = teamLogo),
             contentDescription = teamName,
