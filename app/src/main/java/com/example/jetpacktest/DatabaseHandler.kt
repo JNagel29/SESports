@@ -14,33 +14,19 @@ import java.sql.ResultSet
 import java.sql.SQLException
 import java.sql.Statement
 import java.text.Normalizer
-import java.util.concurrent.Executor
-import java.util.concurrent.Executors
 
 class DatabaseHandler {
-    object Const { // We use object since only way to make them constant
-        //Tag for logging
+    object Const {
         const val TAG = "DatabaseHandler"
-        //Constant to hold how many players to grab (top 10, top 20, etc.)
-        const val MAX_PLAYERS = 10
+        const val NUM_PLAYERS_TO_GRAB = 10
     }
-    //Executor for the database requesting (used to run in background as its own thread)
-    private val executor: Executor = Executors.newSingleThreadExecutor()
-    //Alternative to Executor
     private val scope = CoroutineScope(Dispatchers.IO)
-    //Variables and info to connect to DB
     private val url = "jdbc:mysql://nikoarak.cikeys.com:3306/nikoarak_SESports"
     private val user = Keys.DB_USER
     private val password = Keys.DB_PASS
 
     fun executeStatLeaders(chosenStat: String, year: String,
                            onDataReceived: (MutableList<StatLeader>) -> Unit) {
-        /*
-        executor.execute {
-            val statLeadersList = getStatLeaders(chosenStat, year)
-            onDataReceived(statLeadersList)
-        }
-         */
         scope.launch {
             val statLeadersList = getStatLeaders(chosenStat, year)
             withContext(Dispatchers.IO) {
@@ -49,12 +35,6 @@ class DatabaseHandler {
         }
     }
     fun executeYears(playerName: String, onDataReceived: (MutableList<String>) -> Unit) {
-        /*
-        executor.execute {
-            val yearsList = getPlayerYears(playerName)
-            onDataReceived(yearsList)
-        }
-         */
         scope.launch {
             val yearsList = getPlayerYears(playerName)
             withContext(Dispatchers.IO) {
@@ -65,12 +45,6 @@ class DatabaseHandler {
     }
     fun executePlayerData(playerName: String, year: String,
                           onDataReceived: (Player) -> Unit) {
-        /*
-        executor.execute {
-            val player = getPlayerData(playerName, year)
-            onDataReceived(player)
-        }
-         */
         scope.launch {
             val player = getPlayerData(playerName, year)
             withContext(Dispatchers.IO) {
@@ -81,13 +55,6 @@ class DatabaseHandler {
 
     fun executePlayerSearchResults(searchResultName: String,
                                    onDataReceived: (MutableList<String>) -> Unit) {
-        /*
-        executor.execute {
-            val playerResultsList = getPlayerSearchResults(searchResultName)
-            // After getting list of results, callback to calling function to send back the data
-            onDataReceived(playerResultsList)
-        }
-         */
         scope.launch {
             val playerResultsList = getPlayerSearchResults(searchResultName)
             withContext(Dispatchers.IO) {
@@ -98,12 +65,6 @@ class DatabaseHandler {
 
     fun executeRandomStat(randIndex: Int,
                           onDataReceived: (String) -> Unit) {
-        /*
-        executor.execute {
-            val randomStat = getRandomStat(randIndex)
-            onDataReceived(randomStat)
-        }
-         */
         scope.launch {
             val randomStat = getRandomStat(randIndex)
             withContext(Dispatchers.IO) {
@@ -205,7 +166,6 @@ class DatabaseHandler {
             Class.forName("com.mysql.jdbc.Driver")
             myConn = DriverManager.getConnection(url, user, password)
             statement = myConn.createStatement()
-            //Must wrap playerName in double quotes, not single in case apostrophe in name
             val sql = "SELECT `NbaId` FROM NBA_PLAYER_ID WHERE `Name` = \"$playerName\""
             resultSet = statement.executeQuery(sql)
             while (resultSet.next()) {
@@ -247,39 +207,11 @@ class DatabaseHandler {
         return randomStat
     }
 
-    private fun oldGetRandomStat(): String {
-        var randomStat = ""
-        var myConn: Connection? = null
-        var statement: Statement? = null
-        var resultSet: ResultSet? = null
-        try {
-            Class.forName("com.mysql.jdbc.Driver")
-            myConn = DriverManager.getConnection(url, user, password)
-            statement = myConn.createStatement()
-            val sql = "SELECT statString FROM RANDOM_STAT ORDER BY RAND() LIMIT 1"
-            resultSet = statement.executeQuery(sql)
-            while (resultSet.next()) {
-                randomStat = resultSet.getString("statString")
-            }
-        } catch (e: SQLException) {
-            Log.d(Const.TAG, e.message!!)
-            e.printStackTrace()
-        } catch (e: ClassNotFoundException) {
-            e.printStackTrace()
-        } finally {
-            closeResources(myConn, resultSet, statement)
-        }
-        return randomStat
-    }
-
-
-
     private fun getPlayerSearchResults(searchResultName: String): MutableList<String> {
         val playerResultsList = mutableListOf<String>()
         var myConn: Connection? = null
         var statement: Statement? = null
         var resultSet: ResultSet? = null
-        //We remove accents since searching DB requires none
         val searchResultsNameNoAccents = removeAccents(searchResultName)
         try {
             Log.d("DatabaseHandler", "Fetching new search results")
@@ -306,12 +238,11 @@ class DatabaseHandler {
         return playerResultsList
     }
 
-    //This function uses DB to store all data in a player object and returns
     private fun getPlayerData(playerName: String, year: String): Player {
         var myConn: Connection? = null
         var statement: Statement? = null
         var resultSet: ResultSet? = null
-        var player = Player() //Instantiate with secondary constructor
+        var player = Player()
         //Remove accents since can't have any when searching DB
         val playerNameNoAccents = removeAccents(playerName)
         try {
@@ -444,7 +375,7 @@ class DatabaseHandler {
                     statData.append("Player Name: ").append(playerName).append(", ")
                         .append(chosenStat).append(": ").append(chosenStatValue).append("\n")
                     counter++
-                    if (counter >= Const.MAX_PLAYERS) break // break out after grabbing top x players
+                    if (counter >= Const.NUM_PLAYERS_TO_GRAB) break // break out after grabbing top x players
                 }
             }
         } catch (e: SQLException) {
