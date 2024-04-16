@@ -62,7 +62,8 @@ import com.example.jetpacktest.ui.components.CircularLoadingIcon
 fun ProfileScreen(
     playerName: String,
     navigateBack: () -> Unit,
-    getPreviousScreenName: () -> (String?)
+    getPreviousScreenName: () -> (String?),
+    showSnackBar: (String) -> Unit
 ) {
     val headshotHandler = HeadshotHandler()
     val databaseHandler = DatabaseHandler()
@@ -144,7 +145,8 @@ fun ProfileScreen(
                     injuryStartDate = injuryStartDate,
                     headshotHandler = headshotHandler,
                     favoritesHandler = favoritesHandler,
-                    context = context
+                    context = context,
+                    showSnackBar = showSnackBar
                 )
             }
 
@@ -223,7 +225,8 @@ fun NameAndHeadshot(
     injuryStartDate: String,
     headshotHandler: HeadshotHandler,
     favoritesHandler: FavoritesHandler,
-    context: Context
+    context: Context,
+    showSnackBar: (String) -> Unit
 ) {
     var isFavorite by remember {
         mutableStateOf(favoritesHandler.getFavoritePlayers().contains(playerName))
@@ -276,14 +279,7 @@ fun NameAndHeadshot(
                                         val favoriteAdded =
                                             favoritesHandler.addFavoritePlayer(playerName)
                                         if (!favoriteAdded) {
-                                            //TODO: Toast won't appear
-                                            Toast
-                                                .makeText(
-                                                    context,
-                                                    "Favorite Limit Reached, Sorry!",
-                                                    Toast.LENGTH_SHORT
-                                                )
-                                                .show()
+                                            showSnackBar("Sorry, too many favorites!")
                                             isFavorite = !isFavorite
                                         }
                                     } else {

@@ -12,10 +12,14 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -32,6 +36,7 @@ import com.example.jetpacktest.screens.SearchScreen
 import com.example.jetpacktest.screens.GamesScreen
 import com.example.jetpacktest.screens.StandingsScreen
 import com.example.jetpacktest.screens.TeamProfileScreen
+import kotlinx.coroutines.launch
 
 @Composable
 fun AppNavigation(randomStat: String) {
@@ -41,7 +46,10 @@ fun AppNavigation(randomStat: String) {
     val getPreviousScreenName: () -> (String?) = {
         navController.previousBackStackEntry?.destination?.route
     }
+    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope() // Required for snackbar
     Scaffold(
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState)},
         bottomBar = {
             NavigationBar {
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -185,7 +193,14 @@ fun AppNavigation(randomStat: String) {
                 ProfileScreen(
                     playerName = playerName,
                     navigateBack = { navController.navigateUp() },
-                    getPreviousScreenName = getPreviousScreenName
+                    getPreviousScreenName = getPreviousScreenName,
+                    showSnackBar = { message ->
+                        coroutineScope.launch {
+                            snackbarHostState.showSnackbar(
+                                message = message
+                            )
+                        }
+                    }
                 )
             }
             composable(route = "${Screens.TeamProfileScreen.route}/{teamName}",
