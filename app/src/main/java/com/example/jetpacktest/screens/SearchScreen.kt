@@ -33,7 +33,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.jetpacktest.FavoritesHandler
-import com.example.jetpacktest.models.TeamMaps
 import com.example.jetpacktest.ui.components.CircularLoadingIcon
 
 @Composable
@@ -144,12 +143,9 @@ fun RadioButtonsDisplay(selectedSearchType: String, onSearchTypeSelected: (Strin
                 onClearSearchResults()
             }
         }
-        //First our player button
+        //Player/Team Buttons
         RadioButton(
-            //If var equals Player, then we know it's selected and so it gets a check on it
             selected = selectedSearchType == "Player",
-            //Set var to Player on click
-            //We use the lambda that sets the searchTypeSelected from the caller function, to Team
             onClick = { handleClick("Player")},
             colors = RadioButtonDefaults.colors(Color.Blue)
         )
@@ -157,11 +153,8 @@ fun RadioButtonsDisplay(selectedSearchType: String, onSearchTypeSelected: (Strin
             text = "Player",
             modifier = Modifier.clickable { handleClick("Player") }
         )
-        //Then, team button
         RadioButton(
-            //If var equals Team, then we know it's selected and so it gets a check on it
             selected = selectedSearchType == "Team",
-            //We use the lambda that sets the searchTypeSelected from the caller function, to Team
             onClick = {handleClick("Team")
             },
             colors = RadioButtonDefaults.colors(Color.Blue)
@@ -197,19 +190,6 @@ fun SearchResultsDisplay(
             }
         }
     }
-}
-
-//This function handles searching for teams
-fun handleTeamSearch(searchedTeamName: String, onSearchResult: (List<String>) -> Unit) {
-    val teamNames = mutableListOf<String>() // Instantiate an empty list for matching team names
-    //Loop through each team name that we have in NbaTeam model object
-    for (nbaTeamName in TeamMaps.names) {
-        //If name contains search text as a substring (ignoring case), then add it to list
-        if (nbaTeamName.contains(other = searchedTeamName, ignoreCase = true)) {
-            teamNames.add(nbaTeamName)
-        }
-    }
-    onSearchResult(teamNames) // Call back to SearchScreen() w/ lambda the list so it can display
 }
 
 @Preview
