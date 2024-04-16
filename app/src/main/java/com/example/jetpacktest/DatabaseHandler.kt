@@ -146,7 +146,7 @@ class DatabaseHandler {
             Class.forName("com.mysql.jdbc.Driver")
             myConn = DriverManager.getConnection(url, user, password)
             statement = myConn.createStatement()
-            val sql = "SELECT `InjuryStartDate` FROM INJURED_PLAYER WHERE `Name` = '$playerName'"
+            val sql = "SELECT `InjuryStartDate` FROM INJURED_PLAYER WHERE `Name` = \"$playerName\""
             resultSet = statement.executeQuery(sql)
             while (resultSet.next()) {
                 injuredStartDate = resultSet.getString("InjuryStartDate")
@@ -158,7 +158,6 @@ class DatabaseHandler {
         } catch (e: ClassNotFoundException) {
             e.printStackTrace()
         } finally {
-            //Close resources
             closeResources(myConn, resultSet, statement)
         }
         return if (injuredStartDate == "") "N/A"
@@ -193,7 +192,6 @@ class DatabaseHandler {
         } catch (e: ClassNotFoundException) {
             e.printStackTrace()
         } finally {
-            //Close resources
             closeResources(myConn, null, statement)
         }
     }
@@ -207,7 +205,8 @@ class DatabaseHandler {
             Class.forName("com.mysql.jdbc.Driver")
             myConn = DriverManager.getConnection(url, user, password)
             statement = myConn.createStatement()
-            val sql = "SELECT `NbaId` FROM NBA_PLAYER_ID WHERE `Name` = '$playerName'"
+            //Must wrap playerName in double quotes, not single in case apostrophe in name
+            val sql = "SELECT `NbaId` FROM NBA_PLAYER_ID WHERE `Name` = \"$playerName\""
             resultSet = statement.executeQuery(sql)
             while (resultSet.next()) {
                 id = resultSet.getInt("NbaId")
@@ -218,7 +217,6 @@ class DatabaseHandler {
         } catch (e: ClassNotFoundException) {
             e.printStackTrace()
         } finally {
-            //Close resources
             closeResources(myConn, resultSet, statement)
         }
         return id
@@ -244,7 +242,6 @@ class DatabaseHandler {
         } catch (e: ClassNotFoundException) {
             e.printStackTrace()
         } finally {
-            //Close resources
             closeResources(myConn, resultSet, statement)
         }
         return randomStat
@@ -270,7 +267,6 @@ class DatabaseHandler {
         } catch (e: ClassNotFoundException) {
             e.printStackTrace()
         } finally {
-            //Close resources
             closeResources(myConn, resultSet, statement)
         }
         return randomStat
@@ -305,7 +301,6 @@ class DatabaseHandler {
         } catch (e: ClassNotFoundException) {
             e.printStackTrace()
         } finally {
-            //Close resources
             closeResources(myConn, resultSet, statement)
         }
         return playerResultsList
@@ -374,14 +369,12 @@ class DatabaseHandler {
                     }
                 }
                 //Now, we've set all fields except team name, so do that now
-                //We needed to change team to var for this
                 player.team = appendedTeam.dropLast(1) // Drop trailing slash
             }
             //Otherwise, we only have one record and can just grab all our data
             else {
-                //First, need to point resultSet one ahead so it actually points at first row (not b4)
+                //Point resultSet one ahead to point at actual data
                 resultSet.next()
-                //Give player instance all the fitting params in constructor
                 player = Player(
                     name = resultSet.getString("Player"),
                     year = resultSet.getInt("Year"),
@@ -415,7 +408,6 @@ class DatabaseHandler {
         } catch (e: ClassNotFoundException) {
             e.printStackTrace()
         } finally {
-            //Close resources
             closeResources(myConn, resultSet, statement)
         }
         return player
@@ -461,7 +453,6 @@ class DatabaseHandler {
         } catch (e: ClassNotFoundException) {
             e.printStackTrace()
         } finally {
-            //Close resources
             closeResources(myConn, resultSet, statement)
         }
         return statLeadersList
@@ -494,7 +485,6 @@ class DatabaseHandler {
         } catch (e: ClassNotFoundException) {
             e.printStackTrace()
         } finally {
-            //Close resources
             closeResources(myConn, resultSet, statement)
         }
         return yearsList
