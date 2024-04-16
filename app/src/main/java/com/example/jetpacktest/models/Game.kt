@@ -1,7 +1,5 @@
 package com.example.jetpacktest.models
 
-import com.example.jetpacktest.R
-
 data class GameResponse(
     val data: List<Game>
 )
@@ -26,16 +24,4 @@ data class Team(
     val abbreviation: String,
     var logo: Int
     //val logo: Int = NbaTeam.xmlLogos[name] ?: R.drawable.fallback
-)
-
-//Was using in volley
-data class GameOld(
-    val homeName: String,
-    val awayName: String,
-    val homeScore: String,
-    val awayScore: String,
-    val gameStatus: String,
-    val gameTime: String,
-    val homeLogo: Int,
-    val awayLogo: Int
 )
