@@ -15,8 +15,10 @@ fun StandingsScreen() {
         .fillMaxSize(),
         contentAlignment = Alignment.Center)
     {
-        Text(text = "Standings Screen",
+        Text(
+            text = "Standings Screen",
             fontFamily = FontFamily.Serif,
-            fontSize = 22.sp)
+            fontSize = 22.sp
+        )
     }
 }
