@@ -19,7 +19,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -43,7 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.jetpacktest.GamesHandler
 import com.example.jetpacktest.models.Game
-import com.example.jetpacktest.models.NbaTeam
+import com.example.jetpacktest.models.TeamMaps
 import com.example.jetpacktest.ui.components.CircularLoadingIcon
 import com.foreverrafs.datepicker.DatePickerTimeline
 import java.time.ZoneId
@@ -53,14 +52,13 @@ import java.util.Date
 @Composable
 fun GamesScreen(navigateToTeamProfile: (String) -> Unit) {
     val gamesHandler = GamesHandler()
-    //TODO: Make gamesList and list in TeamProfileScreen parcelable to work w/ savable
     var selectedDate by rememberSaveable { mutableStateOf(Date()) }
-    var gamesList by rememberSaveable { mutableStateOf<List<Game>>(emptyList()) }
-    var isFetching by remember { mutableStateOf(false)}
+    var gamesList by rememberSaveable { mutableStateOf<List<Game>?>(emptyList()) }
+    var isFetching by rememberSaveable { mutableStateOf(false)}
     var lastFetchedDate by remember { mutableStateOf(selectedDate) }
 
     LaunchedEffect(selectedDate) {
-        if (gamesList.isEmpty() || selectedDate != lastFetchedDate) {
+        if ( (gamesList != null && gamesList?.isEmpty()!!) || selectedDate != lastFetchedDate) {
             Log.d("GamesHandler", "Fetching new games...")
             isFetching = true
             gamesList = emptyList()
@@ -95,9 +93,21 @@ fun GamesScreen(navigateToTeamProfile: (String) -> Unit) {
             }
         )
         if (!isFetching) {
-            LazyColumn(modifier = Modifier.weight(1f)) {
-                items(gamesList) { game ->
-                    GameCard(game = game, navigateToTeamProfile)
+            if (gamesList != null) {
+                LazyColumn(modifier = Modifier.weight(1f)) {
+                    items(gamesList!!) { game ->
+                        GameCard(game = game, navigateToTeamProfile)
+                    }
+                }
+            }
+            else {
+                Box(modifier = Modifier.fillMaxSize()) {
+                    Text(
+                        text = "Sorry! No games today",
+                        textAlign = TextAlign.Center,
+                        fontFamily = FontFamily.Serif,
+                        modifier = Modifier.align(Alignment.Center)
+                    )
                 }
             }
         }
@@ -128,30 +138,30 @@ fun GameCard(game: Game, navigateToTeamProfile: (String) -> Unit) {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Image(
-                    painter = painterResource(id = game.home_team.logo),
+                    painter = painterResource(id = game.homeTeam.logo),
                     contentDescription = "Home Team Logo",
                     modifier = Modifier
                         .size(50.dp)
                         //On click, nav to team profile, substituting e.g. Hawks with Atlanta Hawks
                         .clickable {
                             navigateToTeamProfile(
-                                NbaTeam.shortenedNamesToFullNames[game.home_team.name]
-                                    ?: game.home_team.name
+                                TeamMaps.shortenedNamesToFullNames[game.homeTeam.name]
+                                    ?: game.homeTeam.name
                             )
                         }
                 )
                 if (isGameUpcoming(game)) DisplayUpcomingInfo(game)
                 else DisplayOngoingOrPreviousInfo(game)
                 Image(
-                    painter = painterResource(id = game.visitor_team.logo),
+                    painter = painterResource(id = game.visitorTeam.logo),
                     contentDescription = "Away Team Logo",
                     modifier = Modifier
                         .size(50.dp)
                         //On click, nav to team profile, substituting e.g. Hawks with Atlanta Hawks
                         .clickable {
                             navigateToTeamProfile(
-                                NbaTeam.shortenedNamesToFullNames[game.visitor_team.name]
-                                    ?: game.visitor_team.name
+                                TeamMaps.shortenedNamesToFullNames[game.visitorTeam.name]
+                                    ?: game.visitorTeam.name
                             )
                         }
                 )
@@ -165,7 +175,7 @@ fun GameCard(game: Game, navigateToTeamProfile: (String) -> Unit) {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = game.home_team.name,
+                    text = game.homeTeam.name,
                     fontFamily = FontFamily.Serif,
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp
@@ -173,7 +183,7 @@ fun GameCard(game: Game, navigateToTeamProfile: (String) -> Unit) {
                 // Spacer to create gap between home and away team names
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = game.visitor_team.name,
+                    text = game.visitorTeam.name,
                     fontFamily = FontFamily.Serif,
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp
@@ -198,7 +208,7 @@ fun DisplayUpcomingInfo(game: Game) {
 @Composable
 fun DisplayOngoingOrPreviousInfo(game: Game) {
     Text(
-        text = game.home_team_score.toString(),
+        text = game.homeTeamScore.toString(),
         fontFamily = FontFamily.Serif,
         fontSize = 24.sp,
         fontWeight = FontWeight.Bold,
@@ -206,7 +216,7 @@ fun DisplayOngoingOrPreviousInfo(game: Game) {
     )
     Box {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            if (game.status == "Final" && game.home_team_score > game.visitor_team_score) {
+            if (game.status == "Final" && game.homeTeamScore > game.visitorTeamScore) {
                 Icon(
                     Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Left team won",
@@ -222,7 +232,7 @@ fun DisplayOngoingOrPreviousInfo(game: Game) {
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(vertical = 4.dp)
             )
-            if (game.status == "Final" && game.visitor_team_score > game.home_team_score) {
+            if (game.status == "Final" && game.visitorTeamScore > game.homeTeamScore) {
                 Icon(
                     Icons.AutoMirrored.Filled.ArrowForward,
                     contentDescription = "Right team won",
@@ -233,7 +243,7 @@ fun DisplayOngoingOrPreviousInfo(game: Game) {
         }
     }
     Text(
-        text = game.visitor_team_score.toString(),
+        text = game.visitorTeamScore.toString(),
         fontFamily = FontFamily.Serif,
         fontSize = 24.sp,
         fontWeight = FontWeight.Bold,

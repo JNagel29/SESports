@@ -1,6 +1,5 @@
 package com.example.jetpacktest
 
-import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.height
@@ -12,43 +11,34 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
-import com.android.volley.Request
-import com.android.volley.toolbox.JsonArrayRequest
-import com.android.volley.toolbox.JsonObjectRequest
-import com.android.volley.toolbox.Volley
-import org.json.JSONException
+import com.google.gson.annotations.SerializedName
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import java.text.Normalizer
 
 //Small Data classes to hold retrofit data
 data class ActivePlayer(
-    val PlayerID: Int,
-    val FirstName: String,
-    val LastName: String,
+    @SerializedName("PlayerID")
+    val playerId: Int,
+    @SerializedName("FirstName")
+    val firstName: String,
+    @SerializedName("LastName")
+    val lastName: String,
 )
 data class PlayerInfo(
-    val NbaDotComPlayerID: Int
+    @SerializedName("NbaDotComPlayerID")
+    val nbaDotComPlayerId: Int
 )
 
 class HeadshotHandler {
     private val databaseHandler = DatabaseHandler()
-    private val useBiggerImage: Boolean = true
-    private var imageUrlPrefix: String? = null
-    private val apiKey = Keys.SportsDataAPIKey
-    private val activePlayersUrl =
-        "https://api.sportsdata.io/v3/nba/scores/json/PlayersActiveBasic?key=$apiKey"
-    private var matchingPlayerId = -1 // -1 means no match found and to not bother calling next req
+    //private val apiKey = Keys.SPORTS_DATA_IO_KEY
     private var nbaDotComPlayerId = -1
-    object Const { // We use object since only way to make var constant
-        //Const tag for logging
+    object Const {
         const val TAG = "Headshot Handler"
     }
-    //Used in fetchPlayerId/fetchImageUrl to get active players and their ID
-    private var imgUrl = "DEFAULT"
 
     fun fetchImageId(playerName: String, onResult: (Int) -> Unit) {
         //First, attempt fetching from the database
@@ -57,17 +47,49 @@ class HeadshotHandler {
             nbaDotComPlayerId = result
             if (nbaDotComPlayerId != -1) onResult(nbaDotComPlayerId)
             else {
+                Log.d(Const.TAG, "Database Miss, Player is likely a 2023 rookie...")
+                /*
                 Log.d(Const.TAG, "Database Miss, Fetching Headshot via API...")
                 fetchThroughApi(playerName) { apiResult ->
                     nbaDotComPlayerId = apiResult
                     onResult(nbaDotComPlayerId)
                 }
+                 */
             }
         }
     }
 
+    @Composable
+    fun ComposeImage(imgToCompose: String, contentDesc: String,
+                     width: Dp, height: Dp) {
+        //Now, we display image depending on if we actually got a URL or not
+        if (imgToCompose != "DEFAULT") {
+            Image(
+                painter = rememberAsyncImagePainter(
+                    ImageRequest.Builder(LocalContext.current).data(data = imgToCompose)
+                        .apply(block = fun ImageRequest.Builder.() {
+                            crossfade(true)
+                        }).build()
+                ),
+                contentDescription = contentDesc,
+                modifier = Modifier
+                    .width(width)
+                    .height(height)
+            )
+        }
+        else {
+            Image(
+                painter = painterResource(id = R.drawable.fallback),
+                contentDescription = contentDesc,
+                modifier = Modifier
+                    .width(width)
+                    .height(height)
+            )
+        }
+    }
+
     private fun fetchThroughApi(playerName: String, onResult: (Int) -> Unit) {
-        //TODO: This is rather slow when database misses, need to fix it in sprint 3
+        //TODO: Useless now, since database covers everything up to this year, and this fails on this year, so commented out
         val baseUrl = "https://api.sportsdata.io/v3/nba/scores/json/"
         //Before anything else, we must remove accents in the passed name and split it
         val noAccentPlayerName = removeAccents(playerName)
@@ -81,7 +103,7 @@ class HeadshotHandler {
             .baseUrl(baseUrl)
             .build()
             .create(ApiInterface::class.java)
-        val retrofitGames = retrofitBuilder.getActivePlayers(Keys.SportsDataAPIKey)
+        val retrofitGames = retrofitBuilder.getActivePlayers(Keys.SPORTS_DATA_IO_KEY)
 
         retrofitGames.enqueue(object : Callback<List<ActivePlayer>?> {
             override fun onResponse(call: Call<List<ActivePlayer>?>,
@@ -90,9 +112,9 @@ class HeadshotHandler {
                     val responseBody = response.body()!!
                     for (activePlayer in responseBody) {
                         //Check for matching name
-                        if (firstName.equals(activePlayer.FirstName, ignoreCase = true) &&
-                        lastName.equals(activePlayer.LastName, ignoreCase = true)) {
-                            Log.d("HeadshotHandler", "Match Found: ${activePlayer.PlayerID}")
+                        if (firstName.equals(activePlayer.firstName, ignoreCase = true) &&
+                        lastName.equals(activePlayer.lastName, ignoreCase = true)) {
+                            Log.d("HeadshotHandler", "Match Found: ${activePlayer.playerId}")
                             //Make second retrofit request
                             val retrofitBuilder2 = Retrofit.Builder()
                                 .addConverterFactory(GsonConverterFactory.create())
@@ -100,8 +122,8 @@ class HeadshotHandler {
                                 .build()
                                 .create(ApiInterface::class.java)
                             val retrofitPlayers = retrofitBuilder2.getPlayerById(
-                                playerId = activePlayer.PlayerID,
-                                apiKey = Keys.SportsDataAPIKey
+                                playerId = activePlayer.playerId,
+                                apiKey = Keys.SPORTS_DATA_IO_KEY
                             )
                             retrofitPlayers.enqueue(object : Callback<PlayerInfo?> {
                                 override fun onResponse(
@@ -111,8 +133,8 @@ class HeadshotHandler {
                                     if (response2.isSuccessful) {
                                         //No need to loop this time, since only one JSON object
                                         val playerInfo = response2.body()!!
-                                        Log.d("HeadshotHandler", "${playerInfo.NbaDotComPlayerID}")
-                                        onResult(playerInfo.NbaDotComPlayerID)
+                                        Log.d("HeadshotHandler", "${playerInfo.nbaDotComPlayerId}")
+                                        onResult(playerInfo.nbaDotComPlayerId)
                                         return
                                     }
                                     else {
@@ -134,111 +156,7 @@ class HeadshotHandler {
             }
             override fun onFailure(call: Call<List<ActivePlayer>?>, t: Throwable) {
                 Log.d("HeadshotHandler", "Retrofit failure: $t")
-
             }
         })
     }
-
-    fun fetchImageUrl(playerName: String, context: Context, onResult: (String) -> Unit){
-        imageUrlPrefix = if (useBiggerImage) "https://cdn.nba.com/headshots/nba/latest/1040x760/"
-        else "https://ak-static.cms.nba.com/wp-content/uploads/headshots/nba/latest/260x190/"
-        val request = JsonArrayRequest(
-            Request.Method.GET, activePlayersUrl, null,
-            { response ->
-                try {
-                    //First, remove accents using helper function, since API doesn't use accents
-                    val noAccentPlayerName = removeAccents(playerName)
-                    //Splits up name in first/last since API requires that
-                    val nameParts =
-                        noAccentPlayerName.split(" ".toRegex(), limit = 2)
-                    val firstName = nameParts.getOrNull(0) ?: ""
-                    val lastName = nameParts.getOrNull(1) ?: ""
-                    matchingPlayerId = -1 // Default for if no id found (aka not active player)
-                    //Loop through each JSONObject aka each player
-                    for (i in 0 until response.length()) {
-                        val player = response.getJSONObject(i) // Grab ith player
-                        if (firstName.equals(
-                                player.getString("FirstName"),
-                                ignoreCase = true // Ignore casing of letters
-                            ) &&
-                            lastName.equals(player.getString("LastName"), ignoreCase = true)
-                        ) {
-                            matchingPlayerId = player.getInt("PlayerID")
-                            Log.d(Const.TAG, "Player ID found!")
-                            //New request uses the matching ID, also we pass in the API key again
-                            val playerDetailUrl =
-                                "https://api.sportsdata.io/v3/nba/scores/json/Player/" +
-                                        matchingPlayerId + "?key=" + apiKey
-                            // Call the second Volley request here within the first request's onResponse method
-                            // If we tried doing it sequentially, it wouldn't work since the timing is async
-                            val request2 = JsonObjectRequest(
-                                Request.Method.GET, playerDetailUrl, null,
-                                { response2 ->
-                                    try {
-                                        //Fetch player ID (might be null, if so set to -1)
-                                        nbaDotComPlayerId = response2.optInt("NbaDotComPlayerID", -1)
-                                        //As long as we didn't get null (-1), set imgUrl, otherwise default
-                                        imgUrl = if (nbaDotComPlayerId != -1) "$imageUrlPrefix$nbaDotComPlayerId.png"
-                                                else "DEFAULT" // Without this, null id's would have no fallback
-                                        //Performs lambda callback to send back new imgUrl
-                                        onResult(imgUrl)
-                                    } catch (e: JSONException) {
-                                        e.printStackTrace()
-                                    }
-                                }
-                            ) { error -> error.printStackTrace() }
-                            //Use context we passed in
-                            Volley.newRequestQueue(context.applicationContext).add(request2)
-                            break // Break out of loop since match found
-                        }
-                    }
-                    // If id still equals -1, then no match so we set to DEFAULT and callback
-                    if (matchingPlayerId == -1) {
-                        onResult("DEFAULT")
-                    }
-                } catch (e: JSONException) {
-                    e.printStackTrace() // Prints error in logcat
-                }
-            }) { error -> error.printStackTrace() } // Prints error in logcat
-        //Use context we passed in
-        Volley.newRequestQueue(context.applicationContext).add(request)
-    }
-
-    @Composable
-    fun ComposeImage(imgToCompose: String, contentDesc: String,
-                     width: Dp, height: Dp) {
-        //Now, we display image depending on if we actually got a URL or not
-        if (imgToCompose != "DEFAULT") {
-            Image(
-                painter = rememberAsyncImagePainter(
-                    ImageRequest.Builder(LocalContext.current).data(data = imgToCompose)
-                        .apply(block = fun ImageRequest.Builder.() {
-                            crossfade(true)
-                        }).build()
-                ),
-                //Change desc/width/height based off params
-                contentDescription = contentDesc,
-                modifier = Modifier
-                    .width(width)
-                    .height(height)
-            )
-        }
-        else {
-            Image(
-                painter = painterResource(id = R.drawable.fallback),
-                contentDescription = contentDesc,
-                modifier = Modifier
-                    .width(width)
-                    .height(height)
-            )
-        }
-    }
-
-    //Niko: Helper function to remove accents from playerName, since API we use for headshots doesn't use accent
-    //Got it from https://stackoverflow.com/a/3322174
-    private fun removeAccents(input: String): String {
-        return Normalizer.normalize(input, Normalizer.Form.NFD)
-            .replace("\\p{InCombiningDiacriticalMarks}+".toRegex(), "")
-    }
-
 }

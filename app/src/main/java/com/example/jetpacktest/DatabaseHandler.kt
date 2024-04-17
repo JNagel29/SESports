@@ -1,6 +1,7 @@
 package com.example.jetpacktest
 
 import android.util.Log
+import com.example.jetpacktest.models.InjuredPlayer
 import com.example.jetpacktest.models.Player
 import com.example.jetpacktest.models.StatLeader
 import kotlinx.coroutines.CoroutineScope
@@ -13,33 +14,19 @@ import java.sql.ResultSet
 import java.sql.SQLException
 import java.sql.Statement
 import java.text.Normalizer
-import java.util.concurrent.Executor
-import java.util.concurrent.Executors
 
 class DatabaseHandler {
-    object Const { // We use object since only way to make them constant
-        //Tag for logging
+    object Const {
         const val TAG = "DatabaseHandler"
-        //Constant to hold how many players to grab (top 10, top 20, etc.)
-        const val MAX_PLAYERS = 10
+        const val NUM_PLAYERS_TO_GRAB = 10
     }
-    //Executor for the database requesting (used to run in background as its own thread)
-    private val executor: Executor = Executors.newSingleThreadExecutor()
-    //Alternative to Executor
     private val scope = CoroutineScope(Dispatchers.IO)
-    //Variables and info to connect to DB
     private val url = "jdbc:mysql://nikoarak.cikeys.com:3306/nikoarak_SESports"
-    private val user = Keys.DBUser
-    private val password = Keys.DBPass
+    private val user = Keys.DB_USER
+    private val password = Keys.DB_PASS
 
     fun executeStatLeaders(chosenStat: String, year: String,
                            onDataReceived: (MutableList<StatLeader>) -> Unit) {
-        /*
-        executor.execute {
-            val statLeadersList = getStatLeaders(chosenStat, year)
-            onDataReceived(statLeadersList)
-        }
-         */
         scope.launch {
             val statLeadersList = getStatLeaders(chosenStat, year)
             withContext(Dispatchers.IO) {
@@ -48,12 +35,6 @@ class DatabaseHandler {
         }
     }
     fun executeYears(playerName: String, onDataReceived: (MutableList<String>) -> Unit) {
-        /*
-        executor.execute {
-            val yearsList = getPlayerYears(playerName)
-            onDataReceived(yearsList)
-        }
-         */
         scope.launch {
             val yearsList = getPlayerYears(playerName)
             withContext(Dispatchers.IO) {
@@ -64,12 +45,6 @@ class DatabaseHandler {
     }
     fun executePlayerData(playerName: String, year: String,
                           onDataReceived: (Player) -> Unit) {
-        /*
-        executor.execute {
-            val player = getPlayerData(playerName, year)
-            onDataReceived(player)
-        }
-         */
         scope.launch {
             val player = getPlayerData(playerName, year)
             withContext(Dispatchers.IO) {
@@ -80,13 +55,6 @@ class DatabaseHandler {
 
     fun executePlayerSearchResults(searchResultName: String,
                                    onDataReceived: (MutableList<String>) -> Unit) {
-        /*
-        executor.execute {
-            val playerResultsList = getPlayerSearchResults(searchResultName)
-            // After getting list of results, callback to calling function to send back the data
-            onDataReceived(playerResultsList)
-        }
-         */
         scope.launch {
             val playerResultsList = getPlayerSearchResults(searchResultName)
             withContext(Dispatchers.IO) {
@@ -97,12 +65,6 @@ class DatabaseHandler {
 
     fun executeRandomStat(randIndex: Int,
                           onDataReceived: (String) -> Unit) {
-        /*
-        executor.execute {
-            val randomStat = getRandomStat(randIndex)
-            onDataReceived(randomStat)
-        }
-         */
         scope.launch {
             val randomStat = getRandomStat(randIndex)
             withContext(Dispatchers.IO) {
@@ -121,6 +83,80 @@ class DatabaseHandler {
         }
     }
 
+    fun executeStoreInjured(injuredPlayers: List<InjuredPlayer>) {
+        scope.launch {
+            storeInjuredPlayers(injuredPlayers)
+        }
+    }
+
+    fun executeCheckInjuredStartDate(playerName: String, onDataReceived: (String) -> Unit) {
+        scope.launch {
+            val injuryStartDate: String = checkInjuredStartDate(playerName = playerName)
+            withContext(Dispatchers.IO) {
+                onDataReceived(injuryStartDate)
+            }
+        }
+    }
+
+    private fun checkInjuredStartDate(playerName: String): String {
+        var injuredStartDate = ""
+        var myConn: Connection? = null
+        var statement: Statement? = null
+        var resultSet: ResultSet? = null
+        try {
+            Class.forName("com.mysql.jdbc.Driver")
+            myConn = DriverManager.getConnection(url, user, password)
+            statement = myConn.createStatement()
+            val sql = "SELECT `InjuryStartDate` FROM INJURED_PLAYER WHERE `Name` = \"$playerName\""
+            resultSet = statement.executeQuery(sql)
+            while (resultSet.next()) {
+                injuredStartDate = resultSet.getString("InjuryStartDate")
+                Log.d("DatabaseHandler", "Player was injured on $injuredStartDate")
+            }
+        } catch (e: SQLException) {
+            Log.d(Const.TAG, e.message!!)
+            e.printStackTrace()
+        } catch (e: ClassNotFoundException) {
+            e.printStackTrace()
+        } finally {
+            closeResources(myConn, resultSet, statement)
+        }
+        return if (injuredStartDate == "") "N/A"
+        else injuredStartDate
+    }
+
+    private fun storeInjuredPlayers(injuredPlayers: List<InjuredPlayer>) {
+        var myConn: Connection? = null
+        var statement: Statement? = null
+        try {
+            Log.d("DatabaseHandler", "Storing new list of injured players...")
+            Class.forName("com.mysql.jdbc.Driver")
+            myConn = DriverManager.getConnection(url, user, password)
+            statement = myConn.createStatement()
+            //Prevents previous injuries from displaying
+            statement.executeUpdate("DELETE FROM INJURED_PLAYER")
+            //PreparedStatement for re-usability
+            val preparedStatement = myConn.prepareStatement(
+                "INSERT INTO INJURED_PLAYER (`Name`, `InjuryStartDate`) VALUES (?, ?)"
+            )
+            injuredPlayers.forEach {injuredPlayer ->
+                val fullName = "${injuredPlayer.firstName} ${injuredPlayer.lastName}"
+                val injuryStartDate = injuredPlayer.injuryStartDate
+                preparedStatement.setString(1, fullName)
+                preparedStatement.setString(2, injuryStartDate)
+                preparedStatement.executeUpdate()
+            }
+            Log.d("DatabaseHandler", "Finished storing list...")
+        } catch (e: SQLException) {
+            Log.d(Const.TAG, e.message!!)
+            e.printStackTrace()
+        } catch (e: ClassNotFoundException) {
+            e.printStackTrace()
+        } finally {
+            closeResources(myConn, null, statement)
+        }
+    }
+
     private fun getNbaDotComId(playerName: String): Int {
         var id: Int = -1
         var myConn: Connection? = null
@@ -130,7 +166,7 @@ class DatabaseHandler {
             Class.forName("com.mysql.jdbc.Driver")
             myConn = DriverManager.getConnection(url, user, password)
             statement = myConn.createStatement()
-            val sql = "SELECT `NbaId` FROM NBA_PLAYER_ID WHERE `Name` = '$playerName'"
+            val sql = "SELECT `NbaId` FROM NBA_PLAYER_ID WHERE `Name` = \"$playerName\""
             resultSet = statement.executeQuery(sql)
             while (resultSet.next()) {
                 id = resultSet.getInt("NbaId")
@@ -141,14 +177,12 @@ class DatabaseHandler {
         } catch (e: ClassNotFoundException) {
             e.printStackTrace()
         } finally {
-            //Close resources
             closeResources(myConn, resultSet, statement)
         }
         return id
     }
 
     private fun getRandomStat(randIndex: Int): String {
-        Log.d("DatabaseHandler", "Fetching new random stat")
         var randomStat = ""
         var myConn: Connection? = null
         var statement: Statement? = null
@@ -168,46 +202,16 @@ class DatabaseHandler {
         } catch (e: ClassNotFoundException) {
             e.printStackTrace()
         } finally {
-            //Close resources
             closeResources(myConn, resultSet, statement)
         }
         return randomStat
     }
-
-    private fun oldGetRandomStat(): String {
-        var randomStat = ""
-        var myConn: Connection? = null
-        var statement: Statement? = null
-        var resultSet: ResultSet? = null
-        try {
-            Class.forName("com.mysql.jdbc.Driver")
-            myConn = DriverManager.getConnection(url, user, password)
-            statement = myConn.createStatement()
-            val sql = "SELECT statString FROM RANDOM_STAT ORDER BY RAND() LIMIT 1"
-            resultSet = statement.executeQuery(sql)
-            while (resultSet.next()) {
-                randomStat = resultSet.getString("statString")
-            }
-        } catch (e: SQLException) {
-            Log.d(Const.TAG, e.message!!)
-            e.printStackTrace()
-        } catch (e: ClassNotFoundException) {
-            e.printStackTrace()
-        } finally {
-            //Close resources
-            closeResources(myConn, resultSet, statement)
-        }
-        return randomStat
-    }
-
-
 
     private fun getPlayerSearchResults(searchResultName: String): MutableList<String> {
         val playerResultsList = mutableListOf<String>()
         var myConn: Connection? = null
         var statement: Statement? = null
         var resultSet: ResultSet? = null
-        //We remove accents since searching DB requires none
         val searchResultsNameNoAccents = removeAccents(searchResultName)
         try {
             Log.d("DatabaseHandler", "Fetching new search results")
@@ -229,18 +233,16 @@ class DatabaseHandler {
         } catch (e: ClassNotFoundException) {
             e.printStackTrace()
         } finally {
-            //Close resources
             closeResources(myConn, resultSet, statement)
         }
         return playerResultsList
     }
 
-    //This function uses DB to store all data in a player object and returns
     private fun getPlayerData(playerName: String, year: String): Player {
         var myConn: Connection? = null
         var statement: Statement? = null
         var resultSet: ResultSet? = null
-        var player = Player() //Instantiate with secondary constructor
+        var player = Player()
         //Remove accents since can't have any when searching DB
         val playerNameNoAccents = removeAccents(playerName)
         try {
@@ -298,14 +300,12 @@ class DatabaseHandler {
                     }
                 }
                 //Now, we've set all fields except team name, so do that now
-                //We needed to change team to var for this
                 player.team = appendedTeam.dropLast(1) // Drop trailing slash
             }
             //Otherwise, we only have one record and can just grab all our data
             else {
-                //First, need to point resultSet one ahead so it actually points at first row (not b4)
+                //Point resultSet one ahead to point at actual data
                 resultSet.next()
-                //Give player instance all the fitting params in constructor
                 player = Player(
                     name = resultSet.getString("Player"),
                     year = resultSet.getInt("Year"),
@@ -339,7 +339,6 @@ class DatabaseHandler {
         } catch (e: ClassNotFoundException) {
             e.printStackTrace()
         } finally {
-            //Close resources
             closeResources(myConn, resultSet, statement)
         }
         return player
@@ -376,7 +375,7 @@ class DatabaseHandler {
                     statData.append("Player Name: ").append(playerName).append(", ")
                         .append(chosenStat).append(": ").append(chosenStatValue).append("\n")
                     counter++
-                    if (counter >= Const.MAX_PLAYERS) break // break out after grabbing top x players
+                    if (counter >= Const.NUM_PLAYERS_TO_GRAB) break // break out after grabbing top x players
                 }
             }
         } catch (e: SQLException) {
@@ -385,7 +384,6 @@ class DatabaseHandler {
         } catch (e: ClassNotFoundException) {
             e.printStackTrace()
         } finally {
-            //Close resources
             closeResources(myConn, resultSet, statement)
         }
         return statLeadersList
@@ -418,7 +416,6 @@ class DatabaseHandler {
         } catch (e: ClassNotFoundException) {
             e.printStackTrace()
         } finally {
-            //Close resources
             closeResources(myConn, resultSet, statement)
         }
         return yearsList

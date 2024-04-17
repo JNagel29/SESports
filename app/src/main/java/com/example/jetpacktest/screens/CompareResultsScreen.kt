@@ -16,14 +16,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.jetpacktest.DatabaseHandler
-import com.example.jetpacktest.R
-import com.example.jetpacktest.models.NbaTeam
 import com.example.jetpacktest.models.Player
 import com.example.jetpacktest.ui.components.CircularLoadingIcon
 import com.example.jetpacktest.ui.components.LargeDropdownMenu
@@ -77,7 +74,7 @@ fun CompareResultsScreen(playerName1: String, playerName2: String,navigateBack: 
                 .padding(16.dp)
                 .verticalScroll(rememberScrollState())
         ) {
-            ReturnToPreviousHeader(navigateBack = navigateBack)
+            ReturnToPreviousHeader(navigateBack = navigateBack, label = "Compare")
             Spacer(modifier = Modifier.height(15.dp))
             if (isFetching1 || isFetching2) {
                 CircularLoadingIcon()
@@ -166,7 +163,6 @@ fun PlayerStats(player1: Player, player2: Player) {
 
 @Composable
 fun PlayerCard(player: Player, opponent: Player) {
-    val team = player.team
     Box(
         modifier = Modifier
             .width(200.dp)
@@ -219,7 +215,6 @@ fun PlayerCard(player: Player, opponent: Player) {
 fun StatRow(label: String, value: String, playerHasHigherStat: Boolean) {
 
     val statColor = if (playerHasHigherStat) Color(0xFF46923c) else Color(0xFFF5F5DC)
-    val borderColor = Color(0xFFF5F5DC)
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
