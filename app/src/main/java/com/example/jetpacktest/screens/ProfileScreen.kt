@@ -385,21 +385,21 @@ fun PlayerStatisticTable(player: Player) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         //Pass in list of rows with Label and Value
-            PlayerDataRow("Steals", player.steals.toString())
-            PlayerDataRow("Blocks", player.blocks.toString())
-            PlayerDataRow("FG", player.fieldGoals.toString())
-            PlayerDataRow("FGA", player.fieldGoalAttempts.toString())
-            PlayerDataRow("FG%", "%.1f%%".format(player.fieldGoalPercent * 100))
-            PlayerDataRow("3P ", player.threePointers.toString())
-            PlayerDataRow("3PA", player.threePointerAttempts.toString())
-            PlayerDataRow("3P%", "%.1f%%".format(player.threePointPercent * 100))
-            PlayerDataRow("Turnovers", player.turnovers.toString())
-            PlayerDataRow("Fouls", player.personalFouls.toString())
-            PlayerDataRow("Mins. Played", player.minutesPlayed.toString())
-            PlayerDataRow("2P", player.twoPointers.toString())
-            PlayerDataRow("2PA", player.twoPointerAttempts.toString())
-            PlayerDataRow("2P%", "%.1f%%".format(player.twoPointPercent * 100))
-            PlayerDataRow("EFG%", "%.1f%%".format(player.effectiveFieldGoalPercent * 100))
+        PlayerDataRow("Steals", player.steals.toString())
+        PlayerDataRow("Blocks", player.blocks.toString())
+        PlayerDataRow("Field Goals", player.fieldGoals.toString())
+        PlayerDataRow("Field Goal Attempts", player.fieldGoalAttempts.toString())
+        PlayerDataRow("Field Goal %", "%.1f%%".format(player.fieldGoalPercent * 100))
+        PlayerDataRow("3 Pointers ", player.threePointers.toString())
+        PlayerDataRow("3 Point Attempts", player.threePointerAttempts.toString())
+        PlayerDataRow("3 Point %", "%.1f%%".format(player.threePointPercent * 100))
+        PlayerDataRow("Turnovers", player.turnovers.toString())
+        PlayerDataRow("Fouls", player.personalFouls.toString())
+        PlayerDataRow("Mins. Played", player.minutesPlayed.toString())
+        PlayerDataRow("2 Pointers", player.twoPointers.toString())
+        PlayerDataRow("2 Point Attempts", player.twoPointerAttempts.toString())
+        PlayerDataRow("2 Point %", "%.1f%%".format(player.twoPointPercent * 100))
+        PlayerDataRow("Effective Field Goal%", "%.1f%%".format(player.effectiveFieldGoalPercent * 100))
     }
 }
 
