@@ -114,8 +114,9 @@ Surface(modifier = Modifier.fillMaxSize(), color = Color.White) {
                     modifier = Modifier.weight(1f)
                 )
             }
-            StickyHeader(player1Name = player1.name, player2Name = player2.name)
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(5.dp))
+            NameHeader(player1Name = player1.name, player2Name = player2.name)
+            Spacer(modifier = Modifier.height(5.dp))
             DisplayComparison(player1, player2)
         }
     }
@@ -157,29 +158,29 @@ fun PlayerCard(player1: Player, player2: Player) {
 }
 
 @Composable
-fun StickyHeader(player1Name: String, player2Name: String) {
+fun NameHeader(player1Name: String, player2Name: String) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(
-                Color.White
-            )
+            .background(Color.White)
             .padding(8.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
             text = player1Name,
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
             color = Color.Black,
-            fontFamily = FontFamily.Serif
+            fontFamily = FontFamily.Serif,
+            modifier = Modifier.weight(1f)
         )
         Text(
             text = player2Name,
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
             color = Color.Black,
-            fontFamily = FontFamily.Serif
+            fontFamily = FontFamily.Serif,
+            modifier = Modifier.weight(1f),
+            textAlign = TextAlign.End
         )
     }
 }
@@ -205,7 +206,7 @@ fun StatRow(label: String, player1Value: String, player2Value: String) {
             modifier = Modifier
                 .wrapContentSize()
                 .background(
-                    if (player1HasHigherStat) colorResource(R.color.higherStat)
+                    if (player1HasHigherStat == true) colorResource(R.color.higherStat)
                     else MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
                 )
                 .weight(1.5f)
@@ -216,6 +217,7 @@ fun StatRow(label: String, player1Value: String, player2Value: String) {
             fontSize = 20.sp,
             fontFamily = FontFamily.Serif,
             textAlign = TextAlign.Center,
+            fontWeight = FontWeight.Bold,
             modifier = Modifier
                 .weight(2f)
                 .padding(horizontal = 5.dp)
@@ -228,7 +230,7 @@ fun StatRow(label: String, player1Value: String, player2Value: String) {
             modifier = Modifier
                 .wrapContentSize()
                 .background(
-                    if (!player1HasHigherStat) colorResource(R.color.higherStat)
+                    if (player1HasHigherStat == false) colorResource(R.color.higherStat)
                     else MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
                 )
                 .weight(1.5f)
@@ -270,9 +272,13 @@ private fun checkIfPlayer1HasHigherStat(
     statName: String,
     player1Value: String,
     player2Value: String
-): Boolean {
-    return if (statName == "Turnovers" || statName == "Personal Fouls") player1Value < player2Value
-    else player1Value > player2Value
+): Boolean? {
+    val player1Val = player1Value.toFloatOrNull()
+    val player2Val = player2Value.toFloatOrNull()
+
+    if (player1Val == null|| player2Val == null || player1Val == player2Val) return null
+    return if (statName == "Turnovers" || statName == "Personal Fouls") player1Val < player2Val
+    else player1Val > player2Val
 }
 
 

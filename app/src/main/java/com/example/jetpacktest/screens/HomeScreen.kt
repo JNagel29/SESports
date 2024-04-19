@@ -122,7 +122,6 @@ fun RandomStatCard(randomStat: String) {
     ExpandableCard(
         title = "Random Stat of the Day",
         description = randomStat,
-        backgroundColorResource = R.color.purple_lakers
     )
 }
 

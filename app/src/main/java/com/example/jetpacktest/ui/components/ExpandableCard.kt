@@ -16,7 +16,9 @@ import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -38,7 +40,6 @@ import androidx.compose.ui.unit.sp
 fun ExpandableCard(
     title: String,
     description: String,
-    backgroundColorResource: Int
 ) {
     //Savable used to persist state across diff screen swaps
     var isExpanded by rememberSaveable { mutableStateOf(false) }
@@ -57,8 +58,8 @@ fun ExpandableCard(
             defaultElevation = 10.dp //Adds a 'shadow' effect
         ),
         colors = CardDefaults.cardColors(
-            containerColor = colorResource(backgroundColorResource),
-            contentColor = Color.White
+            containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp),
+            contentColor = Color.Black
         )
     ) {
         Column(
@@ -85,7 +86,7 @@ fun ExpandableCard(
                     imageVector = if (isExpanded) Icons.Filled.ArrowDropUp
                                     else Icons.Filled.ArrowDropDown,
                     contentDescription = "Arrow",
-                    tint = Color.White,
+                    tint = Color.Black,
                     modifier = Modifier.weight(1f)
                 )
             }
