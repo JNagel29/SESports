@@ -31,7 +31,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.jetpacktest.R
 import com.example.jetpacktest.models.StatLeader
 import com.example.jetpacktest.ui.components.ExpandableCard
 import com.example.jetpacktest.ui.theme.JetpackTestTheme
