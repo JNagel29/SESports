@@ -26,7 +26,6 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.StarBorder
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
@@ -75,7 +74,6 @@ fun ProfileScreen(
     var yearsList by rememberSaveable { mutableStateOf<List<String>>(emptyList()) }
     var chosenYear by rememberSaveable { mutableStateOf("") }
     var player by rememberSaveable { mutableStateOf(Player()) }
-    var showExpandedData by rememberSaveable { mutableStateOf(false) }
     var isFetchingStats by rememberSaveable { mutableStateOf(true) }
     var isFetchingInfo by rememberSaveable { mutableStateOf(true) }
     var injuryStartDate by rememberSaveable { mutableStateOf("")}
