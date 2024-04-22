@@ -4,6 +4,7 @@ import android.util.Log
 import com.example.jetpacktest.models.InjuredPlayer
 import com.example.jetpacktest.models.Player
 import com.example.jetpacktest.models.StatLeader
+import com.example.jetpacktest.models.TeamStanding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -178,6 +179,17 @@ class DatabaseHandler {
             resultSet = statement.executeQuery(sql)
             while (resultSet.next()) {
                 val standingsData = "${resultSet.getString("Team")} - ${resultSet.getInt("Wins")}-${resultSet.getInt("Losses")}"
+                val teamStanding = TeamStanding(
+                    rank = resultSet.getInt("Rank"),
+                    name = resultSet.getString("Team_Name"),
+                    wins = resultSet.getString("Wins"),
+                    losses = resultSet.getString("Losses"),
+                    winLossPercentage = resultSet.getFloat("Win_Loss_Percentage")
+
+
+
+
+                )
                 standingsList.add(standingsData)
             }
         } catch (e: SQLException) {
