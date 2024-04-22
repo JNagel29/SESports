@@ -36,6 +36,7 @@ import com.example.jetpacktest.screens.SearchScreen
 import com.example.jetpacktest.screens.GamesScreen
 import com.example.jetpacktest.screens.StandingsScreen
 import com.example.jetpacktest.screens.TeamProfileScreen
+import com.example.jetpacktest.viewmodels.StandingsViewModel
 import kotlinx.coroutines.launch
 
 @Composable
@@ -43,6 +44,7 @@ fun AppNavigation(randomStat: String) {
     val navController = rememberNavController()
     val searchViewModel = viewModel<SearchViewModel>()
     val homeViewModel = viewModel<HomeViewModel>()
+    val standingsViewModel = viewModel<StandingsViewModel>()
     val getPreviousScreenName: () -> (String?) = {
         navController.previousBackStackEntry?.destination?.route
     }
@@ -96,7 +98,9 @@ fun AppNavigation(randomStat: String) {
                     homeViewModel = homeViewModel,
                     //Pass in a lambda that'll let us go to a stat leader's profile on click
                     navigateToPlayerProfile = { playerName ->
-                        navController.navigate("${Screens.ProfileScreen.route}/$playerName")
+                        navController.navigate("${Screens.ProfileScreen.route}/$playerName") {
+                            launchSingleTop = true //Prevents double click navigation
+                        }
                     }
                 )
             }
@@ -117,29 +121,41 @@ fun AppNavigation(randomStat: String) {
                     clearResults = { searchViewModel.clearResults() },
                     //Two more lambdas that will let us access team/player profiles on click
                     navigateToPlayerProfile = { playerName ->
-                        navController.navigate("${Screens.ProfileScreen.route}/$playerName")
+                        navController.navigate("${Screens.ProfileScreen.route}/$playerName") {
+                            launchSingleTop = true
+                        }
                     },
                     navigateToTeamProfile = { teamName ->
-                        navController.navigate("${Screens.TeamProfileScreen.route}/$teamName")
+                        navController.navigate("${Screens.TeamProfileScreen.route}/$teamName") {
+                            launchSingleTop = true
+                        }
                     }
                 )
             }
             composable(route = Screens.CompareScreen.name) {
                 CompareScreen(
                     navigateToCompareResults = { playerName1, playerName2 ->
-                        navController.navigate("${Screens.CompareResultsScreen.route}/$playerName1/$playerName2")
+                        navController.navigate("${Screens.CompareResultsScreen.route}/$playerName1/$playerName2") {
+                            launchSingleTop = true
+                        }
                     }
                 )
             }
+            val navigateToTeamProfile: (String) -> Unit = { teamName ->
+                navController.navigate("${Screens.TeamProfileScreen.route}/$teamName") {
+                    launchSingleTop = true
+                }
+            }
             composable(route = Screens.StandingsScreen.name) {
-                    StandingsScreen()
+                StandingsScreen(
+                    westernFlow = standingsViewModel.westernFlow,
+                    easternFlow = standingsViewModel.easternFlow,
+                    navigateToTeamProfile = navigateToTeamProfile
+                )
             }
             composable(route=Screens.GamesScreen.name) {
                 GamesScreen(
-                    //Pass in lambda that lets us go to team profile from logo click
-                    navigateToTeamProfile = { teamName ->
-                        navController.navigate("${Screens.TeamProfileScreen.route}/$teamName")
-                    }
+                    navigateToTeamProfile = navigateToTeamProfile
                 )
             }
             composable(route = "${Screens.CompareResultsScreen.route}/{playerName1}/{playerName2}",
@@ -168,7 +184,7 @@ fun AppNavigation(randomStat: String) {
                     navController.popBackStack()
                 }
             }
-            //Profile screens for player/team (we pass in player/team name as arg in route), not on nav bar
+            //Profile screens for player/team (we pass in player/team name as arg in route)
             composable(route = "${Screens.ProfileScreen.route}/{playerName}",
                 enterTransition = {
                     slideInHorizontally(
@@ -229,7 +245,12 @@ fun AppNavigation(randomStat: String) {
                     navigateBack = { navController.popBackStack()},
                     //When user clicks on a current player of a team, we'll use this to switch over
                     navigateToPlayerProfile = { playerName ->
-                        navController.navigate("${Screens.ProfileScreen.route}/$playerName") },
+                        navController.navigate(
+                            "${Screens.ProfileScreen.route}/$playerName"
+                        ) {
+                            launchSingleTop = true
+                        }
+                    },
                     getPreviousScreenName = getPreviousScreenName
                 )
             }
