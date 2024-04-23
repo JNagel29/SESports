@@ -120,6 +120,7 @@ fun BracketLine() {
 }
 
 
+
 @Composable
 fun BracketMatchup(teamAName: String, teamBName: String, teamALogo: Int, teamBLogo: Int) {
     Column(
