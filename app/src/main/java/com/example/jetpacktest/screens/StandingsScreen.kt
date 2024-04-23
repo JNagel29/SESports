@@ -1,5 +1,4 @@
 package com.example.jetpacktest.screens
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -43,27 +42,27 @@ fun StandingsScreen() {
                 modifier = Modifier.weight(1f)
             ) {
                 Spacer(modifier = Modifier.height(16.dp)) // Top padding
-                BracketMatchup("OKC    1", "NOLA  0", R.drawable.thunder, R.drawable.pelicans)
-                Spacer(modifier = Modifier.height(16.dp)) // Spacing between matchups
-                BracketMatchup("LAL     0", "DEN    2", R.drawable.lakers, R.drawable.nuggets)
-                Spacer(modifier = Modifier.height(16.dp)) // Spacing between matchups
-                BracketMatchup("MIN    1", "PHX   0", R.drawable.xml_timberwolves, R.drawable.suns)
-                Spacer(modifier = Modifier.height(16.dp)) // Spacing between matchups
+                BracketMatchup("OKC    1", "NOLA  0", R.drawable.xml_thunder, R.drawable.xml_pelicans)
+                Spacer(modifier = Modifier.height(16.dp)) // Spacing between match-ups
+                BracketMatchup("LAL     0", "DEN    2", R.drawable.xml_lakers, R.drawable.xml_nuggets)
+                Spacer(modifier = Modifier.height(16.dp)) // Spacing between match-ups
+                BracketMatchup("MIN    1", "PHX   0", R.drawable.xml_timberwolves, R.drawable.xml_suns)
+                Spacer(modifier = Modifier.height(16.dp)) // Spacing between match-ups
                 BracketMatchup(
                     "LAC    1",
                     "DAL    0",
-                    R.drawable.clippers,
+                    R.drawable.xml_clippers,
                     R.drawable.xml_mavericks
                 )
-                Spacer(modifier = Modifier.height(16.dp)) // Spacing between matchups
-                BracketMatchup("BOS     1", "MIA     0", R.drawable.celtics, R.drawable.heat)
-                Spacer(modifier = Modifier.height(16.dp)) // Spacing between matchups
-                BracketMatchup("NYK     2", "PHI      0", R.drawable.knicks, R.drawable.sixers)
-                Spacer(modifier = Modifier.height(16.dp)) // Spacing between matchups
-                BracketMatchup("MIL     1", "IND     0", R.drawable.bucks, R.drawable.pacers)
-                Spacer(modifier = Modifier.height(16.dp)) // Spacing between matchups
-                BracketMatchup("CLE    2", "ORL    0", R.drawable.cavs, R.drawable.magic)
-                Spacer(modifier = Modifier.height(16.dp)) // Spacing between matchups
+                Spacer(modifier = Modifier.height(16.dp)) // Spacing between match-ups
+                BracketMatchup("BOS     1", "MIA     0", R.drawable.xml_celtics, R.drawable.xml_heat)
+                Spacer(modifier = Modifier.height(16.dp)) // Spacing between match-ups
+                BracketMatchup("NYK     2", "PHI      0", R.drawable.xml_knicks, R.drawable.xml_sixers)
+                Spacer(modifier = Modifier.height(16.dp)) // Spacing between match-ups
+                BracketMatchup("MIL     1", "IND     0", R.drawable.xml_bucks, R.drawable.xml_pacers)
+                Spacer(modifier = Modifier.height(16.dp)) // Spacing between match-ups
+                BracketMatchup("CLE    2", "ORL    0", R.drawable.xml_cavaliers, R.drawable.xml_magic)
+                Spacer(modifier = Modifier.height(16.dp)) // Spacing between match-ups
             }
             Column(
 
@@ -73,31 +72,31 @@ fun StandingsScreen() {
                 BracketMatchup(
                     "Winner 1",
                     "Winner 2",
-                    R.drawable.thunder,
-                    R.drawable.lakers
+                    R.drawable.xml_thunder,
+                    R.drawable.xml_lakers
                 )
-                Spacer(modifier = Modifier.height(150.dp)) // Spacing between matchups
+                Spacer(modifier = Modifier.height(150.dp)) // Spacing between match-ups
                 BracketMatchup(
                     "Winner 3",
                     "Winner 4",
                     R.drawable.xml_timberwolves,
-                    R.drawable.mavs
+                    R.drawable.xml_mavericks
                 )
-                Spacer(modifier = Modifier.height(150.dp)) // Spacing between matchups
+                Spacer(modifier = Modifier.height(150.dp)) // Spacing between match-ups
                 BracketMatchup(
                     "Winner 5",
                     "Winner 6",
-                    R.drawable.celtics,
-                    R.drawable.knicks
+                    R.drawable.xml_celtics,
+                    R.drawable.xml_knicks
                 )
-                Spacer(modifier = Modifier.height(135.dp)) // Spacing between matchups
+                Spacer(modifier = Modifier.height(135.dp)) // Spacing between match-ups
                 BracketMatchup(
                     "Winner 7",
                     "Winner 8",
-                    R.drawable.cavs,
-                    R.drawable.bucks
+                    R.drawable.xml_cavaliers,
+                    R.drawable.xml_bucks
                 )
-                // Add more second round matchups here
+                // Add more second round match-ups here
             }
 
         }
@@ -136,7 +135,7 @@ fun BracketMatchup(teamAName: String, teamBName: String, teamALogo: Int, teamBLo
         ) {
             BracketNodeCard(teamBName, teamBLogo)
         }
-        Spacer(modifier = Modifier.height(16.dp)) // Spacing between matchups
+        Spacer(modifier = Modifier.height(16.dp)) // Spacing between match-ups
     }
 }
 
