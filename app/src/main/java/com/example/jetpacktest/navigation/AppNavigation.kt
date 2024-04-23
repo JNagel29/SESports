@@ -36,7 +36,6 @@ import com.example.jetpacktest.screens.SearchScreen
 import com.example.jetpacktest.screens.GamesScreen
 import com.example.jetpacktest.screens.StandingsScreen
 import com.example.jetpacktest.screens.TeamProfileScreen
-import com.example.jetpacktest.viewmodels.StandingsViewModel
 import kotlinx.coroutines.launch
 
 @Composable
@@ -44,7 +43,7 @@ fun AppNavigation(randomStat: String) {
     val navController = rememberNavController()
     val searchViewModel = viewModel<SearchViewModel>()
     val homeViewModel = viewModel<HomeViewModel>()
-    val standingsViewModel = viewModel<StandingsViewModel>()
+    //val standingsViewModel = viewModel<StandingsViewModel>()
     val getPreviousScreenName: () -> (String?) = {
         navController.previousBackStackEntry?.destination?.route
     }
@@ -148,9 +147,9 @@ fun AppNavigation(randomStat: String) {
             }
             composable(route = Screens.StandingsScreen.name) {
                 StandingsScreen(
-                    westernFlow = standingsViewModel.westernFlow,
-                    easternFlow = standingsViewModel.easternFlow,
-                    navigateToTeamProfile = navigateToTeamProfile
+                    //westernFlow = standingsViewModel.westernFlow,
+                    //easternFlow = standingsViewModel.easternFlow,
+                    //navigateToTeamProfile = navigateToTeamProfile
                 )
             }
             composable(route=Screens.GamesScreen.name) {
