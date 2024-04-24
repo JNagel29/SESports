@@ -2,7 +2,6 @@ package com.example.jetpacktest.screens
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -69,11 +68,11 @@ private fun FirstRoundColumn() {
         val firstRoundMatchups = listOf(
             Pair("OKC   1", "NOLA  0") to Pair(R.drawable.xml_thunder, R.drawable.xml_pelicans),
             Pair("LAL   0", "DEN   2") to Pair(R.drawable.xml_lakers, R.drawable.xml_nuggets),
-            Pair("MIN   1", "PHX   0") to Pair(R.drawable.xml_timberwolves, R.drawable.xml_suns),
-            Pair("LAC   1", "DAL   0") to Pair(R.drawable.xml_clippers, R.drawable.xml_mavericks),
+            Pair("MIN   2", "PHX   0") to Pair(R.drawable.xml_timberwolves, R.drawable.xml_suns),
+            Pair("LAC   1", "DAL   1") to Pair(R.drawable.xml_clippers, R.drawable.xml_mavericks),
             Pair("BOS   1", "MIA   0") to Pair(R.drawable.xml_celtics, R.drawable.xml_heat),
             Pair("NYK   2", "PHI   0") to Pair(R.drawable.xml_knicks, R.drawable.xml_sixers),
-            Pair("MIL   1", "IND   0") to Pair(R.drawable.xml_bucks, R.drawable.xml_pacers),
+            Pair("MIL   1", "IND   1") to Pair(R.drawable.xml_bucks, R.drawable.xml_pacers),
             Pair("CLE   2", "ORL   0") to Pair(R.drawable.xml_cavaliers, R.drawable.xml_magic)
         )
 
