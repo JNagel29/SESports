@@ -1,7 +1,7 @@
 package com.example.jetpacktest.screens
 
-import ReturnToPreviousHeader
 import android.util.Log
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -19,11 +19,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.StarBorder
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
@@ -54,6 +55,7 @@ import com.example.jetpacktest.ui.components.LargeDropdownMenu
 import com.example.jetpacktest.models.Player
 import com.example.jetpacktest.models.PlayerPersonalInfo
 import com.example.jetpacktest.ui.components.CircularLoadingIcon
+import com.example.jetpacktest.ui.components.ReturnToPreviousHeader
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -72,7 +74,6 @@ fun ProfileScreen(
     var yearsList by rememberSaveable { mutableStateOf<List<String>>(emptyList()) }
     var chosenYear by rememberSaveable { mutableStateOf("") }
     var player by rememberSaveable { mutableStateOf(Player()) }
-    var showExpandedData by rememberSaveable { mutableStateOf(false) }
     var isFetchingStats by rememberSaveable { mutableStateOf(true) }
     var isFetchingInfo by rememberSaveable { mutableStateOf(true) }
     var injuryStartDate by rememberSaveable { mutableStateOf("")}
@@ -195,15 +196,16 @@ fun ProfileScreen(
                     }
                 )
             }
-
+            /*
             item {
                 ToggleFurtherStats(
                     showExpandedData = showExpandedData,
                     onClick = { showExpandedData = !showExpandedData }
                 )
             }
+             */
 
-            if (showExpandedData && player.points != -1.0f) {
+            if (player.points != -1.0f) { // && showExpandedData
                 item {
                     PlayerStatisticTable(player)
                 }
@@ -308,6 +310,23 @@ fun NameAndHeadshot(
 }
 
 @Composable
+fun StatBox(
+    label: String,
+    value: String,
+    labelFontSize: TextUnit = 16.sp,
+    valueFontSize: TextUnit = 16.sp
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(label, fontSize = labelFontSize,
+            color = Color.White)
+        Text(value, fontSize = valueFontSize, fontWeight = FontWeight.Bold,
+            color = Color.White)
+    }
+}
+
+@Composable
 fun MainStatBoxes(player: Player) {
     //Bool used to print N/A if player has no stats (-1 points)
     val isEmptyStats = (player.points == -1.0f)
@@ -344,66 +363,6 @@ fun MainStatBoxes(player: Player) {
 }
 
 @Composable
-fun StatBox(
-    label: String,
-    value: String,
-    labelFontSize: TextUnit = 16.sp,
-    valueFontSize: TextUnit = 16.sp
-) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(label, fontSize = labelFontSize,
-            color = Color.White)
-        Text(value, fontSize = valueFontSize, fontWeight = FontWeight.Bold,
-            color = Color.White)
-    }
-}
-
-@Composable
-fun ToggleFurtherStats(onClick: () -> Unit, showExpandedData: Boolean) {
-    //Toggles the extra stats
-    Box(
-        modifier = Modifier.fillMaxWidth(),
-        contentAlignment = Alignment.Center
-    ) {
-        OutlinedButton(
-            onClick = onClick
-        ) {
-            Text(if (showExpandedData) "Shrink Stats" else "Expand Stats")
-        }
-    }
-}
-
-@Composable
-fun PlayerStatisticTable(player: Player) {
-    //Slight amount of vertical space
-    Spacer(modifier = Modifier.height(4.dp))
-    //Now the actual list of values
-    Column(
-        modifier = Modifier.padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        //Pass in list of rows with Label and Value
-            PlayerDataRow("Steals", player.steals.toString())
-            PlayerDataRow("Blocks", player.blocks.toString())
-            PlayerDataRow("FG", player.fieldGoals.toString())
-            PlayerDataRow("FGA", player.fieldGoalAttempts.toString())
-            PlayerDataRow("FG%", "%.1f%%".format(player.fieldGoalPercent * 100))
-            PlayerDataRow("3P ", player.threePointers.toString())
-            PlayerDataRow("3PA", player.threePointerAttempts.toString())
-            PlayerDataRow("3P%", "%.1f%%".format(player.threePointPercent * 100))
-            PlayerDataRow("Turnovers", player.turnovers.toString())
-            PlayerDataRow("Fouls", player.personalFouls.toString())
-            PlayerDataRow("Mins. Played", player.minutesPlayed.toString())
-            PlayerDataRow("2P", player.twoPointers.toString())
-            PlayerDataRow("2PA", player.twoPointerAttempts.toString())
-            PlayerDataRow("2P%", "%.1f%%".format(player.twoPointPercent * 100))
-            PlayerDataRow("EFG%", "%.1f%%".format(player.effectiveFieldGoalPercent * 100))
-    }
-}
-
-@Composable
 fun InfoStatBoxes(playerPersonalInfo: PlayerPersonalInfo, color: Color) {
     Row(
         modifier = Modifier
@@ -424,10 +383,10 @@ fun InfoStatBoxes(playerPersonalInfo: PlayerPersonalInfo, color: Color) {
         StatBox(
             label = "Draft",
             value = if (playerPersonalInfo.data[0].draftYear != 0)
-                        "${playerPersonalInfo.data[0].draftYear} " +
+                "${playerPersonalInfo.data[0].draftYear} " +
                         "Round ${playerPersonalInfo.data[0].draftRound} " +
                         "Pick ${playerPersonalInfo.data[0].draftNumber}"
-                    else "Undrafted",
+            else "Undrafted",
             labelFontSize = 14.sp,
             valueFontSize = 16.sp
         )
@@ -457,32 +416,99 @@ fun InfoStatBoxes(playerPersonalInfo: PlayerPersonalInfo, color: Color) {
     }
 }
 
+@Composable
+fun PlayerStatisticTable(player: Player) {
+    Column(
+        modifier = Modifier
+            .padding(16.dp)
+    ) {
+        Spacer(modifier = Modifier.height(4.dp))
+        StatisticCategory("Shooting Splits") {
+            Column(
+                modifier = Modifier
+                    .padding(4.dp)
+            ) {
+                PlayerDataRow("Field Goals", player.fieldGoals.toString())
+                PlayerDataRow("Field Goal Attempts", player.fieldGoalAttempts.toString())
+                PlayerDataRow("Field Goal %", "%.1f%%"
+                    .format(player.fieldGoalPercent * 100))
+                PlayerDataRow("3 Pointers", player.threePointers.toString())
+                PlayerDataRow("3 Point Attempts", player.threePointerAttempts.toString())
+                PlayerDataRow("3 Point %", "%.1f%%"
+                    .format(player.threePointPercent * 100))
+                PlayerDataRow("2 Pointers", player.twoPointers.toString())
+                PlayerDataRow("2 Point Attempts", player.twoPointerAttempts.toString())
+                PlayerDataRow("2 Point %", "%.1f%%"
+                    .format(player.twoPointPercent * 100))
+                PlayerDataRow(
+                    "Effective FG%",
+                    "%.1f%%".format(player.effectiveFieldGoalPercent * 100)
+                )
+            }
+        }
+        StatisticCategory("Defensive Efficiency and Usage") {
+            Column(
+                modifier = Modifier
+                    .padding(4.dp)
+            ) {
+                PlayerDataRow("Steals", player.steals.toString())
+                PlayerDataRow("Blocks", player.blocks.toString())
+                PlayerDataRow("Fouls", player.personalFouls.toString())
+                PlayerDataRow("Turnovers", player.turnovers.toString())
+                PlayerDataRow("Mins. Played", player.minutesPlayed.toString())
+            }
+        }
+    }
+}
+
+@Composable
+fun StatisticCategory(title: String, content: @Composable () -> Unit) {
+    var expandedCategory by remember { mutableStateOf(false) }
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable {expandedCategory = !expandedCategory }
+    ){
+        Text(
+            text = title,
+            modifier = Modifier.padding(8.dp),
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold
+        )
+        Icon(
+            imageVector = if (expandedCategory) Icons.Filled.ArrowDropUp
+                        else Icons.Filled.ArrowDropDown,
+            contentDescription = null,
+            modifier = Modifier.size(24.dp)
+        )
+    }
+    AnimatedVisibility(visible = expandedCategory) {
+        content() // Lambda of rows that we passed in for that specific category
+    }
+}
 
 @Composable
 fun PlayerDataRow(label: String, value: String) {
-    Column {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
-        ) {
-            //Prints label aligned to the left
-            Text(
-                label,
-                fontSize = 22.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.weight(1f)
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            //Prints actual value aligned to the right
-            Text(
-                value,
-                fontSize = 22.sp,
-                textAlign = TextAlign.End,
-                modifier = Modifier.weight(1f)
-            )
-        }
-        HorizontalDivider()
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    ) {
+        Text(
+            label,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.SemiBold,
+            modifier = Modifier.weight(1f)
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(
+            value,
+            fontSize = 16.sp,
+            textAlign = TextAlign.End,
+            modifier = Modifier.weight(1f)
+        )
     }
-
+    HorizontalDivider()
 }

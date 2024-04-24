@@ -40,4 +40,6 @@
     <color name="tor">#CE1141</color>
     <color name="uta">#002B5C</color>
     <color name="was">#E31837</color>
+
+    <color name="higherStat">#E4F4E4</color>
 </resources>

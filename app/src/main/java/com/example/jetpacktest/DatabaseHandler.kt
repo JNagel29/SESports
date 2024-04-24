@@ -4,6 +4,9 @@ import android.util.Log
 import com.example.jetpacktest.models.InjuredPlayer
 import com.example.jetpacktest.models.Player
 import com.example.jetpacktest.models.StatLeader
+import com.example.jetpacktest.models.TeamMaps
+import com.example.jetpacktest.models.TeamStanding
+import com.example.jetpacktest.models.TeamStanding.Conference
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -155,6 +158,56 @@ class DatabaseHandler {
         } finally {
             closeResources(myConn, null, statement)
         }
+    }
+
+    fun executeStandings(conference: Conference, onDataReceived: (MutableList<TeamStanding>) -> Unit) {
+        scope.launch {
+            val standingsList = getStandings(conference)
+            onDataReceived(standingsList)
+        }
+    }
+
+    private fun getStandings(conference: Conference): MutableList<TeamStanding> {
+        var myConn: Connection? = null
+        var statement: Statement? = null
+        var resultSet: ResultSet? = null
+        val teamPlayers = mutableListOf<TeamStanding>()
+        try {
+            Class.forName("com.mysql.jdbc.Driver")
+            myConn = DriverManager.getConnection(url, user, password)
+            statement = myConn.createStatement()
+            val sql = "SELECT* FROM ${conference.name}_STANDING"
+            resultSet = statement.executeQuery(sql)
+            while (resultSet.next()) {
+                val teamName = resultSet.getString("Team_Name")
+                val abbrev = when (teamName) {
+                    "New York Knicks" -> "NYK" // These 4 have their third letter cut off
+                    "New Orleans Pelicans" -> "NOP"
+                    "San Antonio Spurs" -> "SAS"
+                    "Golden State Warriors" -> "GSW"
+                    else -> TeamMaps.namesToAbbreviations[teamName] ?: "N/A"
+                }
+                val teamStanding = TeamStanding(
+                    rank = resultSet.getInt("rank"),
+                    name = teamName,
+                    wins = resultSet.getInt("Wins"),
+                    losses = resultSet.getInt("Losses"),
+                    winLossPercentage = resultSet.getFloat("Win_Loss_Percentage"),
+                    conference = conference,
+                    logo = TeamMaps.xmlLogos[teamName] ?: R.drawable.baseline_arrow_back_ios_new_24,
+                    abbrev = abbrev
+                )
+                teamPlayers.add(teamStanding)
+            }
+        } catch (e: SQLException) {
+            Log.d(Const.TAG, e.message!!)
+            e.printStackTrace()
+        } catch (e: ClassNotFoundException) {
+            e.printStackTrace()
+        } finally {
+            closeResources(myConn, resultSet, statement)
+        }
+        return teamPlayers
     }
 
     private fun getNbaDotComId(playerName: String): Int {

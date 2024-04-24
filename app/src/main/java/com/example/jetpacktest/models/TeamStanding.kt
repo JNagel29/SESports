@@ -5,5 +5,13 @@ data class TeamStanding(
     val name: String,
     val wins: Int,
     val losses: Int,
-    val winLossPercentage: Float
-)
+    val winLossPercentage: Float,
+    val conference: Conference,
+    val logo: Int,
+    val abbrev: String
+) {
+    enum class Conference {
+        WESTERN,
+        EASTERN
+    }
+}

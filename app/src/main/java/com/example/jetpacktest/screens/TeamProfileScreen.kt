@@ -1,6 +1,5 @@
 package com.example.jetpacktest.screens
 
-import ReturnToPreviousHeader
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -35,6 +34,7 @@ import com.example.jetpacktest.R
 import com.example.jetpacktest.TeamHandler
 import com.example.jetpacktest.TeamPlayer
 import com.example.jetpacktest.models.TeamMaps
+import com.example.jetpacktest.ui.components.ReturnToPreviousHeader
 
 @Composable
 fun TeamProfileScreen(

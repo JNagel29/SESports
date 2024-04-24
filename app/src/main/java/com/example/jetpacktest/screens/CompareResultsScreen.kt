@@ -1,33 +1,36 @@
 package com.example.jetpacktest.screens
 
-import ReturnToPreviousHeader
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.jetpacktest.DatabaseHandler
+import com.example.jetpacktest.R
 import com.example.jetpacktest.models.Player
 import com.example.jetpacktest.ui.components.CircularLoadingIcon
 import com.example.jetpacktest.ui.components.LargeDropdownMenu
+import com.example.jetpacktest.ui.components.ReturnToPreviousHeader
 
 @Composable
-fun CompareResultsScreen(playerName1: String, playerName2: String,navigateBack: () -> Unit,
-                         ) {
+fun CompareResultsScreen(playerName1: String, playerName2: String,navigateBack: () -> Unit) {
     val databaseHandler = DatabaseHandler()
     var player1 by remember { mutableStateOf(Player()) }
     var player2 by remember { mutableStateOf(Player()) }
@@ -37,8 +40,6 @@ fun CompareResultsScreen(playerName1: String, playerName2: String,navigateBack: 
     var yearsList2 by remember { mutableStateOf<List<String>>(emptyList()) }
     var isFetching1 by remember { mutableStateOf(false)}
     var isFetching2 by remember { mutableStateOf(false)}
-
-
 
     LaunchedEffect(Unit) {
         isFetching1 = true
@@ -67,180 +68,226 @@ fun CompareResultsScreen(playerName1: String, playerName2: String,navigateBack: 
         }
     }
 
-    Surface(modifier = Modifier.fillMaxSize(), color = Color.White) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp)
-                .verticalScroll(rememberScrollState())
-        ) {
-            ReturnToPreviousHeader(navigateBack = navigateBack, label = "Compare")
-            Spacer(modifier = Modifier.height(15.dp))
-            if (isFetching1 || isFetching2) {
-                CircularLoadingIcon()
-            }
-            else {
-                Row(modifier = Modifier.fillMaxWidth()) {
-                    LargeDropdownMenu(
-                        label = "Select ${player1.name}'s Year:",
-                        items = yearsList1,
-                        selectedIndex = yearsList1.indexOf(chosenYear1),
-                        onItemSelected = { index, _ ->
-                            val year = yearsList1[index]
-                            //Check if newly selected stat is different from previous
-                            if (year != chosenYear1) {
-                                chosenYear1 = year
-                                databaseHandler.executePlayerData(playerName1, chosenYear1) { data ->
-                                    player1 = data
-                                }
-                            }
-                        },
-                        modifier = Modifier.weight(1f)
-                    )
-                    LargeDropdownMenu(
-                        label = "Select ${player2.name}'s Year:",
-                        items = yearsList2,
-                        selectedIndex = yearsList2.indexOf(chosenYear2),
-                        onItemSelected = { index, _ ->
-                            val year = yearsList2[index]
-                            //Check if newly selected stat is different from previous
-                            if (year != chosenYear2) {
-                                chosenYear2 = year
-                                databaseHandler.executePlayerData(playerName2, chosenYear2) { data ->
-                                    player2 = data
-                                }
-                            }
-                        },
-                        modifier = Modifier.weight(1f)
-                    )
-                }
-                PlayerProfile(players = listOf(player1, player2))
-            }
-        }
-    }
-}
-
-@Composable
-fun PlayerProfile(players: List<Player>) {
-    val player1 = players.getOrNull(0)
-    val player2 = players.getOrNull(1)
-
-    HorizontalDivider()
-    player1?.let { player ->
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-        ) {
-            Row(
-                modifier = Modifier.horizontalScroll(rememberScrollState())
-            ) {
-                Box(modifier = Modifier.padding(end = 16.dp)) {
-                    PlayerCard(player, player2!!)
-                }
-                Box(modifier = Modifier.padding(end = 16.dp)) {
-                    PlayerCard(player2!!, player1)
-                }
-            }
-        }
-    }
-}
-
-
-
-
-
-@Composable
-fun PlayerStats(player1: Player, player2: Player) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        PlayerCard(player1, player2)
-        PlayerCard(player2, player1)
-    }
-}
-
-@Composable
-fun PlayerCard(player: Player, opponent: Player) {
-    Box(
+Surface(modifier = Modifier.fillMaxSize(), color = Color.White) {
+    Column(
         modifier = Modifier
-            .width(200.dp)
-            .shadow(elevation = 4.dp)
-            .border(width = 2.dp, color = Color.Gray, shape = RoundedCornerShape(8.dp)) // Border with rounded corners
+            .fillMaxSize()
+            .padding(8.dp)
     ) {
-        Box(
-            modifier = Modifier
-                .background(Color(0xFFF5F5DC)) // Beige background color
-                .padding(16.dp)
-        ) {
-            Column {
-                Text(
-                    text = player.name,
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.Black
+        ReturnToPreviousHeader(navigateBack = navigateBack, label = "Compare")
+        Spacer(modifier = Modifier.height(15.dp))
+        if (isFetching1 || isFetching2) {
+            CircularLoadingIcon()
+        }
+        else {
+            Row(modifier = Modifier.fillMaxWidth()) {
+                LargeDropdownMenu(
+                    label = "Select ${player1.name}'s Year:",
+                    items = yearsList1,
+                    selectedIndex = yearsList1.indexOf(chosenYear1),
+                    onItemSelected = { index, _ ->
+                        val year = yearsList1[index]
+                        //Check if newly selected stat is different from previous
+                        if (year != chosenYear1) {
+                            chosenYear1 = year
+                            databaseHandler.executePlayerData(playerName1, chosenYear1) { data ->
+                                player1 = data
+                            }
+                        }
+                    },
+                    modifier = Modifier.weight(1f)
                 )
-                Spacer(modifier = Modifier.height(8.dp))
-                StatRow("Year", player.year.toString(), false)
-                StatRow("Position", player.position, false)
-                StatRow("Team", player.team, false)
-                StatRow("Points", player.points.toString(), player.points > opponent.points)
-                StatRow("Assists", player.assists.toString(), player.assists > opponent.assists)
-                StatRow("Steals", player.steals.toString(), player.steals > opponent.steals)
-                StatRow("Blocks", player.blocks.toString(), player.blocks > opponent.blocks)
-                StatRow("Total Rebounds", player.totalRebounds.toString(), player.totalRebounds > opponent.totalRebounds)
-                StatRow("Turnovers", player.turnovers.toString(), player.turnovers < opponent.turnovers)
-                StatRow("Personal Fouls", player.personalFouls.toString(), player.personalFouls < opponent.personalFouls)
-                StatRow("Minutes Played", player.minutesPlayed.toString(), player.minutesPlayed > opponent.minutesPlayed)
-                StatRow("FG", player.fieldGoals.toString(), player.fieldGoals > opponent.fieldGoals)
-                StatRow("FGA", player.fieldGoalAttempts.toString(), player.fieldGoalAttempts > opponent.fieldGoalAttempts)
-                StatRow("FG%", player.fieldGoalPercent.toString(), player.fieldGoalPercent > opponent.fieldGoalPercent)
-                StatRow("3P ", player.threePointers.toString(), player.threePointers > opponent.threePointers)
-                StatRow("3PA", player.threePointerAttempts.toString(), player.threePointerAttempts > opponent.threePointerAttempts)
-                StatRow("3P%", player.threePointPercent.toString(), player.threePointPercent > opponent.threePointPercent)
-                StatRow("2P", player.twoPointers.toString(), player.twoPointers > opponent.twoPointers)
-                StatRow("2PA", player.twoPointerAttempts.toString(), player.twoPointerAttempts > opponent.twoPointerAttempts)
-                StatRow("2P%", player.twoPointPercent.toString(), player.twoPointPercent > opponent.twoPointPercent)
-                StatRow("EFG%", player.effectiveFieldGoalPercent.toString(), player.effectiveFieldGoalPercent > opponent.effectiveFieldGoalPercent)
-                StatRow("ORB", player.offensiveRebounds.toString(), player.offensiveRebounds > opponent.offensiveRebounds)
-                StatRow("DRB", player.defensiveRebounds.toString(), player.defensiveRebounds > opponent.defensiveRebounds)
+                LargeDropdownMenu(
+                    label = "Select ${player2.name}'s Year:",
+                    items = yearsList2,
+                    selectedIndex = yearsList2.indexOf(chosenYear2),
+                    onItemSelected = { index, _ ->
+                        val year = yearsList2[index]
+                        //Check if newly selected stat is different from previous
+                        if (year != chosenYear2) {
+                            chosenYear2 = year
+                            databaseHandler.executePlayerData(playerName2, chosenYear2) { data ->
+                                player2 = data
+                            }
+                        }
+                    },
+                    modifier = Modifier.weight(1f)
+                )
             }
+            Spacer(modifier = Modifier.height(5.dp))
+            NameHeader(player1Name = player1.name, player2Name = player2.name)
+            Spacer(modifier = Modifier.height(5.dp))
+            DisplayComparison(player1, player2)
+        }
+    }
+}
+}
+
+@Composable
+fun DisplayComparison(player1: Player, player2: Player) {
+    Card(
+        modifier = Modifier.padding(8.dp),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 10.dp
+        ),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp),
+            contentColor = Color.Black
+        ),
+        shape = RoundedCornerShape(8.dp)
+    ) {
+        PlayerCard(player1 = player1, player2 = player2)
+    }
+}
+
+@Composable
+fun PlayerCard(player1: Player, player2: Player) {
+    LazyColumn(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        items(getPlayerStats(player1 = player1, player2 = player2)) { (statName, statValues) ->
+            val (player1Value, player2Value) = statValues // Unpack pair of stats
+            if (statName != "Team") {
+                StatRow(
+                    label = statName,
+                    player1Value = player1Value.toString(),
+                    player2Value = player2Value.toString(),
+                )
+            } else {
+                StatRow(
+                    label = statName,
+                    player1Value = player1.team,
+                    player2Value = player2.team,
+                )
+            }
+            HorizontalDivider(color = Color.Black)
         }
     }
 }
 
-
 @Composable
-fun StatRow(label: String, value: String, playerHasHigherStat: Boolean) {
-
-    val statColor = if (playerHasHigherStat) Color(0xFF46923c) else Color(0xFFF5F5DC)
+fun NameHeader(player1Name: String, player2Name: String) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color.White)
+            .padding(8.dp),
     ) {
         Text(
-            text = label,
-            fontSize = 16.sp,
+            text = player1Name,
+            fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
+            color = Color.Black,
+            fontFamily = FontFamily.Serif,
             modifier = Modifier.weight(1f)
         )
-        Spacer(modifier = Modifier.width(8.dp))
-        Box(
-            modifier = Modifier
-                .background(statColor, RoundedCornerShape(4.dp))
-                .padding(horizontal = 4.dp, vertical = 2.dp)
-        ) {
-            Text(
-                text = value,
-                fontSize = 16.sp,
-                textAlign = TextAlign.End,
-                color = Color.Black,
-                modifier = Modifier.padding(horizontal = 4.dp)
-            )
-        }
+        Text(
+            text = player2Name,
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color.Black,
+            fontFamily = FontFamily.Serif,
+            modifier = Modifier.weight(1f),
+            textAlign = TextAlign.End
+        )
     }
+}
+
+@Composable
+fun StatRow(label: String, player1Value: String, player2Value: String) {
+    val player1HasHigherStat = checkIfPlayer1HasHigherStat(
+        statName = label,
+        player1Value = player1Value,
+        player2Value = player2Value
+    )
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = player1Value,
+            fontSize = 20.sp,
+            fontFamily = FontFamily.Serif,
+            textAlign = TextAlign.Start,
+            modifier = Modifier
+                .wrapContentSize()
+                .background(
+                    if (player1HasHigherStat == true) colorResource(R.color.higherStat)
+                    else MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
+                )
+                .weight(1.5f)
+                .padding(horizontal = 5.dp)
+        )
+        Text(
+            text = label,
+            fontSize = 20.sp,
+            fontFamily = FontFamily.Serif,
+            textAlign = TextAlign.Center,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier
+                .weight(2f)
+                .padding(horizontal = 5.dp)
+        )
+        Text(
+            text = player2Value,
+            fontSize = 20.sp,
+            fontFamily = FontFamily.Serif,
+            textAlign = TextAlign.End,
+            modifier = Modifier
+                .wrapContentSize()
+                .background(
+                    if (player1HasHigherStat == false) colorResource(R.color.higherStat)
+                    else MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
+                )
+                .weight(1.5f)
+                .padding(horizontal = 5.dp)
+        )
+    }
+}
+
+private fun getPlayerStats(
+    player1: Player,
+    player2: Player
+): List<Pair<String, Pair<Float, Float>>> {
+    return listOf(
+        "Team" to Pair(player1.team.toFloatOrNull() ?: 0f, player2.team.toFloatOrNull() ?: 0f),
+        "Points" to Pair(player1.points, player2.points),
+        "Assists" to Pair(player1.assists, player2.assists),
+        "Steals" to Pair(player1.steals, player2.steals),
+        "Blocks" to Pair(player1.blocks, player2.blocks),
+        "Total Rebounds" to Pair(player1.totalRebounds, player2.totalRebounds),
+        "Turnovers" to Pair(player1.turnovers, player2.turnovers),
+        "Personal Fouls" to Pair(player1.personalFouls, player2.personalFouls),
+        "Minutes Played" to Pair(player1.minutesPlayed, player2.minutesPlayed),
+        "Field Goals" to Pair(player1.fieldGoals, player2.fieldGoals),
+        "Field Goal Attempts" to Pair(player1.fieldGoalAttempts, player2.fieldGoalAttempts),
+        "Field Goal %" to Pair(player1.fieldGoalPercent, player2.fieldGoalPercent),
+        "3 Pointers" to Pair(player1.threePointers, player2.threePointers),
+        "3 Point Attempts" to Pair(player1.threePointerAttempts, player2.threePointerAttempts),
+        "3 Point %" to Pair(player1.threePointPercent, player2.threePointPercent),
+        "2 Pointers" to Pair(player1.twoPointers, player2.twoPointers),
+        "2 Point Attempts" to Pair(player1.twoPointerAttempts, player2.twoPointerAttempts),
+        "2 Point %" to Pair(player1.twoPointPercent, player2.twoPointPercent),
+        "Effective Field Goal %" to Pair(player1.effectiveFieldGoalPercent,
+            player2.effectiveFieldGoalPercent),
+        "Offensive Rebounds" to Pair(player1.offensiveRebounds, player2.offensiveRebounds),
+        "Defensive Rebounds" to Pair(player1.defensiveRebounds, player2.defensiveRebounds)
+    )
+}
+
+private fun checkIfPlayer1HasHigherStat(
+    statName: String,
+    player1Value: String,
+    player2Value: String
+): Boolean? {
+    val player1Val = player1Value.toFloatOrNull()
+    val player2Val = player2Value.toFloatOrNull()
+
+    if (player1Val == null|| player2Val == null || player1Val == player2Val) return null
+    return if (statName == "Turnovers" || statName == "Personal Fouls") player1Val < player2Val
+    else player1Val > player2Val
 }
 
 
