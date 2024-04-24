@@ -1,6 +1,5 @@
 package com.example.jetpacktest.screens
 
-import ReturnToPreviousHeader
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -56,6 +55,7 @@ import com.example.jetpacktest.ui.components.LargeDropdownMenu
 import com.example.jetpacktest.models.Player
 import com.example.jetpacktest.models.PlayerPersonalInfo
 import com.example.jetpacktest.ui.components.CircularLoadingIcon
+import com.example.jetpacktest.ui.components.ReturnToPreviousHeader
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable

@@ -1,6 +1,5 @@
 package com.example.jetpacktest.screens
 
-import ReturnToPreviousHeader
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -28,6 +27,7 @@ import com.example.jetpacktest.R
 import com.example.jetpacktest.models.Player
 import com.example.jetpacktest.ui.components.CircularLoadingIcon
 import com.example.jetpacktest.ui.components.LargeDropdownMenu
+import com.example.jetpacktest.ui.components.ReturnToPreviousHeader
 
 @Composable
 fun CompareResultsScreen(playerName1: String, playerName2: String,navigateBack: () -> Unit) {
