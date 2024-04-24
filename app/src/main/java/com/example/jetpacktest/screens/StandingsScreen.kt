@@ -79,7 +79,7 @@ fun StandingsScreen(
                     }
                 ) {
                     Text(
-                        text = "Brackets",
+                        text = "Bracket",
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.End,
