@@ -167,12 +167,13 @@ fun BracketRow(teamName: String, logoResId: Int, tbd: Boolean) {
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 8.dp)
+            .padding(horizontal = 8.dp, vertical = 4.dp)
     ) {
         if (tbd) {
             Icon(
                 imageVector = Icons.Default.DataSaverOff,
-                contentDescription = null
+                contentDescription = null,
+                modifier = Modifier.size(35.dp)
             )
         }
         else {
