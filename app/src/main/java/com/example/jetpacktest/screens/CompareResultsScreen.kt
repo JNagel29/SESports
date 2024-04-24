@@ -147,11 +147,19 @@ fun PlayerCard(player1: Player, player2: Player) {
     ) {
         items(getPlayerStats(player1 = player1, player2 = player2)) { (statName, statValues) ->
             val (player1Value, player2Value) = statValues // Unpack pair of stats
-            StatRow(
-                label = statName,
-                player1Value = player1Value.toString(),
-                player2Value = player2Value.toString(),
-            )
+            if (statName != "Team") {
+                StatRow(
+                    label = statName,
+                    player1Value = player1Value.toString(),
+                    player2Value = player2Value.toString(),
+                )
+            } else {
+                StatRow(
+                    label = statName,
+                    player1Value = player1.team,
+                    player2Value = player2.team,
+                )
+            }
             HorizontalDivider(color = Color.Black)
         }
     }
@@ -244,6 +252,7 @@ private fun getPlayerStats(
     player2: Player
 ): List<Pair<String, Pair<Float, Float>>> {
     return listOf(
+        "Team" to Pair(player1.team.toFloatOrNull() ?: 0f, player2.team.toFloatOrNull() ?: 0f),
         "Points" to Pair(player1.points, player2.points),
         "Assists" to Pair(player1.assists, player2.assists),
         "Steals" to Pair(player1.steals, player2.steals),

@@ -2,6 +2,7 @@ package com.example.jetpacktest.screens
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -37,6 +38,8 @@ fun BracketsScreen(navigateBack: () -> Unit) {
     LazyColumn(
         modifier = Modifier
             .padding(horizontal = 16.dp)
+  //          .fillMaxSize()
+  //          .background(Color.DarkGray)
     ) {
         stickyHeader {
             ReturnToPreviousHeader(
@@ -60,7 +63,6 @@ fun BracketsScreen(navigateBack: () -> Unit) {
         item { Spacer(modifier = Modifier.height(16.dp)) }
     }
 }
-
 @Composable
 private fun FirstRoundColumn() {
     Column {
@@ -95,10 +97,11 @@ private fun SecondRoundColumn() {
         )
 
         secondRoundMatchups.forEachIndexed { index, (teams, logos) ->
-            if (index > 0) {
-                Spacer(modifier = Modifier.height(150.dp))
+            if (index > 0 ) {
+                Spacer(modifier = Modifier.height(175.dp))
             }
             BracketMatchup(teams.first, teams.second, logos.first, logos.second, tbd = true)
+            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }
@@ -115,7 +118,7 @@ private fun ThirdRoundColumn() {
 
         thirdRoundMatchups.forEachIndexed { index, (teams, logos) ->
             if (index > 0) {
-                Spacer(modifier = Modifier.height(415.dp))
+                Spacer(modifier = Modifier.height(460.dp))
             }
             BracketMatchup(teams.first, teams.second, logos.first, logos.second, tbd = true)
         }
