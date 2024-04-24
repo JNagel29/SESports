@@ -16,7 +16,9 @@ import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -25,12 +27,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -38,7 +38,6 @@ import androidx.compose.ui.unit.sp
 fun ExpandableCard(
     title: String,
     description: String,
-    backgroundColorResource: Int
 ) {
     //Savable used to persist state across diff screen swaps
     var isExpanded by rememberSaveable { mutableStateOf(false) }
@@ -57,8 +56,8 @@ fun ExpandableCard(
             defaultElevation = 10.dp //Adds a 'shadow' effect
         ),
         colors = CardDefaults.cardColors(
-            containerColor = colorResource(backgroundColorResource),
-            contentColor = Color.White
+            containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp),
+            contentColor = Color.Black
         )
     ) {
         Column(
@@ -74,7 +73,6 @@ fun ExpandableCard(
                 Text(
                     text = title,
                     style = TextStyle(
-                        textDecoration = TextDecoration.Underline,
                         fontWeight = FontWeight.Bold,
                         fontSize = 20.sp,
                         textAlign = TextAlign.Center
@@ -85,7 +83,7 @@ fun ExpandableCard(
                     imageVector = if (isExpanded) Icons.Filled.ArrowDropUp
                                     else Icons.Filled.ArrowDropDown,
                     contentDescription = "Arrow",
-                    tint = Color.White,
+                    tint = Color.Black,
                     modifier = Modifier.weight(1f)
                 )
             }

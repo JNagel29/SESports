@@ -31,7 +31,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.jetpacktest.R
 import com.example.jetpacktest.models.StatLeader
 import com.example.jetpacktest.ui.components.ExpandableCard
 import com.example.jetpacktest.ui.theme.JetpackTestTheme
@@ -46,7 +45,7 @@ fun HomeScreen(
     val yearOptions = listOf("2009", "2010", "2011", "2012", "2013", "2014",
             "2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022",
             "2023", "2024").reversed()
-    val statOptions = listOf("PTS", "AST", "TRB", "BLK", "STL")
+    val statOptions = listOf("Points", "Assists", "Rebounds", "Blocks", "Steals")
     //TODO:Change it so we pass just the states and lambdas, not entire Viewmodel
     val statLeadersList by homeViewModel.statLeadersListFlow.collectAsState(initial = emptyList())
     val chosenStat by homeViewModel.chosenStatFlow.collectAsState(initial = "PTS")
@@ -122,7 +121,6 @@ fun RandomStatCard(randomStat: String) {
     ExpandableCard(
         title = "Random Stat of the Day",
         description = randomStat,
-        backgroundColorResource = R.color.purple_lakers
     )
 }
 
@@ -132,7 +130,7 @@ fun StatLeaderCard(statLeader: StatLeader, chosenStat: String,
     Card(
         modifier = Modifier.padding(8.dp),
         elevation = CardDefaults.cardElevation(
-            defaultElevation = 10.dp //Adds a 'shadow' effect
+            defaultElevation = 10.dp
         ),
         colors = CardDefaults.cardColors(
             containerColor = Color.White,

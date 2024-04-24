@@ -1,6 +1,5 @@
 package com.example.jetpacktest.screens
 
-import ReturnToPreviousHeader
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -34,19 +33,23 @@ import androidx.compose.ui.unit.sp
 import com.example.jetpacktest.R
 import com.example.jetpacktest.TeamHandler
 import com.example.jetpacktest.TeamPlayer
-import com.example.jetpacktest.models.NbaTeam
+import com.example.jetpacktest.models.TeamMaps
+import com.example.jetpacktest.ui.components.ReturnToPreviousHeader
 
 @Composable
-fun TeamProfileScreen(teamName: String,
-                      navigateBack: () -> Unit,
-                      navigateToPlayerProfile: (String) -> Unit) {
+fun TeamProfileScreen(
+    teamName: String,
+    navigateBack: () -> Unit,
+    navigateToPlayerProfile: (String) -> Unit,
+    getPreviousScreenName: () -> (String?)
+) {
     val teamHandler = TeamHandler()
     var teamPlayersList by rememberSaveable { mutableStateOf<List<TeamPlayer>>(emptyList()) }
 
     LaunchedEffect(Unit) {
         if (teamPlayersList.isEmpty()) {
             //Before anything else, fetch team abbreviation using dictionary in NbaTeam.kt
-            val teamAbbrev = NbaTeam.namesToAbbreviations[teamName]
+            val teamAbbrev = TeamMaps.namesToAbbreviations[teamName]
             if (teamAbbrev != null) {
                 Log.d("TeamProfile", "Fetching new roster...")
                 teamHandler.fetchCurrentRoster(teamAbbrev = teamAbbrev) { result ->
@@ -57,26 +60,15 @@ fun TeamProfileScreen(teamName: String,
     }
     //Wraps data inside column
     Column(modifier = Modifier.fillMaxSize()) {
-        //Uses search header composable for back button from ProfileScreen.kt since same logic
-        ReturnToPreviousHeader(navigateBack)
-        //Adds space between header and actual data
+        ReturnToPreviousHeader(
+            navigateBack = navigateBack,
+            label = getPreviousScreenName()?.dropLast(6) ?: ""
+        )
         Spacer(modifier = Modifier.height(15.dp))
-        //Team name and logo (will pass into own composable w/ teamName, contentDesc, width/height
-        //Wrap text in box to center it
-        Box(modifier = Modifier.fillMaxWidth()) {
-            Text(
-                text = teamName,
-                fontSize = 26.sp,
-                fontFamily = FontFamily.Serif,
-                fontWeight = FontWeight.ExtraBold,
-                modifier = Modifier.align(Alignment.Center)
-            )
-        }
-        //Add space between team name and logo
+        TeamNameHeader(teamName = teamName)
         Spacer(modifier = Modifier.height(8.dp))
-        //We get the logo from NbaTeam.logos map (String to resource id)
-        //The "?:" means if we get null, then just use default, else use left side
-        val teamLogo = NbaTeam.logos[teamName] ?: R.drawable.fallback
+        //Elvis operator uses fallback if it teamName maps to no logo ID
+        val teamLogo = TeamMaps.logos[teamName] ?: R.drawable.fallback
         Image(
             painter = painterResource(id = teamLogo),
             contentDescription = teamName,
@@ -86,6 +78,19 @@ fun TeamProfileScreen(teamName: String,
                 .align(Alignment.CenterHorizontally)
         )
         CurrentRosterDisplay(teamPlayersList, navigateToPlayerProfile)
+    }
+}
+
+@Composable
+fun TeamNameHeader(teamName: String) {
+    Box(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            text = teamName,
+            fontSize = 26.sp,
+            fontFamily = FontFamily.Serif,
+            fontWeight = FontWeight.ExtraBold,
+            modifier = Modifier.align(Alignment.Center)
+        )
     }
 }
 
@@ -122,7 +127,7 @@ fun TeamPlayerRow(teamPlayer: TeamPlayer, navigateToPlayerProfile: (String) -> U
         .fillMaxWidth()
         .padding(vertical = 8.dp)
         .clickable {
-            val fullTeamPlayerName = "${teamPlayer.FirstName} ${teamPlayer.LastName}"
+            val fullTeamPlayerName = "${teamPlayer.firstName} ${teamPlayer.lastName}"
             navigateToPlayerProfile(fullTeamPlayerName)
         }
     ) {
@@ -132,16 +137,16 @@ fun TeamPlayerRow(teamPlayer: TeamPlayer, navigateToPlayerProfile: (String) -> U
             horizontalAlignment = Alignment.Start
         ) {
             Text(
-                text = "${teamPlayer.FirstName} ${teamPlayer.LastName}",
+                text = "${teamPlayer.firstName} ${teamPlayer.lastName}",
                 fontSize = 22.sp,
                 fontFamily = FontFamily.Serif,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 4.dp)
             )
             Text(
-                text = "${teamPlayer.Position} | #${teamPlayer.Jersey} | " +
-                        "${inchesToFeet(teamPlayer.Height)} | ${teamPlayer.Weight} lbs | " +
-                        teamPlayer.BirthCity,
+                text = "${teamPlayer.position} | #${teamPlayer.jersey} | " +
+                        "${inchesToFeet(teamPlayer.height)} | ${teamPlayer.weight} lbs | " +
+                        teamPlayer.birthCity,
                 fontSize = 16.sp,
                 fontFamily = FontFamily.Serif,
                 modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 4.dp)

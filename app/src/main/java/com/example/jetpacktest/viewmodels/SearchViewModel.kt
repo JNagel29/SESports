@@ -1,14 +1,12 @@
 package com.example.jetpacktest.viewmodels
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.jetpacktest.DatabaseHandler
 import com.example.jetpacktest.RestHandler
-import com.example.jetpacktest.models.NbaTeam
+import com.example.jetpacktest.models.TeamMaps
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import java.net.SocketTimeoutException
 
 
 @OptIn(FlowPreview::class)
@@ -92,10 +90,10 @@ class SearchViewModel() : ViewModel() {
     val teamResults = searchText
         .flatMapLatest { text ->
             if (text.isBlank()) {
-                flowOf(NbaTeam.names)
+                flowOf(TeamMaps.names)
             } else {
                 flow {
-                    val filteredTeams = NbaTeam.names.filter { teamName ->
+                    val filteredTeams = TeamMaps.names.filter { teamName ->
                         teamName.contains(text, ignoreCase = true)
                     }
                     emit(filteredTeams)

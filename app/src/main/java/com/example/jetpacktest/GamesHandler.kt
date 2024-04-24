@@ -10,7 +10,7 @@ import android.util.Log
 //Custom models/object
 import com.example.jetpacktest.models.Game
 import com.example.jetpacktest.models.GameResponse
-import com.example.jetpacktest.models.NbaTeam
+import com.example.jetpacktest.models.TeamMaps
 //For date operations
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -22,9 +22,9 @@ import org.threeten.bp.format.DateTimeFormatter
 
 class GamesHandler {
     //ApiInterface adds the 'games' endpoint, as well as the date query for us
-    private val baseGameUrl = "https://api.balldontlie.io/v1/"
+    private val baseGameUrl = Keys.BDL_BASE_URL
 
-    fun fetchGames(date: Date, onResult: (MutableList<Game>) -> Unit) {
+    fun fetchGames(date: Date, onResult: (MutableList<Game>?) -> Unit) {
         //We first must convert our date into a usable format
         val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         val formattedDate = dateFormat.format(date)
@@ -42,9 +42,9 @@ class GamesHandler {
                     val responseBody = response.body()!!
                     for (game in responseBody.data) {
                         //Set the logos that weren't in JSON.
-                        game.home_team.logo = NbaTeam.xmlLogos[game.home_team.name] ?:
+                        game.homeTeam.logo = TeamMaps.xmlLogos[game.homeTeam.name] ?:
                                 R.drawable.baseline_arrow_back_ios_new_24
-                        game.visitor_team.logo = NbaTeam.xmlLogos[game.visitor_team.name] ?:
+                        game.visitorTeam.logo = TeamMaps.xmlLogos[game.visitorTeam.name] ?:
                                 R.drawable.baseline_arrow_back_ios_new_24
                         //gameTime set to Final means game ended, null means hasn't started
                         if (game.time.isNullOrEmpty() || game.time == "Final") game.time = ""
@@ -54,7 +54,8 @@ class GamesHandler {
                         }
                         gamesList.add(game)
                     }
-                    onResult(gamesList)
+                    if (gamesList.isNotEmpty()) onResult(gamesList)
+                    else onResult(null)
                 }
                 else { Log.d("GamesHandler", "Retrofit: Unsuccessful Response") }
             }

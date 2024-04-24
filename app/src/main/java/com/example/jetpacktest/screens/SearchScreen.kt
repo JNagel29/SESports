@@ -19,14 +19,20 @@ import androidx.compose.material3.TextFieldDefaults
 //Composable/UI
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.jetpacktest.models.NbaTeam
+import androidx.compose.ui.unit.sp
+import com.example.jetpacktest.FavoritesHandler
 import com.example.jetpacktest.ui.components.CircularLoadingIcon
 
 @Composable
@@ -40,16 +46,17 @@ fun SearchScreen(
      onSearchTypeChange: (String) -> Unit,
      clearResults: () -> Unit,
      navigateToPlayerProfile: (String) -> Unit,
-     navigateToTeamProfile: (String) -> Unit)
-{
+     navigateToTeamProfile: (String) -> Unit
+) {
     val keyboardController = LocalSoftwareKeyboardController.current
-
     val searchTextValue = searchText.value
     val isSearchingValue = isSearching.value
     val selectedSearchTypeValue = selectedSearchType.value
     val playerResultsValue = playerResults.value
     val teamResultsValue = teamResults.value
 
+    val favoritesHandler = FavoritesHandler(LocalContext.current)
+    val favoritePlayers by remember { mutableStateOf(favoritesHandler.getFavoritePlayers())}
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
@@ -96,8 +103,17 @@ fun SearchScreen(
                 CircularLoadingIcon()
             }
             else { // Display results after search
+                if (selectedSearchTypeValue == "Player" && searchTextValue.isEmpty()) {
+                    Text(
+                        text = "Favorites",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 20.sp
+                    )
+                }
                 SearchResultsDisplay(
-                    searchResults = if (selectedSearchTypeValue == "Player") playerResultsValue
+                    searchResults = if (selectedSearchTypeValue == "Player"
+                                    && searchTextValue.isEmpty()) favoritePlayers.toList()
+                                    else if (selectedSearchTypeValue == "Player") playerResultsValue
                                     else teamResultsValue,
                     hideKeyboard = { keyboardController!!.hide() },
                     navigateToProfile = { nameArg ->
@@ -127,12 +143,9 @@ fun RadioButtonsDisplay(selectedSearchType: String, onSearchTypeSelected: (Strin
                 onClearSearchResults()
             }
         }
-        //First our player button
+        //Player/Team Buttons
         RadioButton(
-            //If var equals Player, then we know it's selected and so it gets a check on it
             selected = selectedSearchType == "Player",
-            //Set var to Player on click
-            //We use the lambda that sets the searchTypeSelected from the caller function, to Team
             onClick = { handleClick("Player")},
             colors = RadioButtonDefaults.colors(Color.Blue)
         )
@@ -140,11 +153,8 @@ fun RadioButtonsDisplay(selectedSearchType: String, onSearchTypeSelected: (Strin
             text = "Player",
             modifier = Modifier.clickable { handleClick("Player") }
         )
-        //Then, team button
         RadioButton(
-            //If var equals Team, then we know it's selected and so it gets a check on it
             selected = selectedSearchType == "Team",
-            //We use the lambda that sets the searchTypeSelected from the caller function, to Team
             onClick = {handleClick("Team")
             },
             colors = RadioButtonDefaults.colors(Color.Blue)
@@ -180,19 +190,6 @@ fun SearchResultsDisplay(
             }
         }
     }
-}
-
-//This function handles searching for teams
-fun handleTeamSearch(searchedTeamName: String, onSearchResult: (List<String>) -> Unit) {
-    val teamNames = mutableListOf<String>() // Instantiate an empty list for matching team names
-    //Loop through each team name that we have in NbaTeam model object
-    for (nbaTeamName in NbaTeam.names) {
-        //If name contains search text as a substring (ignoring case), then add it to list
-        if (nbaTeamName.contains(other = searchedTeamName, ignoreCase = true)) {
-            teamNames.add(nbaTeamName)
-        }
-    }
-    onSearchResult(teamNames) // Call back to SearchScreen() w/ lambda the list so it can display
 }
 
 @Preview
