@@ -8,3 +8,12 @@ fun removeAccents(input: String): String {
     return Normalizer.normalize(input, Normalizer.Form.NFD)
         .replace("\\p{InCombiningDiacriticalMarks}+".toRegex(), "")
 }
+
+fun dropZeroBeforeDecimal(input: Float): String {
+    val inputStr = input.toString()
+    return if (inputStr.startsWith("0.")) {
+        inputStr.drop(1)
+    } else {
+        inputStr
+    }
+}
