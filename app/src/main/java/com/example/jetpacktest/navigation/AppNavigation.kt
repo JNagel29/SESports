@@ -28,6 +28,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.jetpacktest.screens.BracketsScreen
 import com.example.jetpacktest.screens.CompareResultsScreen
 import com.example.jetpacktest.screens.CompareScreen
 import com.example.jetpacktest.screens.HomeScreen
@@ -84,7 +85,7 @@ fun AppNavigation(randomStat: String) {
                 }
             }
         }
-    ) {paddingValues ->
+    ) { paddingValues ->
         NavHost(navController = navController,
             startDestination = Screens.HomeScreen.name,
             modifier = Modifier
@@ -146,11 +147,40 @@ fun AppNavigation(randomStat: String) {
                     launchSingleTop = true
                 }
             }
+            val navigateToBrackets: () -> Unit = {
+                navController.navigate(Screens.BracketsScreen.name)
+            }
             composable(route = Screens.StandingsScreen.name) {
                 StandingsScreen(
                     westernFlow = standingsViewModel.westernFlow,
                     easternFlow = standingsViewModel.easternFlow,
-                    navigateToTeamProfile = navigateToTeamProfile
+                    navigateToTeamProfile = navigateToTeamProfile,
+                    navigateToBrackets = navigateToBrackets
+                )
+            }
+            composable(
+                route = Screens.BracketsScreen.name,
+                enterTransition = {
+                    slideInHorizontally(
+                        initialOffsetX = { it },
+                        animationSpec = tween(
+                            300,
+                            easing = FastOutLinearInEasing
+                        )
+                    )
+                },
+                exitTransition = {
+                    slideOutHorizontally(
+                        targetOffsetX = { -it },
+                        animationSpec = tween(
+                            300,
+                            easing = FastOutLinearInEasing
+                        )
+                    )
+                }
+            ) {
+                BracketsScreen(
+                    navigateBack = { navController.navigateUp() },
                 )
             }
             composable(route=Screens.GamesScreen.name) {
@@ -161,7 +191,7 @@ fun AppNavigation(randomStat: String) {
             composable(route = "${Screens.CompareResultsScreen.route}/{playerName1}/{playerName2}",
                 enterTransition = {
                     slideInHorizontally(
-                        initialOffsetX = {it },
+                        initialOffsetX = { it },
                         animationSpec = tween(
                             300,
                             easing = FastOutLinearInEasing
@@ -255,6 +285,5 @@ fun AppNavigation(randomStat: String) {
                 )
             }
         }
-
     }
 }

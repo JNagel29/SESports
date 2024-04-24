@@ -4,6 +4,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -16,7 +17,10 @@ import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
@@ -24,6 +28,7 @@ import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -41,7 +46,8 @@ import kotlinx.coroutines.flow.Flow
 fun StandingsScreen(
     westernFlow: Flow<List<TeamStanding>>,
     easternFlow: Flow<List<TeamStanding>>,
-    navigateToTeamProfile: (String) -> Unit
+    navigateToTeamProfile: (String) -> Unit,
+    navigateToBrackets: () -> Unit
 ) {
     val westernStandings by westernFlow.collectAsState(initial = emptyList())
     val easternStandings by easternFlow.collectAsState(initial = emptyList())
@@ -50,19 +56,41 @@ fun StandingsScreen(
 
     LazyColumn {
         stickyHeader {
-            Text(
-                text = "Standings",
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(
-                        MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp) // Same as Nav-Bar
+                    .background(MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp))
+                    .padding(8.dp)
+            ) {
+                Text(
+                    text = "Standings",
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Start,
+                    fontFamily = FontFamily.Serif,
+                )
+                Row(
+                    horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.clickable {
+                        navigateToBrackets()
+                    }
+                ) {
+                    Text(
+                        text = "Brackets",
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.End,
+                        fontFamily = FontFamily.Serif,
                     )
-                    .padding(8.dp),
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center,
-                fontFamily = FontFamily.Serif,
-            )
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                        contentDescription = null
+                    )
+                }
+            }
         }
         //Group by Conference to organize West/East
         combinedStandings.groupBy { it.conference}.forEach { mapEntry ->
@@ -133,7 +161,7 @@ fun TeamStandingRow(teamStanding: TeamStanding, navigateToTeamProfile: (String) 
         modifier = Modifier
             .fillMaxWidth()
             .background(Color.White)
-            .padding(8.dp), // TODO: This padding makes vertical divider not stretch top/bottom row
+            .padding(8.dp),
     ) {
         Text(
             text = "${teamStanding.rank}",

@@ -8,5 +8,6 @@ enum class Screens(val route: String) {
     ProfileScreen("profile"),
     TeamProfileScreen("teamprofile"),
     StandingsScreen("standings"),
+    BracketsScreen("brackets"),
     GamesScreen("games"),
 }
