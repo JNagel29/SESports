@@ -1,6 +1,5 @@
 package com.example.jetpacktest.screens
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -29,23 +28,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.jetpacktest.R
-import com.example.jetpacktest.ui.components.ReturnToPreviousHeader
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun BracketsScreen(navigateBack: () -> Unit) {
+fun BracketsScreen() {
     LazyColumn(
-        modifier = Modifier
-            .padding(horizontal = 16.dp)
-  //          .fillMaxSize()
-  //          .background(Color.DarkGray)
+        modifier = Modifier.padding(horizontal = 16.dp)
     ) {
-        stickyHeader {
-            ReturnToPreviousHeader(
-                navigateBack = navigateBack,
-                label = "Standings Screen"
-            )
-        }
         item { Spacer(modifier = Modifier.height(16.dp)) }
         item {
             LazyRow {

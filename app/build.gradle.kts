@@ -100,6 +100,9 @@ dependencies {
     implementation("com.squareup.retrofit2:converter-gson:2.1.0")
     //Work Manager, for fetching random stat daily
     implementation("androidx.work:work-runtime-ktx:2.9.0")
+    //Horizontal pager to swipe b/w standings and bracket
+    //implementation("com.google.accompanist:accompanist-pager:0.35.0-alpha")
+    //implementation("com.google.accompanist:accompanist-pager-indicators:0.35.0-alpha")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")

@@ -28,14 +28,13 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.jetpacktest.screens.BracketsScreen
 import com.example.jetpacktest.screens.CompareResultsScreen
 import com.example.jetpacktest.screens.CompareScreen
 import com.example.jetpacktest.screens.HomeScreen
 import com.example.jetpacktest.screens.ProfileScreen
 import com.example.jetpacktest.screens.SearchScreen
 import com.example.jetpacktest.screens.GamesScreen
-import com.example.jetpacktest.screens.StandingsScreen
+import com.example.jetpacktest.screens.StandingBracketPager
 import com.example.jetpacktest.screens.TeamProfileScreen
 import com.example.jetpacktest.viewmodels.StandingsViewModel
 import kotlinx.coroutines.launch
@@ -147,45 +146,19 @@ fun AppNavigation(randomStat: String) {
                     launchSingleTop = true
                 }
             }
-            val navigateToBrackets: () -> Unit = {
-                navController.navigate(Screens.BracketsScreen.name)
-            }
-            composable(route = Screens.StandingsScreen.name) {
-                StandingsScreen(
+            composable(
+                route = Screens.StandingsBracketPager.name
+            ) {
+                //This pager screen will let us go to Standings OR Bracket in one swipe
+                StandingBracketPager(
                     westernFlow = standingsViewModel.westernFlow,
                     easternFlow = standingsViewModel.easternFlow,
                     navigateToTeamProfile = navigateToTeamProfile,
-                    navigateToBrackets = navigateToBrackets,
                     updateStandingsByYear = { year: String ->
                         standingsViewModel.updateWesternStandings(year = year)
                         standingsViewModel.updateEasternStandings(year = year)
                     },
                     yearOptions = standingsViewModel.yearOptions
-                )
-            }
-            composable(
-                route = Screens.BracketsScreen.name,
-                enterTransition = {
-                    slideInHorizontally(
-                        initialOffsetX = { it },
-                        animationSpec = tween(
-                            300,
-                            easing = FastOutLinearInEasing
-                        )
-                    )
-                },
-                exitTransition = {
-                    slideOutHorizontally(
-                        targetOffsetX = { -it },
-                        animationSpec = tween(
-                            300,
-                            easing = FastOutLinearInEasing
-                        )
-                    )
-                }
-            ) {
-                BracketsScreen(
-                    navigateBack = { navController.navigateUp() },
                 )
             }
             composable(route=Screens.GamesScreen.name) {

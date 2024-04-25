@@ -7,7 +7,6 @@ enum class Screens(val route: String) {
     CompareResultsScreen("compareresults"),
     ProfileScreen("profile"),
     TeamProfileScreen("teamprofile"),
-    StandingsScreen("standings"),
-    BracketsScreen("brackets"),
+    StandingsBracketPager("standingbracketpager"), // Redirects us to Standings/BracketScreen
     GamesScreen("games"),
 }
