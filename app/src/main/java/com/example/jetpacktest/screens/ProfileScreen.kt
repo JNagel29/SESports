@@ -1,7 +1,6 @@
 package com.example.jetpacktest.screens
 
 import android.util.Log
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -19,8 +18,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.StarBorder
 import androidx.compose.material3.HorizontalDivider
@@ -55,6 +52,7 @@ import com.example.jetpacktest.ui.components.LargeDropdownMenu
 import com.example.jetpacktest.models.Player
 import com.example.jetpacktest.models.PlayerPersonalInfo
 import com.example.jetpacktest.ui.components.CircularLoadingIcon
+import com.example.jetpacktest.ui.components.ExpandableCategory
 import com.example.jetpacktest.ui.components.ReturnToPreviousHeader
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -423,7 +421,7 @@ fun PlayerStatisticTable(player: Player) {
             .padding(16.dp)
     ) {
         Spacer(modifier = Modifier.height(4.dp))
-        StatisticCategory("Shooting Splits") {
+        ExpandableCategory("Shooting Splits") {
             Column(
                 modifier = Modifier
                     .padding(4.dp)
@@ -446,7 +444,7 @@ fun PlayerStatisticTable(player: Player) {
                 )
             }
         }
-        StatisticCategory("Defensive Efficiency and Usage") {
+        ExpandableCategory("Defensive Efficiency and Usage") {
             Column(
                 modifier = Modifier
                     .padding(4.dp)
@@ -458,34 +456,6 @@ fun PlayerStatisticTable(player: Player) {
                 PlayerDataRow("Mins. Played", player.minutesPlayed.toString())
             }
         }
-    }
-}
-
-@Composable
-fun StatisticCategory(title: String, content: @Composable () -> Unit) {
-    var expandedCategory by remember { mutableStateOf(false) }
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween,
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable {expandedCategory = !expandedCategory }
-    ){
-        Text(
-            text = title,
-            modifier = Modifier.padding(8.dp),
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold
-        )
-        Icon(
-            imageVector = if (expandedCategory) Icons.Filled.ArrowDropUp
-                        else Icons.Filled.ArrowDropDown,
-            contentDescription = null,
-            modifier = Modifier.size(24.dp)
-        )
-    }
-    AnimatedVisibility(visible = expandedCategory) {
-        content() // Lambda of rows that we passed in for that specific category
     }
 }
 
