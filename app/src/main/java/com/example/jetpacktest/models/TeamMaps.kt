@@ -68,7 +68,15 @@ object TeamMaps {
         "San Antonio Spurs" to "SA",
         "Toronto Raptors" to "TOR",
         "Utah Jazz" to "UTA",
-        "Washington Wizards" to "WAS"
+        "Washington Wizards" to "WAS",
+        //Defunct teams but required for Standings Screen
+        "Vancouver Grizzlies" to "VAN",
+        "Seattle SuperSonics" to "SEA",
+        "New Orleans/Oklahoma City Hornets" to "NOH",
+        "New Orleans Hornets" to "NOH",
+        "Charlotte Bobcats" to "CHA",
+        "New Jersey Nets" to "NJN",
+        "Washington Bullets" to "WSB"
     )
 
     //Define a mapping of team abbreviations to drawable resource IDs for the logos

@@ -28,6 +28,9 @@ import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -39,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.jetpacktest.dropZeroBeforeDecimal
 import com.example.jetpacktest.models.TeamStanding
+import com.example.jetpacktest.ui.components.LargeDropdownMenu
 import kotlinx.coroutines.flow.Flow
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -47,13 +51,15 @@ fun StandingsScreen(
     westernFlow: Flow<List<TeamStanding>>,
     easternFlow: Flow<List<TeamStanding>>,
     navigateToTeamProfile: (String) -> Unit,
-    navigateToBrackets: () -> Unit
+    navigateToBrackets: () -> Unit,
+    updateStandingsByYear: (String) -> Unit,
+    yearOptions: List<String>
 ) {
     val westernStandings by westernFlow.collectAsState(initial = emptyList())
     val easternStandings by easternFlow.collectAsState(initial = emptyList())
+    var chosenYear by rememberSaveable { mutableStateOf(yearOptions.first()) }
 
     val combinedStandings = easternStandings + westernStandings
-
     LazyColumn {
         stickyHeader {
             Row(
@@ -64,23 +70,18 @@ fun StandingsScreen(
                     .background(MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp))
                     .padding(8.dp)
             ) {
-                Text(
-                    text = "Standings",
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Start,
-                    fontFamily = FontFamily.Serif,
-                )
                 Row(
                     horizontalArrangement = Arrangement.End,
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.clickable {
-                        navigateToBrackets()
-                    }
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            navigateToBrackets()
+                        }
                 ) {
                     Text(
                         text = "Bracket",
-                        fontSize = 24.sp,
+                        fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.End,
                         fontFamily = FontFamily.Serif,
@@ -92,8 +93,24 @@ fun StandingsScreen(
                 }
             }
         }
+        item {
+            LargeDropdownMenu(
+                label = "Select Year:",
+                items = yearOptions,
+                selectedIndex = yearOptions.indexOf(chosenYear),
+                onItemSelected = { index, _ ->
+                    val year = yearOptions[index]
+                    if (year != chosenYear) {
+                        chosenYear = year
+                        updateStandingsByYear(chosenYear)
+                    }
+                },
+                modifier = Modifier.background(MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp))
+            )
+        }
         //Group by Conference to organize West/East
         combinedStandings.groupBy { it.conference}.forEach { mapEntry ->
+            //TODO: Somehow make collapsible
             stickyHeader { ConferenceHeader(
                 conferenceName = mapEntry.key.name.take(4)
             ) }

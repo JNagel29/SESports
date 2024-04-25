@@ -160,26 +160,28 @@ class DatabaseHandler {
         }
     }
 
-    fun executeStandings(conference: Conference, onDataReceived: (MutableList<TeamStanding>) -> Unit) {
+    fun executeStandings(
+        conference: Conference, year: String, onDataReceived: (MutableList<TeamStanding>) -> Unit
+    ) {
         scope.launch {
-            val standingsList = getStandings(conference)
+            val standingsList = getStandings(conference =conference, year = year)
             onDataReceived(standingsList)
         }
     }
 
-    private fun getStandings(conference: Conference): MutableList<TeamStanding> {
+    private fun getStandings(conference: Conference, year: String): MutableList<TeamStanding> {
         var myConn: Connection? = null
         var statement: Statement? = null
         var resultSet: ResultSet? = null
-        val teamPlayers = mutableListOf<TeamStanding>()
+        val teamStandings = mutableListOf<TeamStanding>()
         try {
             Class.forName("com.mysql.jdbc.Driver")
             myConn = DriverManager.getConnection(url, user, password)
             statement = myConn.createStatement()
-            val sql = "SELECT* FROM ${conference.name}_STANDING"
+            val sql = "SELECT* FROM ${conference.name}_STANDING WHERE `Year` = $year"
             resultSet = statement.executeQuery(sql)
             while (resultSet.next()) {
-                val teamName = resultSet.getString("Team_Name")
+                val teamName = resultSet.getString("Team")
                 val abbrev = when (teamName) {
                     "New York Knicks" -> "NYK" // These 4 have their third letter cut off
                     "New Orleans Pelicans" -> "NOP"
@@ -188,16 +190,16 @@ class DatabaseHandler {
                     else -> TeamMaps.namesToAbbreviations[teamName] ?: "N/A"
                 }
                 val teamStanding = TeamStanding(
-                    rank = resultSet.getInt("rank"),
+                    rank = resultSet.getInt("Rank"),
                     name = teamName,
-                    wins = resultSet.getInt("Wins"),
-                    losses = resultSet.getInt("Losses"),
-                    winLossPercentage = resultSet.getFloat("Win_Loss_Percentage"),
+                    wins = resultSet.getInt("W"),
+                    losses = resultSet.getInt("L"),
+                    winLossPercentage = resultSet.getFloat("W/L%"),
                     conference = conference,
                     logo = TeamMaps.xmlLogos[teamName] ?: R.drawable.baseline_arrow_back_ios_new_24,
                     abbrev = abbrev
                 )
-                teamPlayers.add(teamStanding)
+                teamStandings.add(teamStanding)
             }
         } catch (e: SQLException) {
             Log.d(Const.TAG, e.message!!)
@@ -207,7 +209,7 @@ class DatabaseHandler {
         } finally {
             closeResources(myConn, resultSet, statement)
         }
-        return teamPlayers
+        return teamStandings
     }
 
     private fun getNbaDotComId(playerName: String): Int {

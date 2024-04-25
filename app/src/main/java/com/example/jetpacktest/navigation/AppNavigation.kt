@@ -155,7 +155,12 @@ fun AppNavigation(randomStat: String) {
                     westernFlow = standingsViewModel.westernFlow,
                     easternFlow = standingsViewModel.easternFlow,
                     navigateToTeamProfile = navigateToTeamProfile,
-                    navigateToBrackets = navigateToBrackets
+                    navigateToBrackets = navigateToBrackets,
+                    updateStandingsByYear = { year: String ->
+                        standingsViewModel.updateWesternStandings(year = year)
+                        standingsViewModel.updateEasternStandings(year = year)
+                    },
+                    yearOptions = standingsViewModel.yearOptions
                 )
             }
             composable(

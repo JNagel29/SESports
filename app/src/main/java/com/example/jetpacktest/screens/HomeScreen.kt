@@ -49,7 +49,7 @@ fun HomeScreen(
     //TODO:Change it so we pass just the states and lambdas, not entire Viewmodel
     val statLeadersList by homeViewModel.statLeadersListFlow.collectAsState(initial = emptyList())
     val chosenStat by homeViewModel.chosenStatFlow.collectAsState(initial = "PTS")
-    val chosenYear by homeViewModel.chosenYearFlow.collectAsState(initial = "2024")
+    val chosenYear by homeViewModel.chosenYearFlow.collectAsState(initial = yearOptions.first())
 
     LaunchedEffect(Unit) {
         if (statLeadersList.isEmpty()) {
