@@ -2,13 +2,23 @@ package com.example.jetpacktest
 
 import android.util.Log
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.google.gson.annotations.SerializedName
@@ -61,30 +71,40 @@ class HeadshotHandler {
 
     @Composable
     fun ComposeImage(imgToCompose: String, contentDesc: String,
-                     width: Dp, height: Dp) {
-        //Now, we display image depending on if we actually got a URL or not
-        if (imgToCompose != "DEFAULT") {
-            Image(
-                painter = rememberAsyncImagePainter(
-                    ImageRequest.Builder(LocalContext.current).data(data = imgToCompose)
-                        .apply(block = fun ImageRequest.Builder.() {
-                            crossfade(true)
-                        }).build()
-                ),
-                contentDescription = contentDesc,
-                modifier = Modifier
-                    .width(width)
-                    .height(height)
-            )
-        }
-        else {
-            Image(
-                painter = painterResource(id = R.drawable.fallback),
-                contentDescription = contentDesc,
-                modifier = Modifier
-                    .width(width)
-                    .height(height)
-            )
+                     width: Dp, height: Dp, modifier: Modifier = Modifier) {
+        // Now, we display the image depending on if we actually got a URL or not
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .width(width)
+                .height(height)
+                .clip(CircleShape)
+                .then(modifier) // Custom parameter modifier for border
+        ) {
+            //Now, we display image depending on if we actually got a URL or not
+            if (imgToCompose != "DEFAULT") {
+                Image(
+                    painter = rememberAsyncImagePainter(
+                        ImageRequest.Builder(LocalContext.current).data(data = imgToCompose)
+                            .apply(block = fun ImageRequest.Builder.() {
+                                crossfade(true)
+                            }).build()
+                    ),
+                    contentDescription = contentDesc,
+                    modifier = Modifier
+                        .width(width)
+                        .height(height)
+                        .clip(CircleShape)
+                )
+            } else {
+                Image(
+                    painter = painterResource(id = R.drawable.fallback),
+                    contentDescription = contentDesc,
+                    modifier = Modifier
+                        .width(width)
+                        .height(height)
+                )
+            }
         }
     }
 

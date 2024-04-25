@@ -1,9 +1,11 @@
 package com.example.jetpacktest.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -23,6 +25,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.jetpacktest.DatabaseHandler
+import com.example.jetpacktest.HeadshotHandler
 import com.example.jetpacktest.R
 import com.example.jetpacktest.models.Player
 import com.example.jetpacktest.ui.components.CircularLoadingIcon
@@ -32,6 +35,7 @@ import com.example.jetpacktest.ui.components.ReturnToPreviousHeader
 @Composable
 fun CompareResultsScreen(playerName1: String, playerName2: String,navigateBack: () -> Unit) {
     val databaseHandler = DatabaseHandler()
+    val headshotHandler = HeadshotHandler()
     var player1 by remember { mutableStateOf(Player()) }
     var player2 by remember { mutableStateOf(Player()) }
     var chosenYear1 by remember { mutableStateOf("") }
@@ -40,6 +44,10 @@ fun CompareResultsScreen(playerName1: String, playerName2: String,navigateBack: 
     var yearsList2 by remember { mutableStateOf<List<String>>(emptyList()) }
     var isFetching1 by remember { mutableStateOf(false)}
     var isFetching2 by remember { mutableStateOf(false)}
+    var isFetchingImage1 by remember { mutableStateOf(false)}
+    var isFetchingImage2 by remember { mutableStateOf(false)}
+    var imgId1 by remember { mutableIntStateOf(-1) }
+    var imgId2 by remember { mutableIntStateOf(-1) }
 
     LaunchedEffect(Unit) {
         isFetching1 = true
@@ -65,6 +73,16 @@ fun CompareResultsScreen(playerName1: String, playerName2: String,navigateBack: 
                     isFetching2 = false
                 }
             }
+        }
+        isFetchingImage1 = true
+        headshotHandler.fetchImageId(playerName = playerName1) { result ->
+            imgId1 = result
+            isFetchingImage1 = false
+        }
+        isFetchingImage2 = true
+        headshotHandler.fetchImageId(playerName = playerName2) { result ->
+            imgId2 = result
+            isFetchingImage2 = false
         }
     }
 
@@ -115,8 +133,13 @@ Surface(modifier = Modifier.fillMaxSize(), color = Color.White) {
                 )
             }
             Spacer(modifier = Modifier.height(5.dp))
-            NameHeader(player1Name = player1.name, player2Name = player2.name)
-            Spacer(modifier = Modifier.height(5.dp))
+            NamesAndHeadshots(
+                player1Name = player1.name,
+                player2Name = player2.name,
+                imgId1 = imgId1,
+                imgId2 = imgId2,
+                headshotHandler = headshotHandler
+            )
             DisplayComparison(player1, player2)
         }
     }
@@ -166,8 +189,20 @@ fun PlayerCard(player1: Player, player2: Player) {
 }
 
 @Composable
-fun NameHeader(player1Name: String, player2Name: String) {
+fun NamesAndHeadshots(
+    player1Name: String,
+    player2Name: String,
+    imgId1: Int,
+    imgId2: Int,
+    headshotHandler: HeadshotHandler
+) {
+    val player1HeadshotUrl = if (imgId1 == -1 || imgId1 == 0) "DEFAULT"
+    else "https://cdn.nba.com/headshots/nba/latest/1040x760/$imgId1.png"
+    val player2HeadshotUrl = if (imgId2 == -1 || imgId2 == 0) "DEFAULT"
+    else "https://cdn.nba.com/headshots/nba/latest/1040x760/$imgId2.png"
     Row(
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
             .background(Color.White)
@@ -179,7 +214,27 @@ fun NameHeader(player1Name: String, player2Name: String) {
             fontWeight = FontWeight.Bold,
             color = Color.Black,
             fontFamily = FontFamily.Serif,
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.weight(1f),
+        )
+        headshotHandler.ComposeImage(
+            imgToCompose = player1HeadshotUrl,
+            contentDesc = player1Name,
+            width = 90.dp,
+            height = 90.dp,
+            modifier = Modifier
+                .border(2.dp, Color.Black, CircleShape)
+                .background(MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp))
+        )
+        Spacer(modifier = Modifier.width(5.dp))
+        headshotHandler.ComposeImage(
+            imgToCompose = player2HeadshotUrl,
+            contentDesc = player2Name,
+            width = 90.dp,
+            height = 90.dp,
+            modifier = Modifier
+                .border(2.dp, Color.Black, CircleShape)
+                .background(MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp))
+
         )
         Text(
             text = player2Name,
