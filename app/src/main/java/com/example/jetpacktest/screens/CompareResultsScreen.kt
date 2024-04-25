@@ -15,6 +15,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -33,117 +34,121 @@ import com.example.jetpacktest.ui.components.LargeDropdownMenu
 import com.example.jetpacktest.ui.components.ReturnToPreviousHeader
 
 @Composable
-fun CompareResultsScreen(playerName1: String, playerName2: String,navigateBack: () -> Unit) {
+fun CompareResultsScreen(playerName1: String, playerName2: String, navigateBack: () -> Unit) {
     val databaseHandler = DatabaseHandler()
     val headshotHandler = HeadshotHandler()
-    var player1 by remember { mutableStateOf(Player()) }
-    var player2 by remember { mutableStateOf(Player()) }
-    var chosenYear1 by remember { mutableStateOf("") }
-    var chosenYear2 by remember { mutableStateOf("") }
-    var yearsList1 by remember { mutableStateOf<List<String>>(emptyList()) }
-    var yearsList2 by remember { mutableStateOf<List<String>>(emptyList()) }
+    var player1 by rememberSaveable { mutableStateOf(Player()) }
+    var player2 by rememberSaveable { mutableStateOf(Player()) }
+    var chosenYear1 by rememberSaveable { mutableStateOf("") }
+    var chosenYear2 by rememberSaveable { mutableStateOf("") }
+    var yearsList1 by rememberSaveable { mutableStateOf<List<String>>(emptyList()) }
+    var yearsList2 by rememberSaveable { mutableStateOf<List<String>>(emptyList()) }
+    var imgId1 by rememberSaveable { mutableIntStateOf(-1) }
+    var imgId2 by rememberSaveable { mutableIntStateOf(-1) }
     var isFetching1 by remember { mutableStateOf(false)}
     var isFetching2 by remember { mutableStateOf(false)}
     var isFetchingImage1 by remember { mutableStateOf(false)}
     var isFetchingImage2 by remember { mutableStateOf(false)}
-    var imgId1 by remember { mutableIntStateOf(-1) }
-    var imgId2 by remember { mutableIntStateOf(-1) }
 
     LaunchedEffect(Unit) {
-        isFetching1 = true
-        //Fetch player 1 years and data
-        databaseHandler.executeYears(playerName = playerName1) {result ->
-            yearsList1 = result
-            if (yearsList1.isNotEmpty()) {
-                chosenYear1 = yearsList1.first() //Default to most recent year
-                databaseHandler.executePlayerData(playerName1, chosenYear1) { data ->
-                    player1 = data
-                    isFetching1 = false
+        if (yearsList1.isEmpty()) {
+            isFetching1 = true
+            databaseHandler.executeYears(playerName = playerName1) { result ->
+                yearsList1 = result
+                if (yearsList1.isNotEmpty()) {
+                    chosenYear1 = yearsList1.first() //Default to most recent year
+                    databaseHandler.executePlayerData(playerName1, chosenYear1) { data ->
+                        player1 = data
+                        isFetching1 = false
+                    }
                 }
             }
         }
-        isFetching2 = true
-        //Same for player2
-        databaseHandler.executeYears(playerName = playerName2) {result ->
-            yearsList2 = result
-            if (yearsList2.isNotEmpty()) {
-                chosenYear2 = yearsList2.first() //Default to most recent year
-                databaseHandler.executePlayerData(playerName2, chosenYear2) { data ->
-                    player2 = data
-                    isFetching2 = false
+        if (yearsList2.isEmpty()) {
+            isFetching2 = true
+            databaseHandler.executeYears(playerName = playerName2) { result ->
+                yearsList2 = result
+                if (yearsList2.isNotEmpty()) {
+                    chosenYear2 = yearsList2.first() //Default to most recent year
+                    databaseHandler.executePlayerData(playerName2, chosenYear2) { data ->
+                        player2 = data
+                        isFetching2 = false
+                    }
                 }
             }
         }
-        isFetchingImage1 = true
-        headshotHandler.fetchImageId(playerName = playerName1) { result ->
-            imgId1 = result
-            isFetchingImage1 = false
-        }
-        isFetchingImage2 = true
-        headshotHandler.fetchImageId(playerName = playerName2) { result ->
-            imgId2 = result
-            isFetchingImage2 = false
+        if (imgId1 == -1 || imgId2 == -1) {
+            isFetchingImage1 = true
+            headshotHandler.fetchImageId(playerName = playerName1) { result ->
+                imgId1 = result
+                isFetchingImage1 = false
+            }
+            isFetchingImage2 = true
+            headshotHandler.fetchImageId(playerName = playerName2) { result ->
+                imgId2 = result
+                isFetchingImage2 = false
+            }
         }
     }
 
-Surface(modifier = Modifier.fillMaxSize(), color = Color.White) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(8.dp)
-    ) {
-        ReturnToPreviousHeader(navigateBack = navigateBack, label = "Compare")
-        Spacer(modifier = Modifier.height(15.dp))
-        if (isFetching1 || isFetching2) {
-            CircularLoadingIcon()
-        }
-        else {
-            Row(modifier = Modifier.fillMaxWidth()) {
-                LargeDropdownMenu(
-                    label = "Select ${player1.name}'s Year:",
-                    items = yearsList1,
-                    selectedIndex = yearsList1.indexOf(chosenYear1),
-                    onItemSelected = { index, _ ->
-                        val year = yearsList1[index]
-                        //Check if newly selected stat is different from previous
-                        if (year != chosenYear1) {
-                            chosenYear1 = year
-                            databaseHandler.executePlayerData(playerName1, chosenYear1) { data ->
-                                player1 = data
-                            }
-                        }
-                    },
-                    modifier = Modifier.weight(1f)
-                )
-                LargeDropdownMenu(
-                    label = "Select ${player2.name}'s Year:",
-                    items = yearsList2,
-                    selectedIndex = yearsList2.indexOf(chosenYear2),
-                    onItemSelected = { index, _ ->
-                        val year = yearsList2[index]
-                        //Check if newly selected stat is different from previous
-                        if (year != chosenYear2) {
-                            chosenYear2 = year
-                            databaseHandler.executePlayerData(playerName2, chosenYear2) { data ->
-                                player2 = data
-                            }
-                        }
-                    },
-                    modifier = Modifier.weight(1f)
-                )
+    Surface(modifier = Modifier.fillMaxSize(), color = Color.White) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(8.dp)
+        ) {
+            ReturnToPreviousHeader(navigateBack = navigateBack, label = "Compare")
+            Spacer(modifier = Modifier.height(15.dp))
+            if (isFetching1 || isFetching2) {
+                CircularLoadingIcon()
             }
-            Spacer(modifier = Modifier.height(5.dp))
-            NamesAndHeadshots(
-                player1Name = player1.name,
-                player2Name = player2.name,
-                imgId1 = imgId1,
-                imgId2 = imgId2,
-                headshotHandler = headshotHandler
-            )
-            DisplayComparison(player1, player2)
+            else {
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    LargeDropdownMenu(
+                        label = "Select ${player1.name}'s Year:",
+                        items = yearsList1,
+                        selectedIndex = yearsList1.indexOf(chosenYear1),
+                        onItemSelected = { index, _ ->
+                            val year = yearsList1[index]
+                            //Check if newly selected stat is different from previous
+                            if (year != chosenYear1) {
+                                chosenYear1 = year
+                                databaseHandler.executePlayerData(playerName1, chosenYear1) { data ->
+                                    player1 = data
+                                }
+                            }
+                        },
+                        modifier = Modifier.weight(1f)
+                    )
+                    LargeDropdownMenu(
+                        label = "Select ${player2.name}'s Year:",
+                        items = yearsList2,
+                        selectedIndex = yearsList2.indexOf(chosenYear2),
+                        onItemSelected = { index, _ ->
+                            val year = yearsList2[index]
+                            //Check if newly selected stat is different from previous
+                            if (year != chosenYear2) {
+                                chosenYear2 = year
+                                databaseHandler.executePlayerData(playerName2, chosenYear2) { data ->
+                                    player2 = data
+                                }
+                            }
+                        },
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+                Spacer(modifier = Modifier.height(5.dp))
+                NamesAndHeadshots(
+                    player1Name = player1.name,
+                    player2Name = player2.name,
+                    imgId1 = imgId1,
+                    imgId2 = imgId2,
+                    headshotHandler = headshotHandler
+                )
+                DisplayComparison(player1, player2)
+            }
         }
     }
-}
 }
 
 @Composable
