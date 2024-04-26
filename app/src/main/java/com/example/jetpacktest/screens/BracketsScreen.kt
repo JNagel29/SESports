@@ -83,11 +83,13 @@ fun BracketsScreen() {
                 state = pagerState
             ) { page ->
                 when (page) {
-                    //Only need LazyColumn on first b/c many match-ups
+                    //Only need LazyColumn on first two b/c many match-ups
                     0 -> LazyColumn(modifier = Modifier.fillMaxWidth()) {
                         item { FirstRoundColumn() }
                     }
-                    1 -> SecondRoundColumn()
+                    1 -> LazyColumn(modifier = Modifier.fillMaxWidth()) {
+                        item { SecondRoundColumn() }
+                    }
                     2 -> ThirdRoundColumn()
                     3 -> FourthRoundColumn()
                 }
