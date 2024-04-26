@@ -45,14 +45,17 @@ fun StandingBracketPager(
                     selected = pagerState.currentPage == index,
                     onClick = {
                         coroutineScope.launch {
-                            pagerState.scrollToPage(index)
+                            pagerState.scrollToPage(page = index)
                         }
                     }
                 )
             }
         }
         Box(modifier = Modifier.weight(1f)) {
-            HorizontalPager(state = pagerState) { page ->
+            HorizontalPager(
+                state = pagerState,
+                userScrollEnabled = false
+            ) { page ->
                 when (page) {
                     0 -> StandingsScreen(
                         westernFlow = westernFlow,
