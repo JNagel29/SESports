@@ -66,7 +66,9 @@ fun StandingsScreen(
                         updateStandingsByYear(chosenYear)
                     }
                 },
-                modifier = Modifier.background(MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp))
+                modifier = Modifier
+                    .padding(5.dp)
+                    .background(MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp))
             )
         }
         //Group by Conference to organize West/East

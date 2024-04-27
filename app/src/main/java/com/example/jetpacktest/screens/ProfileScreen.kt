@@ -173,6 +173,7 @@ fun ProfileScreen(
                     label = "Select Year:",
                     items = yearsList,
                     selectedIndex = yearsList.indexOf(chosenYear),
+                    modifier = Modifier.padding(top = 5.dp, start = 5.dp, end = 5.dp),
                     onItemSelected = { index, _ ->
                         chosenYear = yearsList[index]
                         if (chosenYear != "2024") {
@@ -194,16 +195,7 @@ fun ProfileScreen(
                     }
                 )
             }
-            /*
-            item {
-                ToggleFurtherStats(
-                    showExpandedData = showExpandedData,
-                    onClick = { showExpandedData = !showExpandedData }
-                )
-            }
-             */
-
-            if (player.points != -1.0f) { // && showExpandedData
+            if (player.points != -1.0f) {
                 item {
                     PlayerStatisticTable(player)
                 }
