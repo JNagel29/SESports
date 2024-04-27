@@ -174,7 +174,16 @@ object TeamMaps {
         "Jazz" to R.drawable.xml_jazz,
         "Utah Jazz" to R.drawable.xml_jazz,
         "Wizards" to R.drawable.xml_wizards,
-        "Washington Wizards" to R.drawable.xml_wizards
+        "Washington Wizards" to R.drawable.xml_wizards,
+        //Defunct teams but required for Standings Screen
+        "Seattle SuperSonics" to R.drawable.xml_supersonics,
+        "New Jersey Nets" to R.drawable.xml_old_nets,
+        "New Orleans/Oklahoma City Hornets" to R.drawable.xml_old_hornets,
+        "New Orleans Hornets" to R.drawable.xml_old_hornets,
+        //WSB and VAN 1996 test , CHA in 2005
+        "Charlotte Bobcats" to R.drawable.xml_bobcats,
+        "Washington Bullets" to R.drawable.xml_wizards, // No SVG of team this old so using Wizards
+        "Vancouver Grizzlies" to R.drawable.xml_old_grizzlies
     )
 
     val shortenedNamesToFullNames: Map<String, String> = mapOf(
