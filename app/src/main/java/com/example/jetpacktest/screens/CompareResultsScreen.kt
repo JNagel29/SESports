@@ -282,7 +282,7 @@ fun StatRow(label: String, player1Value: String, player2Value: String) {
         )
         Text(
             text = label,
-            fontSize = 20.sp,
+            fontSize = 16.sp,
             fontFamily = FontFamily.Serif,
             textAlign = TextAlign.Center,
             fontWeight = FontWeight.Bold,
@@ -310,9 +310,9 @@ fun StatRow(label: String, player1Value: String, player2Value: String) {
 private fun getPlayerStats(
     player1: Player,
     player2: Player
-): List<Pair<String, Pair<Float, Float>>> {
+): List<Pair<String, Pair<Any, Any>>> {
     return listOf(
-        "Team" to Pair(player1.team.toFloatOrNull() ?: 0f, player2.team.toFloatOrNull() ?: 0f),
+        "Team" to Pair(player1.team, player2.team),
         "Points" to Pair(player1.points, player2.points),
         "Assists" to Pair(player1.assists, player2.assists),
         "Steals" to Pair(player1.steals, player2.steals),
@@ -321,6 +321,7 @@ private fun getPlayerStats(
         "Turnovers" to Pair(player1.turnovers, player2.turnovers),
         "Personal Fouls" to Pair(player1.personalFouls, player2.personalFouls),
         "Minutes Played" to Pair(player1.minutesPlayed, player2.minutesPlayed),
+        "Games Started" to Pair(player1.gamesStarted, player2.gamesStarted),
         "Field Goals" to Pair(player1.fieldGoals, player2.fieldGoals),
         "Field Goal Attempts" to Pair(player1.fieldGoalAttempts, player2.fieldGoalAttempts),
         "Field Goal %" to Pair(player1.fieldGoalPercent, player2.fieldGoalPercent),
@@ -330,10 +331,13 @@ private fun getPlayerStats(
         "2 Pointers" to Pair(player1.twoPointers, player2.twoPointers),
         "2 Point Attempts" to Pair(player1.twoPointerAttempts, player2.twoPointerAttempts),
         "2 Point %" to Pair(player1.twoPointPercent, player2.twoPointPercent),
+        "Free Throws" to Pair(player1.freeThrows, player2.freeThrows),
+        "Free Throw Attempts" to Pair(player1.freeThrowAttempts, player2.freeThrowAttempts),
+        "Free Throw %" to Pair(player1.freeThrowPercent, player2.freeThrowPercent),
         "Effective Field Goal %" to Pair(player1.effectiveFieldGoalPercent,
             player2.effectiveFieldGoalPercent),
-        "Offensive Rebounds" to Pair(player1.offensiveRebounds, player2.offensiveRebounds),
-        "Defensive Rebounds" to Pair(player1.defensiveRebounds, player2.defensiveRebounds)
+        "Off. Rebounds" to Pair(player1.offensiveRebounds, player2.offensiveRebounds),
+        "Def. Rebounds" to Pair(player1.defensiveRebounds, player2.defensiveRebounds)
     )
 }
 

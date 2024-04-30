@@ -430,6 +430,10 @@ fun PlayerStatisticTable(player: Player) {
                 PlayerDataRow("2 Point Attempts", player.twoPointerAttempts.toString())
                 PlayerDataRow("2 Point %", "%.1f%%"
                     .format(player.twoPointPercent * 100))
+                PlayerDataRow("Free Throws", player.freeThrows.toString())
+                PlayerDataRow("Free Throw Attempts", player.freeThrowAttempts.toString())
+                PlayerDataRow("Free Throw %", "%.1f%%"
+                    .format(player.freeThrowPercent * 100))
                 PlayerDataRow(
                     "Effective FG%",
                     "%.1f%%".format(player.effectiveFieldGoalPercent * 100)
@@ -446,6 +450,7 @@ fun PlayerStatisticTable(player: Player) {
                 PlayerDataRow("Fouls", player.personalFouls.toString())
                 PlayerDataRow("Turnovers", player.turnovers.toString())
                 PlayerDataRow("Mins. Played", player.minutesPlayed.toString())
+                PlayerDataRow("Games Started", player.gamesStarted.toString())
             }
         }
     }

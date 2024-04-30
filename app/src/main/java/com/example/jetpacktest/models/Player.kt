@@ -17,6 +17,7 @@ data class Player(
     val turnovers: Float,
     val personalFouls: Float,
     val minutesPlayed: Float,
+    val gamesStarted: Int,
     val fieldGoals: Float,
     val fieldGoalAttempts: Float,
     val fieldGoalPercent: Float,
@@ -26,14 +27,17 @@ data class Player(
     val twoPointers: Float,
     val twoPointerAttempts: Float,
     val twoPointPercent: Float,
+    val freeThrows: Float,
+    val freeThrowAttempts: Float,
+    val freeThrowPercent: Float,
     val effectiveFieldGoalPercent: Float,
     val offensiveRebounds: Float,
     val defensiveRebounds: Float,
 ) : Parcelable {
     //Secondary constructor, default for ()
     constructor() : this("", -1, "", "", -1.0f, -1.0f, -1.0f,
-        -1.0f, -1.0f, -1.0f, -1.0f, -1.0f, -1.0f,
+        -1.0f, -1.0f, -1.0f, -1.0f, -1.0f, 0, -1.0f,
         -1.0f, -1.0f, -1.0f, -1.0f, -1.0f,
         -1.0f, -1.0f, -1.0f, -1.0f, -1.0f,
-        -1.0f)
+        -1.0f, -1.0f, -1.0f, -1.0f)
 }
