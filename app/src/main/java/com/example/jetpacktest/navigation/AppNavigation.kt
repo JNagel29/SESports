@@ -95,8 +95,18 @@ fun AppNavigation(randomStat: String) {
             composable(route=Screens.HomeScreen.name) {
                 HomeScreen(
                     randomStat = randomStat,
-                    homeViewModel = homeViewModel,
-                    //Pass in a lambda that'll let us go to a stat leader's profile on click
+                    chosenStatFlow = homeViewModel.chosenStatFlow,
+                    chosenYearFlow = homeViewModel.chosenYearFlow,
+                    statLeadersListFlow = homeViewModel.statLeadersListFlow,
+                    fetchStatLeaders = {
+                        homeViewModel.fetchStatLeaders()
+                    },
+                    updateChosenStat = { chosenStat ->
+                       homeViewModel.updateChosenStat(newStat = chosenStat)
+                    },
+                    updateChosenYear = { chosenYear ->
+                       homeViewModel.updateChosenYear(newYear = chosenYear)
+                    },
                     navigateToPlayerProfile = { playerName ->
                         navController.navigate("${Screens.ProfileScreen.route}/$playerName") {
                             launchSingleTop = true //Prevents double click navigation

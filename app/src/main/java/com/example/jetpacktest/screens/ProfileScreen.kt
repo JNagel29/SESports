@@ -176,21 +176,11 @@ fun ProfileScreen(
                     modifier = Modifier.padding(top = 5.dp, start = 5.dp, end = 5.dp),
                     onItemSelected = { index, _ ->
                         chosenYear = yearsList[index]
-                        if (chosenYear != "2024") {
-                            databaseHandler.executePlayerData(
-                                playerName,
-                                chosenYear
-                            ) { data ->
-                                player = data
-                            }
-                        } else {
-                            //TODO: Call upon API later for 2024 data
-                            databaseHandler.executePlayerData(
-                                playerName,
-                                chosenYear
-                            ) { data ->
-                                player = data
-                            }
+                        databaseHandler.executePlayerData(
+                            playerName,
+                            chosenYear
+                        ) { data ->
+                            player = data
                         }
                     }
                 )

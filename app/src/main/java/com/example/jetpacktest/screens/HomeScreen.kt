@@ -1,6 +1,5 @@
 package com.example.jetpacktest.screens
 
-import com.example.jetpacktest.viewmodels.HomeViewModel
 import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -35,26 +34,33 @@ import com.example.jetpacktest.models.StatLeader
 import com.example.jetpacktest.ui.components.ExpandableCard
 import com.example.jetpacktest.ui.theme.JetpackTestTheme
 import com.example.jetpacktest.ui.components.LargeDropdownMenu
+import kotlinx.coroutines.flow.Flow
 
 @Composable
 fun HomeScreen(
     randomStat: String,
-    homeViewModel: HomeViewModel,
-    navigateToPlayerProfile: (String) -> Unit)
+    chosenStatFlow: Flow<String>,
+    chosenYearFlow: Flow<String>,
+    statLeadersListFlow: Flow<List<StatLeader>>,
+    fetchStatLeaders: () -> Unit,
+    updateChosenStat: (String) -> Unit,
+    updateChosenYear: (String) -> Unit,
+    navigateToPlayerProfile: (String) -> Unit
+)
 {
-    val yearOptions = listOf("2009", "2010", "2011", "2012", "2013", "2014",
-            "2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022",
-            "2023", "2024").reversed()
+    val yearOptions = listOf("1991", "1992", "1993", "1994", "1995", "1996", "1997", "1998",
+        "1999", "2000", "2001", "2002", "2003", "2004", "2005", "2006", "2007", "2008", "2009",
+        "2010", "2011", "2012", "2013", "2014", "2015", "2016", "2017", "2018", "2019", "2020",
+        "2021", "2022", "2023", "2024").reversed()
     val statOptions = listOf("Points", "Assists", "Rebounds", "Blocks", "Steals")
-    //TODO:Change it so we pass just the states and lambdas, not entire Viewmodel
-    val statLeadersList by homeViewModel.statLeadersListFlow.collectAsState(initial = emptyList())
-    val chosenStat by homeViewModel.chosenStatFlow.collectAsState(initial = "PTS")
-    val chosenYear by homeViewModel.chosenYearFlow.collectAsState(initial = yearOptions.first())
+    val statLeadersList by statLeadersListFlow.collectAsState(initial = emptyList())
+    val chosenStat by chosenStatFlow.collectAsState(initial = "PTS")
+    val chosenYear by chosenYearFlow.collectAsState(initial = yearOptions.first())
 
     LaunchedEffect(Unit) {
         if (statLeadersList.isEmpty()) {
             Log.d("HomeScreen", "Fetching new stat leads...")
-            homeViewModel.fetchStatLeaders()
+            fetchStatLeaders()
         }
     }
 
@@ -81,8 +87,8 @@ fun HomeScreen(
                 onItemSelected = { index, _ ->
                     val stat = statOptions[index]
                     if (stat != chosenStat) {
-                        homeViewModel.updateChosenStat(stat)
-                        homeViewModel.fetchStatLeaders()
+                        updateChosenStat(stat)
+                        fetchStatLeaders()
                     }
                 },
                 modifier = Modifier.weight(1f) //Take up half of the width
@@ -96,8 +102,8 @@ fun HomeScreen(
                 onItemSelected = { index, _ ->
                     val year = yearOptions[index]
                     if (year != chosenYear) {
-                        homeViewModel.updateChosenYear(year)
-                        homeViewModel.fetchStatLeaders()
+                        updateChosenYear(year)
+                        fetchStatLeaders()
                     }
                 },
                 modifier = Modifier.weight(1f) //Take up other half of width

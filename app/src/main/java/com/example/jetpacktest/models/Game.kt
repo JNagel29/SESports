@@ -7,9 +7,9 @@ data class GameResponse(
 )
 
 data class Game(
-    var status: String, //TODO fix var
+    var status: String,
     val period: Int,
-    var time: String?, //TODO fix var
+    var time: String?,
     @SerializedName("home_team_score")
     val homeTeamScore: Int,
     @SerializedName("visitor_team_score")
