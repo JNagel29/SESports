@@ -2,6 +2,7 @@ package com.example.jetpacktest.screens
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -42,6 +43,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.jetpacktest.R
+import com.example.jetpacktest.models.TeamMaps
 import kotlinx.coroutines.launch
 
 data class Matchup (
@@ -58,7 +60,7 @@ data class TeamBracket (
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun BracketsScreen() {
+fun BracketsScreen(navigateToTeamProfile: (String) -> Unit) {
     val pagerState = rememberPagerState(pageCount = { 4 })
     val titles = listOf("1st Round", "Conf. Semifinals", "Conf. Finals", "NBA Finals")
     val coroutineScope = rememberCoroutineScope()
@@ -101,20 +103,20 @@ fun BracketsScreen() {
                 when (page) {
                     //Only need LazyColumn on first two b/c many match-ups
                     0 -> LazyColumn(modifier = Modifier.fillMaxWidth()) {
-                        item { FirstRoundColumn() }
+                        item { FirstRoundColumn(navigateToTeamProfile) }
                     }
                     1 -> LazyColumn(modifier = Modifier.fillMaxWidth()) {
-                        item { SecondRoundColumn() }
+                        item { SecondRoundColumn(navigateToTeamProfile) }
                     }
-                    2 -> ThirdRoundColumn()
-                    3 -> FourthRoundColumn()
+                    2 -> ThirdRoundColumn(navigateToTeamProfile)
+                    3 -> FourthRoundColumn(navigateToTeamProfile)
                 }
             }
         }
     }
 }
 @Composable
-private fun FirstRoundColumn() {
+private fun FirstRoundColumn(navigateToTeamProfile: (String) -> Unit) {
     Column {
         Spacer(modifier = Modifier.height(10.dp))
 
@@ -158,13 +160,17 @@ private fun FirstRoundColumn() {
                 ConferenceNameHeader(conferenceName = "EAST")
             else if (index == 4)
                 ConferenceNameHeader(conferenceName = "WEST")
-            MatchupCard(team1 = matchUp.team1, team2 = matchUp.team2)
+            MatchupCard(
+                team1 = matchUp.team1,
+                team2 = matchUp.team2,
+                navigateToTeamProfile = navigateToTeamProfile
+            )
         }
     }
 }
 
 @Composable
-private fun SecondRoundColumn() {
+private fun SecondRoundColumn(navigateToTeamProfile: (String) -> Unit) {
     Column {
         Spacer(modifier = Modifier.height(10.dp))
 
@@ -191,13 +197,14 @@ private fun SecondRoundColumn() {
                 ConferenceNameHeader(conferenceName = "EAST")
             else if (index == 2)
                 ConferenceNameHeader(conferenceName = "WEST")
-            MatchupCard(team1 = matchUp.team1, team2 = matchUp.team2)
+            MatchupCard(team1 = matchUp.team1, team2 = matchUp.team2,
+                navigateToTeamProfile = navigateToTeamProfile)
         }
     }
 }
 
 @Composable
-private fun ThirdRoundColumn() {
+private fun ThirdRoundColumn(navigateToTeamProfile: (String) -> Unit) {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.CenterStart
@@ -221,14 +228,15 @@ private fun ThirdRoundColumn() {
                     ConferenceNameHeader(conferenceName = "EAST")
                 else if (index == 1)
                     ConferenceNameHeader(conferenceName = "WEST")
-                MatchupCard(team1 = matchUp.team1, team2 = matchUp.team2)
+                MatchupCard(team1 = matchUp.team1, team2 = matchUp.team2,
+                    navigateToTeamProfile = navigateToTeamProfile)
             }
         }
     }
 }
 
 @Composable
-private fun FourthRoundColumn() {
+private fun FourthRoundColumn(navigateToTeamProfile: (String) -> Unit) {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.CenterStart
@@ -242,13 +250,14 @@ private fun FourthRoundColumn() {
             )
 
             ConferenceNameHeader(conferenceName = "NBA FINALS")
-            MatchupCard(team1 = fourthRoundMatchup.team1, team2 = fourthRoundMatchup.team2)
+            MatchupCard(team1 = fourthRoundMatchup.team1, team2 = fourthRoundMatchup.team2,
+                navigateToTeamProfile = navigateToTeamProfile)
         }
     }
 }
 
 @Composable
-fun MatchupCard(team1: TeamBracket, team2: TeamBracket) {
+fun MatchupCard(team1: TeamBracket, team2: TeamBracket, navigateToTeamProfile: (String) -> Unit) {
     Card(
         modifier = Modifier.padding(16.dp).width(250.dp),
         elevation = CardDefaults.cardElevation(
@@ -265,7 +274,8 @@ fun MatchupCard(team1: TeamBracket, team2: TeamBracket) {
                 gamesWon = team1.gamesWon,
                 logo = team1.logo,
                 standing = team1.standing,
-                isEliminated = team2.gamesWon == 4 // Eliminated iff other team has 4 wins
+                isEliminated = team2.gamesWon == 4, // Eliminated iff other team has 4 wins,
+                navigateToTeamProfile = navigateToTeamProfile
             )
             HorizontalDivider(
                 color = Color.LightGray,
@@ -276,7 +286,8 @@ fun MatchupCard(team1: TeamBracket, team2: TeamBracket) {
                 gamesWon = team2.gamesWon,
                 logo = team2.logo,
                 standing = team2.standing,
-                isEliminated = team1.gamesWon == 4
+                isEliminated = team1.gamesWon == 4,
+                navigateToTeamProfile = navigateToTeamProfile
             )
         }
     }
@@ -293,7 +304,9 @@ fun ConferenceNameHeader(conferenceName: String) {
 }
 
 @Composable
-fun TeamRow(name: String, gamesWon: Int?, logo: Int?, standing: Int?, isEliminated: Boolean) {
+fun TeamRow(name: String, gamesWon: Int?, logo: Int?, standing: Int?,
+            isEliminated: Boolean, navigateToTeamProfile: (String) -> Unit
+) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
@@ -315,6 +328,9 @@ fun TeamRow(name: String, gamesWon: Int?, logo: Int?, standing: Int?, isEliminat
                 modifier = Modifier
                     .size(40.dp)
                     .clip(RoundedCornerShape(4.dp))
+                    .clickable {
+                        navigateToTeamProfile(TeamMaps.shortenedNamesToFullNames[name] ?: "N/A")
+                    }
             )
         }
         Spacer(modifier = Modifier.width(8.dp))
