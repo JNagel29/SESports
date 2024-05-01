@@ -43,17 +43,23 @@ fun TeamProfileScreen(
     navigateToPlayerProfile: (String) -> Unit,
     getPreviousScreenName: () -> (String?)
 ) {
+    val defunctTeams = listOf("VAN", "SEA", "NJN", "WSB", "NOH")
     val teamHandler = TeamHandler()
     var teamPlayersList by rememberSaveable { mutableStateOf<List<TeamPlayer>>(emptyList()) }
-
+    var isDefunct by rememberSaveable { mutableStateOf(false)}
     LaunchedEffect(Unit) {
-        if (teamPlayersList.isEmpty()) {
-            //Before anything else, fetch team abbreviation using dictionary in NbaTeam.kt
+        if (teamPlayersList.isEmpty() && !isDefunct) {
+            //Before anything else, fetch team abbreviation using dictionary in TeamMaps.kt
             val teamAbbrev = TeamMaps.namesToAbbreviations[teamName]
             if (teamAbbrev != null) {
-                Log.d("TeamProfile", "Fetching new roster...")
-                teamHandler.fetchCurrentRoster(teamAbbrev = teamAbbrev) { result ->
-                    teamPlayersList = result
+                if (defunctTeams.contains(teamAbbrev)) {
+                    isDefunct = true
+                }
+                else {
+                    Log.d("TeamProfile", "Fetching new roster...")
+                    teamHandler.fetchCurrentRoster(teamAbbrev = teamAbbrev) { result ->
+                        teamPlayersList = result
+                    }
                 }
             }
         }
@@ -67,17 +73,20 @@ fun TeamProfileScreen(
         Spacer(modifier = Modifier.height(15.dp))
         TeamNameHeader(teamName = teamName)
         Spacer(modifier = Modifier.height(8.dp))
-        //Elvis operator uses fallback if it teamName maps to no logo ID
-        val teamLogo = TeamMaps.logos[teamName] ?: R.drawable.fallback
-        Image(
-            painter = painterResource(id = teamLogo),
-            contentDescription = teamName,
-            modifier = Modifier
-                .width(200.dp)
-                .height(200.dp)
-                .align(Alignment.CenterHorizontally)
-        )
-        CurrentRosterDisplay(teamPlayersList, navigateToPlayerProfile)
+        if (!isDefunct) {
+            //Elvis operator uses fallback if it teamName maps to no logo ID
+            val teamLogo = TeamMaps.logos[teamName] ?: R.drawable.fallback
+            Image(
+                painter = painterResource(id = teamLogo),
+                contentDescription = teamName,
+                modifier = Modifier
+                    .width(200.dp)
+                    .height(200.dp)
+                    .align(Alignment.CenterHorizontally)
+            )
+            CurrentRosterDisplay(teamPlayersList, navigateToPlayerProfile)
+        }
+        else DisplayDefunctTeamMessage()
     }
 }
 
@@ -152,6 +161,21 @@ fun TeamPlayerRow(teamPlayer: TeamPlayer, navigateToPlayerProfile: (String) -> U
                 modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 4.dp)
             )
         }
+    }
+}
+
+@Composable
+fun DisplayDefunctTeamMessage() {
+    Box(
+        modifier = Modifier.fillMaxWidth(),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = "This team is defunct and thus has no current roster!",
+            modifier = Modifier.fillMaxWidth().padding(5.dp),
+            textAlign = TextAlign.Center,
+            fontFamily = FontFamily.Serif
+        )
     }
 }
 
