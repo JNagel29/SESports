@@ -15,8 +15,8 @@ class RandomStatWorker(appContext: Context, workerParams: WorkerParameters):
     override suspend fun doWork(): Result {
         Log.d("RandomStatWorker", "Fetching new random stat...")
 
-        //Gets random index from 101-121
-        val randomIndex = (101 until 108).random()
+        //Gets random index from 101-112
+        val randomIndex = (101 until 113).random()
         databaseHandler.executeRandomStat(randomIndex) {data ->
             randomStat = data
             saveRandomStatToSharedPreferences(randomStat)

@@ -33,6 +33,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -119,36 +120,36 @@ private fun FirstRoundColumn() {
 
         val firstRoundMatchups = listOf(
             Matchup(
-                TeamBracket(abbrev = "Celtics", gamesWon = 1, logo = R.drawable.xml_celtics, standing = 1),
+                TeamBracket(abbrev = "Celtics", gamesWon = 3, logo = R.drawable.xml_celtics, standing = 1),
                 TeamBracket(abbrev = "Heat", gamesWon = 1, logo = R.drawable.xml_heat, standing = 8)
             ),
             Matchup(
                 TeamBracket(abbrev = "Cavaliers", gamesWon = 2, logo = R.drawable.xml_cavaliers, standing = 4),
-                TeamBracket(abbrev = "Magic", gamesWon = 1, logo = R.drawable.xml_magic, standing = 5)
+                TeamBracket(abbrev = "Magic", gamesWon = 2, logo = R.drawable.xml_magic, standing = 5)
             ),
             Matchup(
                 TeamBracket(abbrev = "Bucks", gamesWon = 1, logo = R.drawable.xml_bucks, standing = 3),
-                TeamBracket(abbrev = "Pacers", gamesWon = 2, logo = R.drawable.xml_pacers, standing = 6)
+                TeamBracket(abbrev = "Pacers", gamesWon = 3, logo = R.drawable.xml_pacers, standing = 6)
             ),
             Matchup(
-                TeamBracket(abbrev = "Knicks", gamesWon = 2, logo = R.drawable.xml_knicks, standing = 2),
+                TeamBracket(abbrev = "Knicks", gamesWon = 3, logo = R.drawable.xml_knicks, standing = 2),
                 TeamBracket(abbrev = "76ers", gamesWon = 1, logo = R.drawable.xml_sixers, standing = 7)
             ),
             Matchup(
-                TeamBracket(abbrev = "Thunder", gamesWon = 2, logo = R.drawable.xml_thunder, standing = 1),
+                TeamBracket(abbrev = "Thunder", gamesWon = 4, logo = R.drawable.xml_thunder, standing = 1),
                 TeamBracket(abbrev = "Pelicans", gamesWon = 0, logo = R.drawable.xml_pelicans, standing = 8)
             ),
             Matchup(
-                TeamBracket(abbrev = "Clippers", gamesWon = 1, logo = R.drawable.xml_clippers, standing = 4),
+                TeamBracket(abbrev = "Clippers", gamesWon = 2, logo = R.drawable.xml_clippers, standing = 4),
                 TeamBracket(abbrev = "Mavericks", gamesWon = 2, logo = R.drawable.xml_mavericks, standing = 5)
             ),
             Matchup(
-                TeamBracket(abbrev = "Timberwolves", gamesWon = 2, logo = R.drawable.xml_timberwolves, standing = 3),
+                TeamBracket(abbrev = "Timberwolves", gamesWon = 4, logo = R.drawable.xml_timberwolves, standing = 3),
                 TeamBracket(abbrev = "Suns", gamesWon = 0, logo = R.drawable.xml_suns, standing = 6 )
             ),
             Matchup(
-                TeamBracket(abbrev = "Nuggets", gamesWon = 3, logo = R.drawable.xml_nuggets, standing = 2),
-                TeamBracket(abbrev = "Lakers", gamesWon = 0, logo = R.drawable.xml_lakers, standing = 7)
+                TeamBracket(abbrev = "Nuggets", gamesWon = 4, logo = R.drawable.xml_nuggets, standing = 2),
+                TeamBracket(abbrev = "Lakers", gamesWon = 1, logo = R.drawable.xml_lakers, standing = 7)
             )
         )
 
@@ -167,13 +168,24 @@ private fun SecondRoundColumn() {
     Column {
         Spacer(modifier = Modifier.height(10.dp))
 
-        val secondRoundMatchups = List(4) {
+        val secondRoundMatchups = listOf(
             Matchup(
                 TeamBracket(abbrev = "TBD", gamesWon = null, logo = null, standing = null),
                 TeamBracket(abbrev = "TBD", gamesWon = null, logo = null, standing = null)
+            ),
+            Matchup(
+                TeamBracket(abbrev = "TBD", gamesWon = null, logo = null, standing = null),
+                TeamBracket(abbrev = "TBD", gamesWon = null, logo = null, standing = null)
+            ),
+            Matchup(
+                TeamBracket(abbrev = "Thunder", gamesWon = null, logo = R.drawable.xml_thunder, standing = 1),
+                TeamBracket(abbrev = "TBD", gamesWon = null, logo = null, standing = null)
+            ),
+            Matchup(
+                TeamBracket(abbrev = "Timberwolves", gamesWon = null, logo = R.drawable.xml_timberwolves, standing = 3),
+                TeamBracket(abbrev = "Nuggets", gamesWon = null, logo = R.drawable.xml_nuggets, standing = 2),
             )
-        }
-
+        )
         secondRoundMatchups.forEachIndexed { index, matchUp ->
             if (index == 0)
                 ConferenceNameHeader(conferenceName = "EAST")
@@ -193,12 +205,16 @@ private fun ThirdRoundColumn() {
         Column {
             Spacer(modifier = Modifier.height(10.dp))
 
-            val thirdRoundMatchups = List(2) {
+            val thirdRoundMatchups = listOf(
+                Matchup(
+                    TeamBracket(abbrev = "TBD", gamesWon = null, logo = null, standing = null),
+                    TeamBracket(abbrev = "TBD", gamesWon = null, logo = null, standing = null)
+                ),
                 Matchup(
                     TeamBracket(abbrev = "TBD", gamesWon = null, logo = null, standing = null),
                     TeamBracket(abbrev = "TBD", gamesWon = null, logo = null, standing = null)
                 )
-            }
+            )
 
             thirdRoundMatchups.forEachIndexed { index, matchUp ->
                 if (index == 0)
@@ -248,7 +264,8 @@ fun MatchupCard(team1: TeamBracket, team2: TeamBracket) {
                 name = team1.abbrev,
                 gamesWon = team1.gamesWon,
                 logo = team1.logo,
-                standing = team1.standing
+                standing = team1.standing,
+                isEliminated = team2.gamesWon == 4 // Eliminated iff other team has 4 wins
             )
             HorizontalDivider(
                 color = Color.LightGray,
@@ -258,7 +275,8 @@ fun MatchupCard(team1: TeamBracket, team2: TeamBracket) {
                 name = team2.abbrev,
                 gamesWon = team2.gamesWon,
                 logo = team2.logo,
-                standing = team2.standing
+                standing = team2.standing,
+                isEliminated = team1.gamesWon == 4
             )
         }
     }
@@ -275,11 +293,13 @@ fun ConferenceNameHeader(conferenceName: String) {
 }
 
 @Composable
-fun TeamRow(name: String, gamesWon: Int?, logo: Int?, standing: Int?) {
+fun TeamRow(name: String, gamesWon: Int?, logo: Int?, standing: Int?, isEliminated: Boolean) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .padding(horizontal = 8.dp, vertical = 4.dp)
+            .fillMaxWidth()
+            .alpha(if (!isEliminated) 1.0f else .5f) // Gray out if eliminated
     ) {
         if (logo == null) {
             Icon(
@@ -310,7 +330,6 @@ fun TeamRow(name: String, gamesWon: Int?, logo: Int?, standing: Int?) {
         gamesWon?.let {
             Text(text = gamesWon.toString())
         }
-
     }
 }
 
