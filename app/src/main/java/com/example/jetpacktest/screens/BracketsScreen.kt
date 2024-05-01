@@ -124,16 +124,16 @@ private fun FirstRoundColumn() {
                 TeamBracket(abbrev = "Heat", gamesWon = 1, logo = R.drawable.xml_heat, standing = 8)
             ),
             Matchup(
-                TeamBracket(abbrev = "Cavaliers", gamesWon = 2, logo = R.drawable.xml_cavaliers, standing = 4),
+                TeamBracket(abbrev = "Cavaliers", gamesWon = 3, logo = R.drawable.xml_cavaliers, standing = 4),
                 TeamBracket(abbrev = "Magic", gamesWon = 2, logo = R.drawable.xml_magic, standing = 5)
             ),
             Matchup(
-                TeamBracket(abbrev = "Bucks", gamesWon = 1, logo = R.drawable.xml_bucks, standing = 3),
+                TeamBracket(abbrev = "Bucks", gamesWon = 2, logo = R.drawable.xml_bucks, standing = 3),
                 TeamBracket(abbrev = "Pacers", gamesWon = 3, logo = R.drawable.xml_pacers, standing = 6)
             ),
             Matchup(
                 TeamBracket(abbrev = "Knicks", gamesWon = 3, logo = R.drawable.xml_knicks, standing = 2),
-                TeamBracket(abbrev = "76ers", gamesWon = 1, logo = R.drawable.xml_sixers, standing = 7)
+                TeamBracket(abbrev = "76ers", gamesWon = 2, logo = R.drawable.xml_sixers, standing = 7)
             ),
             Matchup(
                 TeamBracket(abbrev = "Thunder", gamesWon = 4, logo = R.drawable.xml_thunder, standing = 1),
