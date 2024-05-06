@@ -28,7 +28,7 @@ import androidx.compose.ui.unit.sp
 import com.example.jetpacktest.DatabaseHandler
 import com.example.jetpacktest.HeadshotHandler
 import com.example.jetpacktest.R
-import com.example.jetpacktest.getFantasyScore
+import com.example.jetpacktest.getFantasyRating
 import com.example.jetpacktest.models.Player
 import com.example.jetpacktest.ui.components.CircularLoadingIcon
 import com.example.jetpacktest.ui.components.LargeDropdownMenu
@@ -312,8 +312,8 @@ private fun getPlayerStats(
     player2: Player
 ): List<Pair<String, Pair<Any, Any>>> {
     //Comparison screen will display the fantasy scores along with other stats
-    val fantasyScore1 = getFantasyScore(player1)
-    val fantasyScore2 = getFantasyScore(player2)
+    val fantasyRating1 = getFantasyRating(player1)
+    val fantasyRating2 = getFantasyRating(player2)
 
     return listOf(
         "Team" to Pair(player1.team, player2.team),
@@ -322,7 +322,7 @@ private fun getPlayerStats(
         "Steals" to Pair(player1.steals, player2.steals),
         "Blocks" to Pair(player1.blocks, player2.blocks),
         "Total Rebounds" to Pair(player1.totalRebounds, player2.totalRebounds),
-        "Fantasy Score" to Pair(fantasyScore1, fantasyScore2),
+        "Fantasy Rating" to Pair(fantasyRating1, fantasyRating2),
         "Turnovers" to Pair(player1.turnovers, player2.turnovers),
         "Personal Fouls" to Pair(player1.personalFouls, player2.personalFouls),
         "Minutes Played" to Pair(player1.minutesPlayed, player2.minutesPlayed),
