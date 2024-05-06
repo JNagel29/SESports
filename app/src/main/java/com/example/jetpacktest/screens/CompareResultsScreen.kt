@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.sp
 import com.example.jetpacktest.DatabaseHandler
 import com.example.jetpacktest.HeadshotHandler
 import com.example.jetpacktest.R
+import com.example.jetpacktest.getFantasyScore
 import com.example.jetpacktest.models.Player
 import com.example.jetpacktest.ui.components.CircularLoadingIcon
 import com.example.jetpacktest.ui.components.LargeDropdownMenu
@@ -90,7 +91,6 @@ fun CompareResultsScreen(playerName1: String, playerName2: String, navigateBack:
             }
         }
     }
-
     Surface(modifier = Modifier.fillMaxSize(), color = Color.White) {
         Column(
             modifier = Modifier
@@ -311,7 +311,12 @@ private fun getPlayerStats(
     player1: Player,
     player2: Player
 ): List<Pair<String, Pair<Any, Any>>> {
+    //Comparison screen will display the fantasy scores along with other stats
+    val fantasyScore1 = getFantasyScore(player1)
+    val fantasyScore2 = getFantasyScore(player2)
+
     return listOf(
+        "Fantasy Score" to Pair(fantasyScore1, fantasyScore2),
         "Team" to Pair(player1.team, player2.team),
         "Points" to Pair(player1.points, player2.points),
         "Assists" to Pair(player1.assists, player2.assists),

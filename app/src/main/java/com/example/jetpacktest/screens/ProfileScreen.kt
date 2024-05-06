@@ -47,6 +47,7 @@ import com.example.jetpacktest.DatabaseHandler
 import com.example.jetpacktest.FavoritesHandler
 import com.example.jetpacktest.R
 import com.example.jetpacktest.HeadshotHandler
+import com.example.jetpacktest.getFantasyScore
 import com.example.jetpacktest.models.TeamMaps
 import com.example.jetpacktest.ui.components.LargeDropdownMenu
 import com.example.jetpacktest.models.Player
@@ -408,6 +409,7 @@ fun PlayerStatisticTable(player: Player) {
                 modifier = Modifier
                     .padding(4.dp)
             ) {
+                PlayerDataRow("Fantasy Score", getFantasyScore(player).toString())
                 PlayerDataRow("Field Goals", player.fieldGoals.toString())
                 PlayerDataRow("Field Goal Attempts", player.fieldGoalAttempts.toString())
                 PlayerDataRow("Field Goal %", "%.1f%%"
@@ -430,6 +432,7 @@ fun PlayerStatisticTable(player: Player) {
                 )
             }
         }
+
         ExpandableCategory("Defensive Efficiency and Usage") {
             Column(
                 modifier = Modifier
