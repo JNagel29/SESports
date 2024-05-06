@@ -122,19 +122,19 @@ private fun FirstRoundColumn(navigateToTeamProfile: (String) -> Unit) {
 
         val firstRoundMatchups = listOf(
             Matchup(
-                TeamBracket(abbrev = "Celtics", gamesWon = 3, logo = R.drawable.xml_celtics, standing = 1),
+                TeamBracket(abbrev = "Celtics", gamesWon = 4, logo = R.drawable.xml_celtics, standing = 1),
                 TeamBracket(abbrev = "Heat", gamesWon = 1, logo = R.drawable.xml_heat, standing = 8)
             ),
             Matchup(
-                TeamBracket(abbrev = "Cavaliers", gamesWon = 3, logo = R.drawable.xml_cavaliers, standing = 4),
-                TeamBracket(abbrev = "Magic", gamesWon = 2, logo = R.drawable.xml_magic, standing = 5)
+                TeamBracket(abbrev = "Cavaliers", gamesWon = 4, logo = R.drawable.xml_cavaliers, standing = 4),
+                TeamBracket(abbrev = "Magic", gamesWon = 3, logo = R.drawable.xml_magic, standing = 5)
             ),
             Matchup(
                 TeamBracket(abbrev = "Bucks", gamesWon = 2, logo = R.drawable.xml_bucks, standing = 3),
-                TeamBracket(abbrev = "Pacers", gamesWon = 3, logo = R.drawable.xml_pacers, standing = 6)
+                TeamBracket(abbrev = "Pacers", gamesWon = 4, logo = R.drawable.xml_pacers, standing = 6)
             ),
             Matchup(
-                TeamBracket(abbrev = "Knicks", gamesWon = 3, logo = R.drawable.xml_knicks, standing = 2),
+                TeamBracket(abbrev = "Knicks", gamesWon = 4, logo = R.drawable.xml_knicks, standing = 2),
                 TeamBracket(abbrev = "76ers", gamesWon = 2, logo = R.drawable.xml_sixers, standing = 7)
             ),
             Matchup(
@@ -143,7 +143,7 @@ private fun FirstRoundColumn(navigateToTeamProfile: (String) -> Unit) {
             ),
             Matchup(
                 TeamBracket(abbrev = "Clippers", gamesWon = 2, logo = R.drawable.xml_clippers, standing = 4),
-                TeamBracket(abbrev = "Mavericks", gamesWon = 2, logo = R.drawable.xml_mavericks, standing = 5)
+                TeamBracket(abbrev = "Mavericks", gamesWon = 4, logo = R.drawable.xml_mavericks, standing = 5)
             ),
             Matchup(
                 TeamBracket(abbrev = "Timberwolves", gamesWon = 4, logo = R.drawable.xml_timberwolves, standing = 3),
@@ -176,20 +176,20 @@ private fun SecondRoundColumn(navigateToTeamProfile: (String) -> Unit) {
 
         val secondRoundMatchups = listOf(
             Matchup(
-                TeamBracket(abbrev = "TBD", gamesWon = null, logo = null, standing = null),
-                TeamBracket(abbrev = "TBD", gamesWon = null, logo = null, standing = null)
+                TeamBracket(abbrev = "Celtics", gamesWon = 0, logo = R.drawable.xml_celtics, standing = 1),
+                TeamBracket(abbrev = "Cavaliers", gamesWon = 0, logo = R.drawable.xml_cavaliers, standing = 4),
             ),
             Matchup(
-                TeamBracket(abbrev = "TBD", gamesWon = null, logo = null, standing = null),
-                TeamBracket(abbrev = "TBD", gamesWon = null, logo = null, standing = null)
+                TeamBracket(abbrev = "Pacers", gamesWon = 0, logo = R.drawable.xml_pacers, standing = 6),
+                TeamBracket(abbrev = "Knicks", gamesWon = 0, logo = R.drawable.xml_knicks, standing = 2)
             ),
             Matchup(
-                TeamBracket(abbrev = "Thunder", gamesWon = null, logo = R.drawable.xml_thunder, standing = 1),
-                TeamBracket(abbrev = "TBD", gamesWon = null, logo = null, standing = null)
+                TeamBracket(abbrev = "Thunder", gamesWon = 0, logo = R.drawable.xml_thunder, standing = 1),
+                TeamBracket(abbrev = "Mavericks", gamesWon = 0, logo = R.drawable.xml_mavericks, standing = 5)
             ),
             Matchup(
-                TeamBracket(abbrev = "Timberwolves", gamesWon = null, logo = R.drawable.xml_timberwolves, standing = 3),
-                TeamBracket(abbrev = "Nuggets", gamesWon = null, logo = R.drawable.xml_nuggets, standing = 2),
+                TeamBracket(abbrev = "Timberwolves", gamesWon = 1, logo = R.drawable.xml_timberwolves, standing = 3),
+                TeamBracket(abbrev = "Nuggets", gamesWon = 0, logo = R.drawable.xml_nuggets, standing = 2),
             )
         )
         secondRoundMatchups.forEachIndexed { index, matchUp ->
