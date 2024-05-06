@@ -64,7 +64,9 @@ fun StandingBracketPager(
                         updateStandingsByYear = updateStandingsByYear,
                         yearOptions = yearOptions
                     )
-                    1 -> BracketsScreen()
+                    1 -> BracketsScreen(
+                        navigateToTeamProfile = navigateToTeamProfile
+                    )
                 }
             }
         }
