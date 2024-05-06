@@ -409,7 +409,7 @@ fun PlayerStatisticTable(player: Player) {
                 modifier = Modifier
                     .padding(4.dp)
             ) {
-                PlayerDataRow("Fantasy Score", getFantasyScore(player).toString())
+                PlayerDataRow("Fantasy Score", getFantasyScore(player))
                 PlayerDataRow("Field Goals", player.fieldGoals.toString())
                 PlayerDataRow("Field Goal Attempts", player.fieldGoalAttempts.toString())
                 PlayerDataRow("Field Goal %", "%.1f%%"

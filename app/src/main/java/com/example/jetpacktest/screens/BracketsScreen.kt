@@ -40,6 +40,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.jetpacktest.R
@@ -344,7 +345,10 @@ fun TeamRow(name: String, gamesWon: Int?, logo: Int?, standing: Int?,
         Text(text = name)
         Spacer(modifier = Modifier.width(12.dp))
         gamesWon?.let {
-            Text(text = gamesWon.toString())
+            Text(
+                text = gamesWon.toString(),
+                textAlign = TextAlign.End
+            )
         }
     }
 }

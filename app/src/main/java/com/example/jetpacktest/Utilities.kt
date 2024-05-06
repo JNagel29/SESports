@@ -18,7 +18,7 @@ fun dropZeroBeforeDecimal(input: Float): String {
         inputStr
     }
 }
-fun getFantasyScore(player: Player): Float {
+fun getFantasyScore(player: Player): String {
     var fantasyScore = 0f
 
     // Three Point Field Goals: 3 points
@@ -45,5 +45,5 @@ fun getFantasyScore(player: Player): Float {
     // Turnovers: -1 points
     fantasyScore -= player.turnovers
 
-    return fantasyScore
+    return "%.2f".format(fantasyScore)
 }

@@ -316,13 +316,13 @@ private fun getPlayerStats(
     val fantasyScore2 = getFantasyScore(player2)
 
     return listOf(
-        "Fantasy Score" to Pair(fantasyScore1, fantasyScore2),
         "Team" to Pair(player1.team, player2.team),
         "Points" to Pair(player1.points, player2.points),
         "Assists" to Pair(player1.assists, player2.assists),
         "Steals" to Pair(player1.steals, player2.steals),
         "Blocks" to Pair(player1.blocks, player2.blocks),
         "Total Rebounds" to Pair(player1.totalRebounds, player2.totalRebounds),
+        "Fantasy Score" to Pair(fantasyScore1, fantasyScore2),
         "Turnovers" to Pair(player1.turnovers, player2.turnovers),
         "Personal Fouls" to Pair(player1.personalFouls, player2.personalFouls),
         "Minutes Played" to Pair(player1.minutesPlayed, player2.minutesPlayed),
