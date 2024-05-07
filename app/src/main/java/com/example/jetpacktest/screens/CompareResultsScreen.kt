@@ -4,11 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -31,6 +27,7 @@ import com.example.jetpacktest.R
 import com.example.jetpacktest.getFantasyRating
 import com.example.jetpacktest.models.Player
 import com.example.jetpacktest.ui.components.CircularLoadingIcon
+import com.example.jetpacktest.ui.components.ExpandableCategory
 import com.example.jetpacktest.ui.components.LargeDropdownMenu
 import com.example.jetpacktest.ui.components.ReturnToPreviousHeader
 
@@ -91,6 +88,7 @@ fun CompareResultsScreen(playerName1: String, playerName2: String, navigateBack:
             }
         }
     }
+
     Surface(modifier = Modifier.fillMaxSize(), color = Color.White) {
         Column(
             modifier = Modifier
@@ -145,51 +143,91 @@ fun CompareResultsScreen(playerName1: String, playerName2: String, navigateBack:
                     imgId2 = imgId2,
                     headshotHandler = headshotHandler
                 )
-                DisplayComparison(player1, player2)
+                PlayerComparison(player1 = player1, player2 = player2)
             }
         }
     }
 }
-
 @Composable
-fun DisplayComparison(player1: Player, player2: Player) {
-    Card(
-        modifier = Modifier.padding(8.dp),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 10.dp
-        ),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp),
-            contentColor = Color.Black
-        ),
-        shape = RoundedCornerShape(8.dp)
-    ) {
-        PlayerCard(player1 = player1, player2 = player2)
-    }
-}
-
-@Composable
-fun PlayerCard(player1: Player, player2: Player) {
+fun PlayerComparison(player1: Player, player2: Player) {
     LazyColumn(
         modifier = Modifier.fillMaxWidth()
     ) {
-        items(getPlayerStats(player1 = player1, player2 = player2)) { (statName, statValues) ->
-            val (player1Value, player2Value) = statValues // Unpack pair of stats
-            if (statName != "Team") {
-                StatRow(
-                    label = statName,
-                    player1Value = player1Value.toString(),
-                    player2Value = player2Value.toString(),
-                )
-            } else {
-                StatRow(
-                    label = statName,
-                    player1Value = player1.team,
-                    player2Value = player2.team,
-                )
-            }
-            HorizontalDivider(color = Color.Black)
+        item {
+            StatCategory(
+                title = "Main Stats",
+                stats = getPlayerStats(player1, player2, category = "Main Stats"),
+                player1 = player1,
+                player2 = player2,
+                showByDefault = true
+            )
         }
+        item {
+            StatCategory(
+                title = "Shooting Splits",
+                stats = getPlayerStats(player1, player2, category = "Shooting Splits"),
+                player1 = player1,
+                player2 = player2,
+                showByDefault = false
+            )
+        }
+        item {
+            StatCategory(
+                title = "Defensive Efficiency and Usage",
+                stats = getPlayerStats(player1, player2, category = "Defensive Efficiency and Usage"),
+                player1 = player1,
+                player2 = player2,
+                showByDefault = false
+            )
+        }
+    }
+}
+
+@Composable
+fun StatCategory(
+    title: String,
+    stats: List<Pair<String, Pair<Any, Any>>>,
+    player1: Player,
+    player2: Player,
+    showByDefault: Boolean
+) {
+    ExpandableCategory(title = title, showByDefault = showByDefault) {
+        Column(modifier = Modifier.padding(4.dp)) {
+            stats.forEachIndexed { index, (statName, statValues) ->
+                ExpandableStatRow(
+                    statName = statName,
+                    statValues = statValues,
+                    player1 = player1,
+                    player2 = player2
+                )
+                if (index < stats.lastIndex) {
+                    HorizontalDivider(color = Color.Black)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun ExpandableStatRow(
+    statName: String,
+    statValues: Pair<Any, Any>,
+    player1: Player,
+    player2: Player
+) {
+    val (player1Value, player2Value) = statValues
+    if (statName != "Team") {
+        StatRow(
+            label = statName,
+            player1Value = player1Value.toString(),
+            player2Value = player2Value.toString()
+        )
+    } else {
+        StatRow(
+            label = statName,
+            player1Value = player1.team,
+            player2Value = player2.team
+        )
     }
 }
 
@@ -275,7 +313,7 @@ fun StatRow(label: String, player1Value: String, player2Value: String) {
                 .wrapContentSize()
                 .background(
                     if (player1HasHigherStat == true) colorResource(R.color.higherStat)
-                    else MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
+                    else Color.Transparent
                 )
                 .weight(1.5f)
                 .padding(horizontal = 5.dp)
@@ -299,7 +337,7 @@ fun StatRow(label: String, player1Value: String, player2Value: String) {
                 .wrapContentSize()
                 .background(
                     if (player1HasHigherStat == false) colorResource(R.color.higherStat)
-                    else MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
+                    else Color.Transparent
                 )
                 .weight(1.5f)
                 .padding(horizontal = 5.dp)
@@ -309,41 +347,46 @@ fun StatRow(label: String, player1Value: String, player2Value: String) {
 
 private fun getPlayerStats(
     player1: Player,
-    player2: Player
+    player2: Player,
+    category: String
 ): List<Pair<String, Pair<Any, Any>>> {
-    //Comparison screen will display the fantasy scores along with other stats
-    val fantasyRating1 = getFantasyRating(player1)
-    val fantasyRating2 = getFantasyRating(player2)
 
-    return listOf(
-        "Team" to Pair(player1.team, player2.team),
-        "Points" to Pair(player1.points, player2.points),
-        "Assists" to Pair(player1.assists, player2.assists),
-        "Steals" to Pair(player1.steals, player2.steals),
-        "Blocks" to Pair(player1.blocks, player2.blocks),
-        "Total Rebounds" to Pair(player1.totalRebounds, player2.totalRebounds),
-        "Fantasy Rating" to Pair(fantasyRating1, fantasyRating2),
-        "Turnovers" to Pair(player1.turnovers, player2.turnovers),
-        "Personal Fouls" to Pair(player1.personalFouls, player2.personalFouls),
-        "Minutes Played" to Pair(player1.minutesPlayed, player2.minutesPlayed),
-        "Games Started" to Pair(player1.gamesStarted, player2.gamesStarted),
-        "Field Goals" to Pair(player1.fieldGoals, player2.fieldGoals),
-        "Field Goal Attempts" to Pair(player1.fieldGoalAttempts, player2.fieldGoalAttempts),
-        "Field Goal %" to Pair(player1.fieldGoalPercent, player2.fieldGoalPercent),
-        "3 Pointers" to Pair(player1.threePointers, player2.threePointers),
-        "3 Point Attempts" to Pair(player1.threePointerAttempts, player2.threePointerAttempts),
-        "3 Point %" to Pair(player1.threePointPercent, player2.threePointPercent),
-        "2 Pointers" to Pair(player1.twoPointers, player2.twoPointers),
-        "2 Point Attempts" to Pair(player1.twoPointerAttempts, player2.twoPointerAttempts),
-        "2 Point %" to Pair(player1.twoPointPercent, player2.twoPointPercent),
-        "Free Throws" to Pair(player1.freeThrows, player2.freeThrows),
-        "Free Throw Attempts" to Pair(player1.freeThrowAttempts, player2.freeThrowAttempts),
-        "Free Throw %" to Pair(player1.freeThrowPercent, player2.freeThrowPercent),
-        "Effective Field Goal %" to Pair(player1.effectiveFieldGoalPercent,
-            player2.effectiveFieldGoalPercent),
-        "Off. Rebounds" to Pair(player1.offensiveRebounds, player2.offensiveRebounds),
-        "Def. Rebounds" to Pair(player1.defensiveRebounds, player2.defensiveRebounds)
-    )
+
+    when (category) {
+        "Main Stats" -> return listOf(
+            "Team" to Pair(player1.team, player2.team),
+            "Points" to Pair(player1.points, player2.points),
+            "Assists" to Pair(player1.assists, player2.assists),
+            "Total Rebounds" to Pair(player1.totalRebounds, player2.totalRebounds),
+            "Off. Rebounds" to Pair(player1.offensiveRebounds, player2.offensiveRebounds),
+            "Def. Rebounds" to Pair(player1.defensiveRebounds, player2.defensiveRebounds),
+            "Fantasy Rating" to Pair(getFantasyRating(player1), getFantasyRating(player2)))
+        "Shooting Splits" -> return listOf(
+            "Field Goals" to Pair(player1.fieldGoals, player2.fieldGoals),
+            "Field Goal Attempts" to Pair(player1.fieldGoalAttempts, player2.fieldGoalAttempts),
+            "Field Goal %" to Pair(player1.fieldGoalPercent, player2.fieldGoalPercent),
+            "3 Pointers" to Pair(player1.threePointers, player2.threePointers),
+            "3 Point Attempts" to Pair(player1.threePointerAttempts, player2.threePointerAttempts),
+            "3 Point %" to Pair(player1.threePointPercent, player2.threePointPercent),
+            "2 Pointers" to Pair(player1.twoPointers, player2.twoPointers),
+            "2 Point Attempts" to Pair(player1.twoPointerAttempts, player2.twoPointerAttempts),
+            "2 Point %" to Pair(player1.twoPointPercent, player2.twoPointPercent),
+            "Free Throws" to Pair(player1.freeThrows, player2.freeThrows),
+            "Free Throw Attempts" to Pair(player1.freeThrowAttempts, player2.freeThrowAttempts),
+            "Free Throw %" to Pair(player1.freeThrowPercent, player2.freeThrowPercent),
+            "Effective Field Goal %" to Pair(
+                player1.effectiveFieldGoalPercent,
+                player2.effectiveFieldGoalPercent
+            ))
+        "Defensive Efficiency and Usage" -> return listOf(
+            "Steals" to Pair(player1.steals, player2.steals),
+            "Blocks" to Pair(player1.blocks, player2.blocks),
+            "Fouls" to Pair(player1.personalFouls, player2.personalFouls),
+            "Minutes Played" to Pair(player1.minutesPlayed, player2.minutesPlayed),
+            "Games Started" to Pair(player1.gamesStarted, player2.gamesStarted),
+        )
+        else -> return listOf("N/A" to Pair("N/A", "N/A"))
+    }
 }
 
 private fun checkIfPlayer1HasHigherStat(

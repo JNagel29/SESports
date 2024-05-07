@@ -404,6 +404,7 @@ fun PlayerStatisticTable(player: Player) {
             .padding(16.dp)
     ) {
         Spacer(modifier = Modifier.height(4.dp))
+
         ExpandableCategory("Shooting Splits") {
             Column(
                 modifier = Modifier
