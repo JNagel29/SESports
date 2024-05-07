@@ -24,8 +24,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun ExpandableCategory(title: String, content: @Composable () -> Unit) {
-    var expandedCategory by remember { mutableStateOf(false) }
+fun ExpandableCategory(title: String, showByDefault: Boolean = false, content: @Composable () -> Unit) {
+    var expandedCategory by remember { mutableStateOf(showByDefault) }
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
