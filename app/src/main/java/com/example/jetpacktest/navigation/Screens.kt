@@ -2,12 +2,12 @@ package com.example.jetpacktest.navigation
 
 enum class Screens(val route: String) {
     HomeScreen("home"),
+    SplashScreen("splash"),
     SearchScreen("search"),
     CompareScreen("compare"),
     CompareResultsScreen("compareresults"),
     ProfileScreen("profile"),
     TeamProfileScreen("teamprofile"),
-    StandingsScreen("standings"),
-    BracketsScreen("brackets"),
+    StandingsBracketPager("standingbracketpager"), // Redirects us to Standings/BracketScreen
     GamesScreen("games"),
 }

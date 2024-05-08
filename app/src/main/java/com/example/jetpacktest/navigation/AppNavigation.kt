@@ -28,14 +28,14 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.jetpacktest.screens.BracketsScreen
 import com.example.jetpacktest.screens.CompareResultsScreen
 import com.example.jetpacktest.screens.CompareScreen
 import com.example.jetpacktest.screens.HomeScreen
 import com.example.jetpacktest.screens.ProfileScreen
 import com.example.jetpacktest.screens.SearchScreen
 import com.example.jetpacktest.screens.GamesScreen
-import com.example.jetpacktest.screens.StandingsScreen
+import com.example.jetpacktest.screens.SplashScreen
+import com.example.jetpacktest.screens.StandingBracketPager
 import com.example.jetpacktest.screens.TeamProfileScreen
 import com.example.jetpacktest.viewmodels.StandingsViewModel
 import kotlinx.coroutines.launch
@@ -49,55 +49,74 @@ fun AppNavigation(randomStat: String) {
     val getPreviousScreenName: () -> (String?) = {
         navController.previousBackStackEntry?.destination?.route
     }
+    val outerNavBackStackEntry by navController.currentBackStackEntryAsState()
+
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope() // Required for snackbar
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState)},
         bottomBar = {
-            NavigationBar {
-                val navBackStackEntry by navController.currentBackStackEntryAsState()
-                val currentDestination = navBackStackEntry?.destination
-                //Loop through each nav item and set it up as a navigation bar item
-                listOfNavItems.forEach { navItem ->
-                    NavigationBarItem(
-                        //We know it's selected if current route matches item route
-                        selected = currentDestination?.hierarchy?.any
-                        { it.route == navItem.route } == true,
-                        onClick = {
-                                  navController.navigate(navItem.route) {
-                                      popUpTo(navController.graph.findStartDestination().id) {
-                                          saveState = true
-                                      }
-                                      //Prevents creating multiple instances of same screen
-                                      launchSingleTop = true
-                                      //Restores state when re-selecting a previously selected item
-                                      restoreState = true
-                                  }
-                        },
-                        icon = {
-                            Icon(imageVector = navItem.icon, // Use icon of current navItem
-                                contentDescription = navItem.label)
-                        },
-                        label = {
-                            Text(text = navItem.label)
-                        }
-                    )
+            if (outerNavBackStackEntry?.destination?.route != Screens.SplashScreen.name) {
+                NavigationBar {
+                    val navBackStackEntry by navController.currentBackStackEntryAsState()
+                    val currentDestination = navBackStackEntry?.destination
+                    //Loop through each nav item and set it up as a navigation bar item
+                    listOfNavItems.forEach { navItem ->
+                        NavigationBarItem(
+                            //We know it's selected if current route matches item route
+                            selected = currentDestination?.hierarchy?.any
+                            { it.route == navItem.route } == true,
+                            onClick = {
+                                navController.navigate(navItem.route) {
+                                    popUpTo(navController.graph.findStartDestination().id) {
+                                        saveState = true
+                                    }
+                                    //Prevents creating multiple instances of same screen
+                                    launchSingleTop = true
+                                    //Restores state when re-selecting a previously selected item
+                                    restoreState = true
+                                }
+                            },
+                            icon = {
+                                Icon(imageVector = navItem.icon, // Use icon of current navItem
+                                    contentDescription = navItem.label)
+                            },
+                            label = {
+                                Text(text = navItem.label)
+                            }
+                        )
+                    }
                 }
             }
         }
     ) { paddingValues ->
         NavHost(navController = navController,
-            startDestination = Screens.HomeScreen.name,
+            startDestination = Screens.SplashScreen.name,
             modifier = Modifier
                 .padding(paddingValues)
                 .fillMaxSize() // Fixes weird transition effect
         ) {
             //When passing navigation control, we pass lambdas instead of navController itself
+            composable(route = Screens.SplashScreen.name) {
+                SplashScreen {
+                    navController.navigate(Screens.HomeScreen.name)
+                }
+            }
             composable(route=Screens.HomeScreen.name) {
                 HomeScreen(
                     randomStat = randomStat,
-                    homeViewModel = homeViewModel,
-                    //Pass in a lambda that'll let us go to a stat leader's profile on click
+                    chosenStatFlow = homeViewModel.chosenStatFlow,
+                    chosenYearFlow = homeViewModel.chosenYearFlow,
+                    statLeadersListFlow = homeViewModel.statLeadersListFlow,
+                    fetchStatLeaders = {
+                        homeViewModel.fetchStatLeaders()
+                    },
+                    updateChosenStat = { chosenStat ->
+                       homeViewModel.updateChosenStat(newStat = chosenStat)
+                    },
+                    updateChosenYear = { chosenYear ->
+                       homeViewModel.updateChosenYear(newYear = chosenYear)
+                    },
                     navigateToPlayerProfile = { playerName ->
                         navController.navigate("${Screens.ProfileScreen.route}/$playerName") {
                             launchSingleTop = true //Prevents double click navigation
@@ -147,40 +166,19 @@ fun AppNavigation(randomStat: String) {
                     launchSingleTop = true
                 }
             }
-            val navigateToBrackets: () -> Unit = {
-                navController.navigate(Screens.BracketsScreen.name)
-            }
-            composable(route = Screens.StandingsScreen.name) {
-                StandingsScreen(
+            composable(
+                route = Screens.StandingsBracketPager.name
+            ) {
+                //This pager screen will let us go to Standings OR Bracket in one swipe
+                StandingBracketPager(
                     westernFlow = standingsViewModel.westernFlow,
                     easternFlow = standingsViewModel.easternFlow,
                     navigateToTeamProfile = navigateToTeamProfile,
-                    navigateToBrackets = navigateToBrackets
-                )
-            }
-            composable(
-                route = Screens.BracketsScreen.name,
-                enterTransition = {
-                    slideInHorizontally(
-                        initialOffsetX = { it },
-                        animationSpec = tween(
-                            300,
-                            easing = FastOutLinearInEasing
-                        )
-                    )
-                },
-                exitTransition = {
-                    slideOutHorizontally(
-                        targetOffsetX = { -it },
-                        animationSpec = tween(
-                            300,
-                            easing = FastOutLinearInEasing
-                        )
-                    )
-                }
-            ) {
-                BracketsScreen(
-                    navigateBack = { navController.navigateUp() },
+                    updateStandingsByYear = { year: String ->
+                        standingsViewModel.updateWesternStandings(year = year)
+                        standingsViewModel.updateEasternStandings(year = year)
+                    },
+                    yearOptions = standingsViewModel.yearOptions
                 )
             }
             composable(route=Screens.GamesScreen.name) {

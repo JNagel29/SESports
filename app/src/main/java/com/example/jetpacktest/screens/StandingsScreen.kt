@@ -4,7 +4,6 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -17,10 +16,7 @@ import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
@@ -28,17 +24,19 @@ import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.jetpacktest.dropZeroBeforeDecimal
 import com.example.jetpacktest.models.TeamStanding
+import com.example.jetpacktest.ui.components.LargeDropdownMenu
 import kotlinx.coroutines.flow.Flow
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -47,50 +45,31 @@ fun StandingsScreen(
     westernFlow: Flow<List<TeamStanding>>,
     easternFlow: Flow<List<TeamStanding>>,
     navigateToTeamProfile: (String) -> Unit,
-    navigateToBrackets: () -> Unit
+    updateStandingsByYear: (String) -> Unit,
+    yearOptions: List<String>
 ) {
     val westernStandings by westernFlow.collectAsState(initial = emptyList())
     val easternStandings by easternFlow.collectAsState(initial = emptyList())
+    var chosenYear by rememberSaveable { mutableStateOf(yearOptions.first()) }
 
     val combinedStandings = easternStandings + westernStandings
-
     LazyColumn {
-        stickyHeader {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp))
-                    .padding(8.dp)
-            ) {
-                Text(
-                    text = "Standings",
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Start,
-                    fontFamily = FontFamily.Serif,
-                )
-                Row(
-                    horizontalArrangement = Arrangement.End,
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.clickable {
-                        navigateToBrackets()
+        item {
+            LargeDropdownMenu(
+                label = "Select Year:",
+                items = yearOptions,
+                selectedIndex = yearOptions.indexOf(chosenYear),
+                onItemSelected = { index, _ ->
+                    val year = yearOptions[index]
+                    if (year != chosenYear) {
+                        chosenYear = year
+                        updateStandingsByYear(chosenYear)
                     }
-                ) {
-                    Text(
-                        text = "Bracket",
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold,
-                        textAlign = TextAlign.End,
-                        fontFamily = FontFamily.Serif,
-                    )
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                        contentDescription = null
-                    )
-                }
-            }
+                },
+                modifier = Modifier
+                    .padding(5.dp)
+                    .background(MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp))
+            )
         }
         //Group by Conference to organize West/East
         combinedStandings.groupBy { it.conference}.forEach { mapEntry ->

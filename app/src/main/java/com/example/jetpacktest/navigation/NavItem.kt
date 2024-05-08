@@ -33,7 +33,7 @@ val listOfNavItems = listOf(
     NavItem(
         label = "Standings",
         icon = Icons.Default.Analytics,
-        route = Screens.StandingsScreen.name // Returns enum name as string
+        route = Screens.StandingsBracketPager.name // Returns enum name as string
     ),
     NavItem(
         label = "Games",
