@@ -2,6 +2,7 @@ package com.example.jetpacktest.navigation
 
 enum class Screens(val route: String) {
     HomeScreen("home"),
+    SplashScreen("splash"),
     SearchScreen("search"),
     CompareScreen("compare"),
     CompareResultsScreen("compareresults"),

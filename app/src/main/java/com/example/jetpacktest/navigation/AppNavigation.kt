@@ -49,53 +49,59 @@ fun AppNavigation(randomStat: String) {
     val getPreviousScreenName: () -> (String?) = {
         navController.previousBackStackEntry?.destination?.route
     }
+    val outerNavBackStackEntry by navController.currentBackStackEntryAsState()
+
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope() // Required for snackbar
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState)},
         bottomBar = {
-            NavigationBar {
-                val navBackStackEntry by navController.currentBackStackEntryAsState()
-                val currentDestination = navBackStackEntry?.destination
-                //Loop through each nav item and set it up as a navigation bar item
-                listOfNavItems.forEach { navItem ->
-                    NavigationBarItem(
-                        //We know it's selected if current route matches item route
-                        selected = currentDestination?.hierarchy?.any
-                        { it.route == navItem.route } == true,
-                        onClick = {
-                                  navController.navigate(navItem.route) {
-                                      popUpTo(navController.graph.findStartDestination().id) {
-                                          saveState = true
-                                      }
-                                      //Prevents creating multiple instances of same screen
-                                      launchSingleTop = true
-                                      //Restores state when re-selecting a previously selected item
-                                      restoreState = true
-                                  }
-                        },
-                        icon = {
-                            Icon(imageVector = navItem.icon, // Use icon of current navItem
-                                contentDescription = navItem.label)
-                        },
-                        label = {
-                            Text(text = navItem.label)
-                        }
-                    )
+            if (outerNavBackStackEntry?.destination?.route != Screens.SplashScreen.name) {
+                NavigationBar {
+                    val navBackStackEntry by navController.currentBackStackEntryAsState()
+                    val currentDestination = navBackStackEntry?.destination
+                    //Loop through each nav item and set it up as a navigation bar item
+                    listOfNavItems.forEach { navItem ->
+                        NavigationBarItem(
+                            //We know it's selected if current route matches item route
+                            selected = currentDestination?.hierarchy?.any
+                            { it.route == navItem.route } == true,
+                            onClick = {
+                                navController.navigate(navItem.route) {
+                                    popUpTo(navController.graph.findStartDestination().id) {
+                                        saveState = true
+                                    }
+                                    //Prevents creating multiple instances of same screen
+                                    launchSingleTop = true
+                                    //Restores state when re-selecting a previously selected item
+                                    restoreState = true
+                                }
+                            },
+                            icon = {
+                                Icon(imageVector = navItem.icon, // Use icon of current navItem
+                                    contentDescription = navItem.label)
+                            },
+                            label = {
+                                Text(text = navItem.label)
+                            }
+                        )
+                    }
                 }
             }
         }
     ) { paddingValues ->
         NavHost(navController = navController,
-            startDestination = "splash_screen",
+            startDestination = Screens.SplashScreen.name,
             modifier = Modifier
                 .padding(paddingValues)
                 .fillMaxSize() // Fixes weird transition effect
         ) {
-            composable(route = "splash_screen") {
-                SplashScreen(navController = navController)
-            }
             //When passing navigation control, we pass lambdas instead of navController itself
+            composable(route = Screens.SplashScreen.name) {
+                SplashScreen {
+                    navController.navigate(Screens.HomeScreen.name)
+                }
+            }
             composable(route=Screens.HomeScreen.name) {
                 HomeScreen(
                     randomStat = randomStat,
