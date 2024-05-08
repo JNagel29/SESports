@@ -177,19 +177,19 @@ private fun SecondRoundColumn(navigateToTeamProfile: (String) -> Unit) {
 
         val secondRoundMatchups = listOf(
             Matchup(
-                TeamBracket(abbrev = "Celtics", gamesWon = 0, logo = R.drawable.xml_celtics, standing = 1),
+                TeamBracket(abbrev = "Celtics", gamesWon = 1, logo = R.drawable.xml_celtics, standing = 1),
                 TeamBracket(abbrev = "Cavaliers", gamesWon = 0, logo = R.drawable.xml_cavaliers, standing = 4),
             ),
             Matchup(
                 TeamBracket(abbrev = "Pacers", gamesWon = 0, logo = R.drawable.xml_pacers, standing = 6),
-                TeamBracket(abbrev = "Knicks", gamesWon = 0, logo = R.drawable.xml_knicks, standing = 2)
+                TeamBracket(abbrev = "Knicks", gamesWon = 1, logo = R.drawable.xml_knicks, standing = 2)
             ),
             Matchup(
-                TeamBracket(abbrev = "Thunder", gamesWon = 0, logo = R.drawable.xml_thunder, standing = 1),
+                TeamBracket(abbrev = "Thunder", gamesWon = 1, logo = R.drawable.xml_thunder, standing = 1),
                 TeamBracket(abbrev = "Mavericks", gamesWon = 0, logo = R.drawable.xml_mavericks, standing = 5)
             ),
             Matchup(
-                TeamBracket(abbrev = "Timberwolves", gamesWon = 1, logo = R.drawable.xml_timberwolves, standing = 3),
+                TeamBracket(abbrev = "Timberwolves", gamesWon = 2, logo = R.drawable.xml_timberwolves, standing = 3),
                 TeamBracket(abbrev = "Nuggets", gamesWon = 0, logo = R.drawable.xml_nuggets, standing = 2),
             )
         )
