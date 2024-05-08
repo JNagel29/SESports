@@ -34,6 +34,7 @@ import com.example.jetpacktest.screens.HomeScreen
 import com.example.jetpacktest.screens.ProfileScreen
 import com.example.jetpacktest.screens.SearchScreen
 import com.example.jetpacktest.screens.GamesScreen
+import com.example.jetpacktest.screens.SplashScreen
 import com.example.jetpacktest.screens.StandingBracketPager
 import com.example.jetpacktest.screens.TeamProfileScreen
 import com.example.jetpacktest.viewmodels.StandingsViewModel
@@ -86,11 +87,14 @@ fun AppNavigation(randomStat: String) {
         }
     ) { paddingValues ->
         NavHost(navController = navController,
-            startDestination = Screens.HomeScreen.name,
+            startDestination = "splash_screen",
             modifier = Modifier
                 .padding(paddingValues)
                 .fillMaxSize() // Fixes weird transition effect
         ) {
+            composable(route = "splash_screen") {
+                SplashScreen(navController = navController)
+            }
             //When passing navigation control, we pass lambdas instead of navController itself
             composable(route=Screens.HomeScreen.name) {
                 HomeScreen(
