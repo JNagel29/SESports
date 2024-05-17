@@ -24,7 +24,9 @@ class DatabaseHandler {
         const val NUM_PLAYERS_TO_GRAB = 10
     }
     private val scope = CoroutineScope(Dispatchers.IO)
-    private val url = "jdbc:mysql://nikoarak.cikeys.com:3306/nikoarak_SESports"
+    private val url = "jdbc:mysql://nikoarak.cikeys.com:3306/nikoarak_SESports?useSSL=false"
+    //private val url = "jdbc:mysql://nikoarak.cikeys.com:3306/nikoarak_SESports?useSSL=true&enabledTLSProtocols=TLSv1.2"
+
     private val user = Keys.DB_USER
     private val password = Keys.DB_PASS
 
