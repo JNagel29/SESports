@@ -26,7 +26,7 @@ class DatabaseHandler {
     private val scope = CoroutineScope(Dispatchers.IO)
     private val url = "jdbc:mysql://nikoarak.cikeys.com:3306/nikoarak_SESports?useSSL=false"
     //private val url = "jdbc:mysql://nikoarak.cikeys.com:3306/nikoarak_SESports?useSSL=true&enabledTLSProtocols=TLSv1.2"
-
+    //private val url = "jdbc:mysql://nikoarak.cikeys.com:3306/nikoarak_SESports"
     private val user = Keys.DB_USER
     private val password = Keys.DB_PASS
 
