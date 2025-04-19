@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+    package="com.example.jetpacktest">
 
-    <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Allow network calls -->
+    <uses-permission android:name="android.permission.INTERNET"/>
 
-    <!-- Below property allows us to connect to REST API -->
     <application
         android:usesCleartextTraffic="true"
         android:allowBackup="true"
@@ -14,18 +14,32 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.JetpackTest"
-        tools:targetApi="31">
+        android:theme="@style/Theme.JetpackTest">
+
+        <!-- your original launcher -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
             android:theme="@style/Theme.JetpackTest">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-    </application>
 
+        <!-- Props feature screens -->
+        <activity
+            android:name=".props.ui2.EventsActivity"
+            android:exported="true" />
+
+        <activity
+            android:name=".props.ui2.PropsDetailActivity"
+            android:exported="true" />
+
+        <!-- (Optional) keep your legacy player detail if still used -->
+        <activity
+            android:name=".PlayerDetailActivity"
+            android:exported="true" />
+
+    </application>
 </manifest>
