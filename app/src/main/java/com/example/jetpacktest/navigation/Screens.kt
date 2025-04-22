@@ -9,5 +9,7 @@ enum class Screens(val route: String) {
     ProfileScreen("profile"),
     TeamProfileScreen("teamprofile"),
     StandingsBracketPager("standingbracketpager"), // Redirects us to Standings/BracketScreen
+    StandingsScreen("standings"),
+    BracketsScreen("brackets"),
     GamesScreen("games"),
 }

@@ -77,6 +77,7 @@ object TeamMaps {
         "Charlotte Bobcats" to "CHA",
         "New Jersey Nets" to "NJN",
         "Washington Bullets" to "WSB"
+        "Washington Wizards" to "WAS"
     )
 
     //Define a mapping of team abbreviations to drawable resource IDs for the logos
@@ -184,6 +185,7 @@ object TeamMaps {
         "Charlotte Bobcats" to R.drawable.xml_bobcats,
         "Washington Bullets" to R.drawable.xml_wizards, // No SVG of team this old so using Wizards
         "Vancouver Grizzlies" to R.drawable.xml_old_grizzlies
+        "Washington Wizards" to R.drawable.xml_wizards
     )
 
     val shortenedNamesToFullNames: Map<String, String> = mapOf(

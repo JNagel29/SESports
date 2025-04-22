@@ -32,6 +32,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.jetpacktest.screens.BracketsScreen
 import com.example.jetpacktest.screens.CompareResultsScreen
 import com.example.jetpacktest.screens.CompareScreen
 import com.example.jetpacktest.screens.HomeScreen
@@ -114,6 +115,8 @@ fun AppNavigation(randomStat: String) {
         NavHost(
             navController = navController,
             startDestination = Screens.SplashScreen.name,
+        NavHost(navController = navController,
+            startDestination = Screens.HomeScreen.name,
             modifier = Modifier
                 .padding(paddingValues)
                 .fillMaxSize()
@@ -136,6 +139,7 @@ fun AppNavigation(randomStat: String) {
                     navigateToPlayerProfile = { playerName ->
                         navController.navigate("${Screens.ProfileScreen.route}/$playerName") {
                             launchSingleTop = true
+                            launchSingleTop = true //Prevents double click navigation
                         }
                     }
                 )
@@ -166,6 +170,8 @@ fun AppNavigation(randomStat: String) {
                 CompareScreen(
                     navigateToCompareResults = { p1, p2 ->
                         navController.navigate("${Screens.CompareResultsScreen.route}/$p1/$p2") {
+                    navigateToCompareResults = { playerName1, playerName2 ->
+                        navController.navigate("${Screens.CompareResultsScreen.route}/$playerName1/$playerName2") {
                             launchSingleTop = true
                         }
                     }
@@ -185,6 +191,45 @@ fun AppNavigation(randomStat: String) {
                         standingsViewModel.updateEasternStandings(year)
                     },
                     yearOptions           = standingsViewModel.yearOptions
+            val navigateToTeamProfile: (String) -> Unit = { teamName ->
+                navController.navigate("${Screens.TeamProfileScreen.route}/$teamName") {
+                    launchSingleTop = true
+                }
+            }
+            val navigateToBrackets: () -> Unit = {
+                navController.navigate(Screens.BracketsScreen.name)
+            }
+            composable(route = Screens.StandingsScreen.name) {
+                StandingsScreen(
+                    westernFlow = standingsViewModel.westernFlow,
+                    easternFlow = standingsViewModel.easternFlow,
+                    navigateToTeamProfile = navigateToTeamProfile,
+                    navigateToBrackets = navigateToBrackets
+                )
+            }
+            composable(
+                route = Screens.BracketsScreen.name,
+                enterTransition = {
+                    slideInHorizontally(
+                        initialOffsetX = { it },
+                        animationSpec = tween(
+                            300,
+                            easing = FastOutLinearInEasing
+                        )
+                    )
+                },
+                exitTransition = {
+                    slideOutHorizontally(
+                        targetOffsetX = { -it },
+                        animationSpec = tween(
+                            300,
+                            easing = FastOutLinearInEasing
+                        )
+                    )
+                }
+            ) {
+                BracketsScreen(
+                    navigateBack = { navController.navigateUp() },
                 )
             }
             composable(route = Screens.GamesScreen.name) {
@@ -194,6 +239,7 @@ fun AppNavigation(randomStat: String) {
                             launchSingleTop = true
                         }
                     }
+                    navigateToTeamProfile = navigateToTeamProfile
                 )
             }
             composable(
@@ -202,6 +248,10 @@ fun AppNavigation(randomStat: String) {
                     slideInHorizontally(
                         initialOffsetX = { it },
                         animationSpec = tween(300, easing = FastOutLinearInEasing)
+                        animationSpec = tween(
+                            300,
+                            easing = FastOutLinearInEasing
+                        )
                     )
                 },
                 exitTransition = {
@@ -219,6 +269,8 @@ fun AppNavigation(randomStat: String) {
             }
             composable(
                 route = "${Screens.ProfileScreen.route}/{playerName}",
+            //Profile screens for player/team (we pass in player/team name as arg in route)
+            composable(route = "${Screens.ProfileScreen.route}/{playerName}",
                 enterTransition = {
                     slideInHorizontally(
                         initialOffsetX = { it },
@@ -240,6 +292,14 @@ fun AppNavigation(randomStat: String) {
                     showSnackBar          = { msg ->
                         coroutineScope.launch {
                             snackbarHostState.showSnackbar(msg)
+                    playerName = playerName,
+                    navigateBack = { navController.navigateUp() },
+                    getPreviousScreenName = getPreviousScreenName,
+                    showSnackBar = { message ->
+                        coroutineScope.launch {
+                            snackbarHostState.showSnackbar(
+                                message = message
+                            )
                         }
                     }
                 )
@@ -269,6 +329,18 @@ fun AppNavigation(randomStat: String) {
                         }
                     },
                     getPreviousScreenName   = getPreviousScreenName
+                TeamProfileScreen(teamName = teamName,
+                    //Used for back button
+                    navigateBack = { navController.popBackStack()},
+                    //When user clicks on a current player of a team, we'll use this to switch over
+                    navigateToPlayerProfile = { playerName ->
+                        navController.navigate(
+                            "${Screens.ProfileScreen.route}/$playerName"
+                        ) {
+                            launchSingleTop = true
+                        }
+                    },
+                    getPreviousScreenName = getPreviousScreenName
                 )
             }
         }

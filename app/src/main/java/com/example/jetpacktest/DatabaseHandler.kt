@@ -27,6 +27,8 @@ class DatabaseHandler {
     private val url = "jdbc:mysql://nikoarak.cikeys.com:3306/nikoarak_SESports?useSSL=false"
     //private val url = "jdbc:mysql://nikoarak.cikeys.com:3306/nikoarak_SESports?useSSL=true&enabledTLSProtocols=TLSv1.2"
 
+
+    private val url = "jdbc:mysql://nikoarak.cikeys.com:3306/nikoarak_SESports"
     private val user = Keys.DB_USER
     private val password = Keys.DB_PASS
 
@@ -167,6 +169,10 @@ class DatabaseHandler {
     ) {
         scope.launch {
             val standingsList = getStandings(conference =conference, year = year)
+
+    fun executeStandings(conference: Conference, onDataReceived: (MutableList<TeamStanding>) -> Unit) {
+        scope.launch {
+            val standingsList = getStandings(conference)
             onDataReceived(standingsList)
         }
     }
@@ -176,6 +182,11 @@ class DatabaseHandler {
         var statement: Statement? = null
         var resultSet: ResultSet? = null
         val teamStandings = mutableListOf<TeamStanding>()
+    private fun getStandings(conference: Conference): MutableList<TeamStanding> {
+        var myConn: Connection? = null
+        var statement: Statement? = null
+        var resultSet: ResultSet? = null
+        val teamPlayers = mutableListOf<TeamStanding>()
         try {
             Class.forName("com.mysql.jdbc.Driver")
             myConn = DriverManager.getConnection(url, user, password)
@@ -184,6 +195,10 @@ class DatabaseHandler {
             resultSet = statement.executeQuery(sql)
             while (resultSet.next()) {
                 val teamName = resultSet.getString("Team")
+            val sql = "SELECT* FROM ${conference.name}_STANDING"
+            resultSet = statement.executeQuery(sql)
+            while (resultSet.next()) {
+                val teamName = resultSet.getString("Team_Name")
                 val abbrev = when (teamName) {
                     "New York Knicks" -> "NYK" // These 4 have their third letter cut off
                     "New Orleans Pelicans" -> "NOP"
@@ -197,11 +212,17 @@ class DatabaseHandler {
                     wins = resultSet.getInt("W"),
                     losses = resultSet.getInt("L"),
                     winLossPercentage = resultSet.getFloat("W/L%"),
+                    rank = resultSet.getInt("rank"),
+                    name = teamName,
+                    wins = resultSet.getInt("Wins"),
+                    losses = resultSet.getInt("Losses"),
+                    winLossPercentage = resultSet.getFloat("Win_Loss_Percentage"),
                     conference = conference,
                     logo = TeamMaps.xmlLogos[teamName] ?: R.drawable.baseline_arrow_back_ios_new_24,
                     abbrev = abbrev
                 )
                 teamStandings.add(teamStanding)
+                teamPlayers.add(teamStanding)
             }
         } catch (e: SQLException) {
             Log.d(Const.TAG, e.message!!)
@@ -212,6 +233,7 @@ class DatabaseHandler {
             closeResources(myConn, resultSet, statement)
         }
         return teamStandings
+        return teamPlayers
     }
 
     private fun getNbaDotComId(playerName: String): Int {

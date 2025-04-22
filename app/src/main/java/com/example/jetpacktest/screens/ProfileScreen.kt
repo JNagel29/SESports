@@ -1,6 +1,7 @@
 package com.example.jetpacktest.screens
 
 import android.util.Log
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -18,6 +19,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.StarBorder
 import androidx.compose.material3.HorizontalDivider
@@ -187,6 +190,35 @@ fun ProfileScreen(
                 )
             }
             if (player.points != -1.0f) {
+                        if (chosenYear != "2024") {
+                            databaseHandler.executePlayerData(
+                                playerName,
+                                chosenYear
+                            ) { data ->
+                                player = data
+                            }
+                        } else {
+                            //TODO: Call upon API later for 2024 data
+                            databaseHandler.executePlayerData(
+                                playerName,
+                                chosenYear
+                            ) { data ->
+                                player = data
+                            }
+                        }
+                    }
+                )
+            }
+            /*
+            item {
+                ToggleFurtherStats(
+                    showExpandedData = showExpandedData,
+                    onClick = { showExpandedData = !showExpandedData }
+                )
+            }
+             */
+
+            if (player.points != -1.0f) { // && showExpandedData
                 item {
                     PlayerStatisticTable(player)
                 }
@@ -395,6 +427,74 @@ fun InfoStatBoxes(playerPersonalInfo: PlayerPersonalInfo, color: Color) {
             valueFontSize = 16.sp
         )
     }
+    HorizontalDivider(thickness = 2.dp, color = Color.White)
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(color = color),
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        StatBox(
+            label = "College",
+            value = playerPersonalInfo.data[0].college,
+            labelFontSize = 14.sp,
+            valueFontSize = 16.sp
+        )
+        VerticalDivider(modifier = Modifier.height(50.dp),
+            thickness = 2.dp, color = Color.White)
+        StatBox(
+            label = "Country",
+            value = playerPersonalInfo.data[0].country,
+            labelFontSize = 14.sp,
+            valueFontSize = 16.sp
+        )
+    }
+}
+
+@Composable
+fun PlayerStatisticTable(player: Player) {
+    Column(
+        modifier = Modifier
+            .padding(16.dp)
+    ) {
+        Spacer(modifier = Modifier.height(4.dp))
+        StatisticCategory("Shooting Splits") {
+            Column(
+                modifier = Modifier
+                    .padding(4.dp)
+            ) {
+                PlayerDataRow("Field Goals", player.fieldGoals.toString())
+                PlayerDataRow("Field Goal Attempts", player.fieldGoalAttempts.toString())
+                PlayerDataRow("Field Goal %", "%.1f%%"
+                    .format(player.fieldGoalPercent * 100))
+                PlayerDataRow("3 Pointers", player.threePointers.toString())
+                PlayerDataRow("3 Point Attempts", player.threePointerAttempts.toString())
+                PlayerDataRow("3 Point %", "%.1f%%"
+                    .format(player.threePointPercent * 100))
+                PlayerDataRow("2 Pointers", player.twoPointers.toString())
+                PlayerDataRow("2 Point Attempts", player.twoPointerAttempts.toString())
+                PlayerDataRow("2 Point %", "%.1f%%"
+                    .format(player.twoPointPercent * 100))
+                PlayerDataRow(
+                    "Effective FG%",
+                    "%.1f%%".format(player.effectiveFieldGoalPercent * 100)
+                )
+            }
+        }
+        StatisticCategory("Defensive Efficiency and Usage") {
+            Column(
+                modifier = Modifier
+                    .padding(4.dp)
+            ) {
+                PlayerDataRow("Steals", player.steals.toString())
+                PlayerDataRow("Blocks", player.blocks.toString())
+                PlayerDataRow("Fouls", player.personalFouls.toString())
+                PlayerDataRow("Turnovers", player.turnovers.toString())
+                PlayerDataRow("Mins. Played", player.minutesPlayed.toString())
+            }
+        }
+    }
 }
 
 @Composable
@@ -447,6 +547,30 @@ fun PlayerStatisticTable(player: Player) {
                 PlayerDataRow("Games Started", player.gamesStarted.toString())
             }
         }
+fun StatisticCategory(title: String, content: @Composable () -> Unit) {
+    var expandedCategory by remember { mutableStateOf(false) }
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable {expandedCategory = !expandedCategory }
+    ){
+        Text(
+            text = title,
+            modifier = Modifier.padding(8.dp),
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold
+        )
+        Icon(
+            imageVector = if (expandedCategory) Icons.Filled.ArrowDropUp
+                        else Icons.Filled.ArrowDropDown,
+            contentDescription = null,
+            modifier = Modifier.size(24.dp)
+        )
+    }
+    AnimatedVisibility(visible = expandedCategory) {
+        content() // Lambda of rows that we passed in for that specific category
     }
 }
 

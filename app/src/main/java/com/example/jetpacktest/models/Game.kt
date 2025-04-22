@@ -10,6 +10,7 @@ data class Game(
     var status: String,
     val period: Int,
     var time: String?,
+    var time: String?, //TODO fix var
     @SerializedName("home_team_score")
     val homeTeamScore: Int,
     @SerializedName("visitor_team_score")

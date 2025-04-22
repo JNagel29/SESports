@@ -50,6 +50,8 @@ fun TeamProfileScreen(
     LaunchedEffect(Unit) {
         if (teamPlayersList.isEmpty() && !isDefunct) {
             //Before anything else, fetch team abbreviation using dictionary in TeamMaps.kt
+        if (teamPlayersList.isEmpty()) {
+            //Before anything else, fetch team abbreviation using dictionary in NbaTeam.kt
             val teamAbbrev = TeamMaps.namesToAbbreviations[teamName]
             if (teamAbbrev != null) {
                 if (defunctTeams.contains(teamAbbrev)) {
@@ -87,6 +89,28 @@ fun TeamProfileScreen(
             CurrentRosterDisplay(teamPlayersList, navigateToPlayerProfile)
         }
         else DisplayDefunctTeamMessage()
+    }
+}
+
+@Composable
+fun TeamNameHeader(teamName: String) {
+    Box(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            text = teamName,
+            fontSize = 26.sp,
+            fontFamily = FontFamily.Serif,
+            fontWeight = FontWeight.ExtraBold,
+            modifier = Modifier.align(Alignment.Center)
+        //Elvis operator uses fallback if it teamName maps to no logo ID
+        val teamLogo = TeamMaps.logos[teamName] ?: R.drawable.fallback
+        Image(
+            painter = painterResource(id = teamLogo),
+            contentDescription = teamName,
+            modifier = Modifier
+                .width(200.dp)
+                .height(200.dp)
+                .align(Alignment.CenterHorizontally)
+        )
     }
 }
 

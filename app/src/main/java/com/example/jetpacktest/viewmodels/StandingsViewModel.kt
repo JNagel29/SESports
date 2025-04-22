@@ -31,6 +31,15 @@ class StandingsViewModel : ViewModel() {
         databaseHandler.executeStandings(
             conference = Conference.WESTERN,
             year = year
+    init {
+        fetchWesternStandings()
+        fetchEasternStandings()
+    }
+
+    private fun fetchWesternStandings() {
+        Log.d("StandingsVM", "Fetching Western Standings...")
+        databaseHandler.executeStandings(
+            conference = Conference.WESTERN,
         ) { teamStandings ->
             _westernFlow.value = teamStandings
         }
@@ -41,6 +50,10 @@ class StandingsViewModel : ViewModel() {
         databaseHandler.executeStandings(
             conference = Conference.EASTERN,
             year = year
+    private fun fetchEasternStandings() {
+        Log.d("StandingsVM", "Fetching Eastern Standings...")
+        databaseHandler.executeStandings(
+            conference = Conference.EASTERN
         ) { teamStandings ->
             _easternFlow.value = teamStandings
         }
