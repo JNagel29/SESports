@@ -1,2 +1,2 @@
-# SESports
-Sports group project 
+# Sportify
+Sports capstone project 
