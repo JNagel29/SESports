@@ -1,5 +1,6 @@
 package com.example.jetpacktest.navigation
 
+import android.content.Intent
 import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInHorizontally
@@ -15,12 +16,15 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -35,92 +39,121 @@ import com.example.jetpacktest.screens.HomeScreen
 import com.example.jetpacktest.screens.ProfileScreen
 import com.example.jetpacktest.screens.SearchScreen
 import com.example.jetpacktest.screens.GamesScreen
-import com.example.jetpacktest.screens.StandingsScreen
+import com.example.jetpacktest.screens.SplashScreen
+import com.example.jetpacktest.screens.StandingBracketPager
 import com.example.jetpacktest.screens.TeamProfileScreen
+import com.example.jetpacktest.props.ui2.EventsActivity              // ← our new feature’s entry point
 import com.example.jetpacktest.viewmodels.StandingsViewModel
 import kotlinx.coroutines.launch
 
 @Composable
 fun AppNavigation(randomStat: String) {
     val navController = rememberNavController()
+    val ctx = LocalContext.current                         // ← need this to launch the Activity
     val searchViewModel = viewModel<SearchViewModel>()
     val homeViewModel = viewModel<HomeViewModel>()
     val standingsViewModel = viewModel<StandingsViewModel>()
     val getPreviousScreenName: () -> (String?) = {
         navController.previousBackStackEntry?.destination?.route
     }
+    val outerNavBackStackEntry by navController.currentBackStackEntryAsState()
+
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope() // Required for snackbar
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState)},
         bottomBar = {
-            NavigationBar {
-                val navBackStackEntry by navController.currentBackStackEntryAsState()
-                val currentDestination = navBackStackEntry?.destination
-                //Loop through each nav item and set it up as a navigation bar item
-                listOfNavItems.forEach { navItem ->
+            if (outerNavBackStackEntry?.destination?.route != Screens.SplashScreen.name) {
+                NavigationBar {
+                    val navBackStackEntry by navController.currentBackStackEntryAsState()
+                    val currentDestination = navBackStackEntry?.destination
+
+                    // ─── existing items ──────────────────────────────────
+                    listOfNavItems.forEach { navItem ->
+                        NavigationBarItem(
+                            selected = currentDestination?.hierarchy?.any { it.route == navItem.route } == true,
+                            onClick = {
+                                navController.navigate(navItem.route) {
+                                    popUpTo(navController.graph.findStartDestination().id) {
+                                        saveState = true
+                                    }
+                                    launchSingleTop = true
+                                    restoreState     = true
+                                }
+                            },
+                            icon = {
+                                Icon(
+                                    imageVector    = navItem.icon,
+                                    contentDescription = navItem.label
+                                )
+                            },
+                            label = { Text(navItem.label) }
+                        )
+                    }
+
+                    // ─── NEW: Props feature button ───────────────────────
                     NavigationBarItem(
-                        //We know it's selected if current route matches item route
-                        selected = currentDestination?.hierarchy?.any
-                        { it.route == navItem.route } == true,
-                        onClick = {
-                                  navController.navigate(navItem.route) {
-                                      popUpTo(navController.graph.findStartDestination().id) {
-                                          saveState = true
-                                      }
-                                      //Prevents creating multiple instances of same screen
-                                      launchSingleTop = true
-                                      //Restores state when re-selecting a previously selected item
-                                      restoreState = true
-                                  }
+                        selected = false,
+                        onClick  = {
+                            ctx.startActivity(
+                                Intent(ctx, EventsActivity::class.java)
+                                    .putExtra("randomStat", randomStat)
+                            )
                         },
                         icon = {
-                            Icon(imageVector = navItem.icon, // Use icon of current navItem
-                                contentDescription = navItem.label)
+                            Icon(
+                                imageVector = Icons.Filled.EmojiEvents,
+                                contentDescription = "Props"
+                            )
                         },
-                        label = {
-                            Text(text = navItem.label)
-                        }
+                        label = { Text("Props") }
                     )
                 }
             }
         }
     ) { paddingValues ->
+        NavHost(
+            navController = navController,
+            startDestination = Screens.SplashScreen.name,
         NavHost(navController = navController,
             startDestination = Screens.HomeScreen.name,
             modifier = Modifier
                 .padding(paddingValues)
-                .fillMaxSize() // Fixes weird transition effect
+                .fillMaxSize()
         ) {
-            //When passing navigation control, we pass lambdas instead of navController itself
-            composable(route=Screens.HomeScreen.name) {
+            // ─── all your existing composable routes ────────────
+            composable(route = Screens.SplashScreen.name) {
+                SplashScreen {
+                    navController.navigate(Screens.HomeScreen.name)
+                }
+            }
+            composable(route = Screens.HomeScreen.name) {
                 HomeScreen(
-                    randomStat = randomStat,
-                    homeViewModel = homeViewModel,
-                    //Pass in a lambda that'll let us go to a stat leader's profile on click
+                    randomStat           = randomStat,
+                    chosenStatFlow       = homeViewModel.chosenStatFlow,
+                    chosenYearFlow       = homeViewModel.chosenYearFlow,
+                    statLeadersListFlow  = homeViewModel.statLeadersListFlow,
+                    fetchStatLeaders     = { homeViewModel.fetchStatLeaders() },
+                    updateChosenStat     = { homeViewModel.updateChosenStat(newStat = it) },
+                    updateChosenYear     = { homeViewModel.updateChosenYear(newYear = it) },
                     navigateToPlayerProfile = { playerName ->
                         navController.navigate("${Screens.ProfileScreen.route}/$playerName") {
+                            launchSingleTop = true
                             launchSingleTop = true //Prevents double click navigation
                         }
                     }
                 )
             }
-            composable(route=Screens.SearchScreen.name) {
+            composable(route = Screens.SearchScreen.name) {
                 SearchScreen(
-                    //States and lambdas from view model (we never want to pass entire VM)
-                    searchText = searchViewModel.searchText.collectAsState(),
-                    isSearching = searchViewModel.isSearching.collectAsState(),
-                    selectedSearchType = searchViewModel.selectedSearchType.collectAsState(),
-                    playerResults = searchViewModel.playerResults.collectAsState(),
-                    teamResults = searchViewModel.teamResults.collectAsState(),
-                    onSearchTextChange ={ newText ->
-                        searchViewModel.onSearchTextChange(newText)
-                    },
-                    onSearchTypeChange = { newType ->
-                       searchViewModel.onSearchTypeChanged(newType)
-                    },
-                    clearResults = { searchViewModel.clearResults() },
-                    //Two more lambdas that will let us access team/player profiles on click
+                    searchText            = searchViewModel.searchText.collectAsState(),
+                    isSearching           = searchViewModel.isSearching.collectAsState(),
+                    selectedSearchType    = searchViewModel.selectedSearchType.collectAsState(),
+                    playerResults         = searchViewModel.playerResults.collectAsState(),
+                    teamResults           = searchViewModel.teamResults.collectAsState(),
+                    onSearchTextChange    = { searchViewModel.onSearchTextChange(it) },
+                    onSearchTypeChange    = { searchViewModel.onSearchTypeChanged(it) },
+                    clearResults          = { searchViewModel.clearResults() },
                     navigateToPlayerProfile = { playerName ->
                         navController.navigate("${Screens.ProfileScreen.route}/$playerName") {
                             launchSingleTop = true
@@ -135,6 +168,8 @@ fun AppNavigation(randomStat: String) {
             }
             composable(route = Screens.CompareScreen.name) {
                 CompareScreen(
+                    navigateToCompareResults = { p1, p2 ->
+                        navController.navigate("${Screens.CompareResultsScreen.route}/$p1/$p2") {
                     navigateToCompareResults = { playerName1, playerName2 ->
                         navController.navigate("${Screens.CompareResultsScreen.route}/$playerName1/$playerName2") {
                             launchSingleTop = true
@@ -142,6 +177,20 @@ fun AppNavigation(randomStat: String) {
                     }
                 )
             }
+            composable(route = Screens.StandingsBracketPager.name) {
+                StandingBracketPager(
+                    westernFlow           = standingsViewModel.westernFlow,
+                    easternFlow           = standingsViewModel.easternFlow,
+                    navigateToTeamProfile = { team ->
+                        navController.navigate("${Screens.TeamProfileScreen.route}/$team") {
+                            launchSingleTop = true
+                        }
+                    },
+                    updateStandingsByYear = { year ->
+                        standingsViewModel.updateWesternStandings(year)
+                        standingsViewModel.updateEasternStandings(year)
+                    },
+                    yearOptions           = standingsViewModel.yearOptions
             val navigateToTeamProfile: (String) -> Unit = { teamName ->
                 navController.navigate("${Screens.TeamProfileScreen.route}/$teamName") {
                     launchSingleTop = true
@@ -183,15 +232,22 @@ fun AppNavigation(randomStat: String) {
                     navigateBack = { navController.navigateUp() },
                 )
             }
-            composable(route=Screens.GamesScreen.name) {
+            composable(route = Screens.GamesScreen.name) {
                 GamesScreen(
+                    navigateToTeamProfile = { team ->
+                        navController.navigate("${Screens.TeamProfileScreen.route}/$team") {
+                            launchSingleTop = true
+                        }
+                    }
                     navigateToTeamProfile = navigateToTeamProfile
                 )
             }
-            composable(route = "${Screens.CompareResultsScreen.route}/{playerName1}/{playerName2}",
+            composable(
+                route = "${Screens.CompareResultsScreen.route}/{playerName1}/{playerName2}",
                 enterTransition = {
                     slideInHorizontally(
                         initialOffsetX = { it },
+                        animationSpec = tween(300, easing = FastOutLinearInEasing)
                         animationSpec = tween(
                             300,
                             easing = FastOutLinearInEasing
@@ -201,10 +257,7 @@ fun AppNavigation(randomStat: String) {
                 exitTransition = {
                     slideOutHorizontally(
                         targetOffsetX = { -it },
-                        animationSpec = tween(
-                            300,
-                            easing = FastOutLinearInEasing
-                        )
+                        animationSpec = tween(300, easing = FastOutLinearInEasing)
                     )
                 }
             ) { backStackEntry ->
@@ -214,29 +267,31 @@ fun AppNavigation(randomStat: String) {
                     navController.popBackStack()
                 }
             }
+            composable(
+                route = "${Screens.ProfileScreen.route}/{playerName}",
             //Profile screens for player/team (we pass in player/team name as arg in route)
             composable(route = "${Screens.ProfileScreen.route}/{playerName}",
                 enterTransition = {
                     slideInHorizontally(
-                        initialOffsetX = {it },
-                        animationSpec = tween(
-                            300,
-                            easing = FastOutLinearInEasing
-                        )
+                        initialOffsetX = { it },
+                        animationSpec = tween(300, easing = FastOutLinearInEasing)
                     )
                 },
                 exitTransition = {
                     slideOutHorizontally(
-                        targetOffsetX = {-it},
-                        animationSpec = tween(
-                            300,
-                            easing = FastOutLinearInEasing
-                        )
+                        targetOffsetX = { -it },
+                        animationSpec = tween(300, easing = FastOutLinearInEasing)
                     )
                 }
             ) { backStackEntry ->
                 val playerName = backStackEntry.arguments?.getString("playerName") ?: ""
                 ProfileScreen(
+                    playerName            = playerName,
+                    navigateBack          = { navController.navigateUp() },
+                    getPreviousScreenName = getPreviousScreenName,
+                    showSnackBar          = { msg ->
+                        coroutineScope.launch {
+                            snackbarHostState.showSnackbar(msg)
                     playerName = playerName,
                     navigateBack = { navController.navigateUp() },
                     getPreviousScreenName = getPreviousScreenName,
@@ -249,27 +304,31 @@ fun AppNavigation(randomStat: String) {
                     }
                 )
             }
-            composable(route = "${Screens.TeamProfileScreen.route}/{teamName}",
+            composable(
+                route = "${Screens.TeamProfileScreen.route}/{teamName}",
                 enterTransition = {
                     slideInHorizontally(
-                        initialOffsetX = {it },
-                        animationSpec = tween(
-                            300,
-                            easing = FastOutLinearInEasing
-                        )
+                        initialOffsetX = { it },
+                        animationSpec = tween(300, easing = FastOutLinearInEasing)
                     )
                 },
                 exitTransition = {
                     slideOutHorizontally(
-                        targetOffsetX = {-it},
-                        animationSpec = tween(
-                            300,
-                            easing = FastOutLinearInEasing
-                        )
+                        targetOffsetX = { -it },
+                        animationSpec = tween(300, easing = FastOutLinearInEasing)
                     )
                 }
             ) { backStackEntry ->
                 val teamName = backStackEntry.arguments?.getString("teamName") ?: ""
+                TeamProfileScreen(
+                    teamName                = teamName,
+                    navigateBack            = { navController.popBackStack() },
+                    navigateToPlayerProfile = { player ->
+                        navController.navigate("${Screens.ProfileScreen.route}/$player") {
+                            launchSingleTop = true
+                        }
+                    },
+                    getPreviousScreenName   = getPreviousScreenName
                 TeamProfileScreen(teamName = teamName,
                     //Used for back button
                     navigateBack = { navController.popBackStack()},

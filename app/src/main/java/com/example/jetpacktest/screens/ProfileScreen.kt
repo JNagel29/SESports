@@ -50,11 +50,13 @@ import com.example.jetpacktest.DatabaseHandler
 import com.example.jetpacktest.FavoritesHandler
 import com.example.jetpacktest.R
 import com.example.jetpacktest.HeadshotHandler
+import com.example.jetpacktest.getFantasyRating
 import com.example.jetpacktest.models.TeamMaps
 import com.example.jetpacktest.ui.components.LargeDropdownMenu
 import com.example.jetpacktest.models.Player
 import com.example.jetpacktest.models.PlayerPersonalInfo
 import com.example.jetpacktest.ui.components.CircularLoadingIcon
+import com.example.jetpacktest.ui.components.ExpandableCategory
 import com.example.jetpacktest.ui.components.ReturnToPreviousHeader
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -175,8 +177,19 @@ fun ProfileScreen(
                     label = "Select Year:",
                     items = yearsList,
                     selectedIndex = yearsList.indexOf(chosenYear),
+                    modifier = Modifier.padding(top = 5.dp, start = 5.dp, end = 5.dp),
                     onItemSelected = { index, _ ->
                         chosenYear = yearsList[index]
+                        databaseHandler.executePlayerData(
+                            playerName,
+                            chosenYear
+                        ) { data ->
+                            player = data
+                        }
+                    }
+                )
+            }
+            if (player.points != -1.0f) {
                         if (chosenYear != "2024") {
                             databaseHandler.executePlayerData(
                                 playerName,
@@ -414,6 +427,29 @@ fun InfoStatBoxes(playerPersonalInfo: PlayerPersonalInfo, color: Color) {
             valueFontSize = 16.sp
         )
     }
+    HorizontalDivider(thickness = 2.dp, color = Color.White)
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(color = color),
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        StatBox(
+            label = "College",
+            value = playerPersonalInfo.data[0].college,
+            labelFontSize = 14.sp,
+            valueFontSize = 16.sp
+        )
+        VerticalDivider(modifier = Modifier.height(50.dp),
+            thickness = 2.dp, color = Color.White)
+        StatBox(
+            label = "Country",
+            value = playerPersonalInfo.data[0].country,
+            labelFontSize = 14.sp,
+            valueFontSize = 16.sp
+        )
+    }
 }
 
 @Composable
@@ -462,6 +498,55 @@ fun PlayerStatisticTable(player: Player) {
 }
 
 @Composable
+fun PlayerStatisticTable(player: Player) {
+    Column(
+        modifier = Modifier
+            .padding(16.dp)
+    ) {
+        Spacer(modifier = Modifier.height(4.dp))
+
+        ExpandableCategory("Shooting Splits") {
+            Column(
+                modifier = Modifier
+                    .padding(4.dp)
+            ) {
+                PlayerDataRow("Fantasy Rating", getFantasyRating(player))
+                PlayerDataRow("Field Goals", player.fieldGoals.toString())
+                PlayerDataRow("Field Goal Attempts", player.fieldGoalAttempts.toString())
+                PlayerDataRow("Field Goal %", "%.1f%%"
+                    .format(player.fieldGoalPercent * 100))
+                PlayerDataRow("3 Pointers", player.threePointers.toString())
+                PlayerDataRow("3 Point Attempts", player.threePointerAttempts.toString())
+                PlayerDataRow("3 Point %", "%.1f%%"
+                    .format(player.threePointPercent * 100))
+                PlayerDataRow("2 Pointers", player.twoPointers.toString())
+                PlayerDataRow("2 Point Attempts", player.twoPointerAttempts.toString())
+                PlayerDataRow("2 Point %", "%.1f%%"
+                    .format(player.twoPointPercent * 100))
+                PlayerDataRow("Free Throws", player.freeThrows.toString())
+                PlayerDataRow("Free Throw Attempts", player.freeThrowAttempts.toString())
+                PlayerDataRow("Free Throw %", "%.1f%%"
+                    .format(player.freeThrowPercent * 100))
+                PlayerDataRow(
+                    "Effective FG%",
+                    "%.1f%%".format(player.effectiveFieldGoalPercent * 100)
+                )
+            }
+        }
+
+        ExpandableCategory("Defensive Efficiency and Usage") {
+            Column(
+                modifier = Modifier
+                    .padding(4.dp)
+            ) {
+                PlayerDataRow("Steals", player.steals.toString())
+                PlayerDataRow("Blocks", player.blocks.toString())
+                PlayerDataRow("Fouls", player.personalFouls.toString())
+                PlayerDataRow("Turnovers", player.turnovers.toString())
+                PlayerDataRow("Mins. Played", player.minutesPlayed.toString())
+                PlayerDataRow("Games Started", player.gamesStarted.toString())
+            }
+        }
 fun StatisticCategory(title: String, content: @Composable () -> Unit) {
     var expandedCategory by remember { mutableStateOf(false) }
     Row(

@@ -24,6 +24,10 @@ class DatabaseHandler {
         const val NUM_PLAYERS_TO_GRAB = 10
     }
     private val scope = CoroutineScope(Dispatchers.IO)
+    private val url = "jdbc:mysql://nikoarak.cikeys.com:3306/nikoarak_SESports?useSSL=false"
+    //private val url = "jdbc:mysql://nikoarak.cikeys.com:3306/nikoarak_SESports?useSSL=true&enabledTLSProtocols=TLSv1.2"
+
+
     private val url = "jdbc:mysql://nikoarak.cikeys.com:3306/nikoarak_SESports"
     private val user = Keys.DB_USER
     private val password = Keys.DB_PASS
@@ -160,6 +164,12 @@ class DatabaseHandler {
         }
     }
 
+    fun executeStandings(
+        conference: Conference, year: String, onDataReceived: (MutableList<TeamStanding>) -> Unit
+    ) {
+        scope.launch {
+            val standingsList = getStandings(conference =conference, year = year)
+
     fun executeStandings(conference: Conference, onDataReceived: (MutableList<TeamStanding>) -> Unit) {
         scope.launch {
             val standingsList = getStandings(conference)
@@ -167,6 +177,11 @@ class DatabaseHandler {
         }
     }
 
+    private fun getStandings(conference: Conference, year: String): MutableList<TeamStanding> {
+        var myConn: Connection? = null
+        var statement: Statement? = null
+        var resultSet: ResultSet? = null
+        val teamStandings = mutableListOf<TeamStanding>()
     private fun getStandings(conference: Conference): MutableList<TeamStanding> {
         var myConn: Connection? = null
         var statement: Statement? = null
@@ -176,6 +191,10 @@ class DatabaseHandler {
             Class.forName("com.mysql.jdbc.Driver")
             myConn = DriverManager.getConnection(url, user, password)
             statement = myConn.createStatement()
+            val sql = "SELECT* FROM ${conference.name}_STANDING WHERE `Year` = $year"
+            resultSet = statement.executeQuery(sql)
+            while (resultSet.next()) {
+                val teamName = resultSet.getString("Team")
             val sql = "SELECT* FROM ${conference.name}_STANDING"
             resultSet = statement.executeQuery(sql)
             while (resultSet.next()) {
@@ -188,6 +207,11 @@ class DatabaseHandler {
                     else -> TeamMaps.namesToAbbreviations[teamName] ?: "N/A"
                 }
                 val teamStanding = TeamStanding(
+                    rank = resultSet.getInt("Rank"),
+                    name = teamName,
+                    wins = resultSet.getInt("W"),
+                    losses = resultSet.getInt("L"),
+                    winLossPercentage = resultSet.getFloat("W/L%"),
                     rank = resultSet.getInt("rank"),
                     name = teamName,
                     wins = resultSet.getInt("Wins"),
@@ -197,6 +221,7 @@ class DatabaseHandler {
                     logo = TeamMaps.xmlLogos[teamName] ?: R.drawable.baseline_arrow_back_ios_new_24,
                     abbrev = abbrev
                 )
+                teamStandings.add(teamStanding)
                 teamPlayers.add(teamStanding)
             }
         } catch (e: SQLException) {
@@ -207,6 +232,7 @@ class DatabaseHandler {
         } finally {
             closeResources(myConn, resultSet, statement)
         }
+        return teamStandings
         return teamPlayers
     }
 
@@ -333,6 +359,7 @@ class DatabaseHandler {
                             turnovers = resultSet.getFloat("TOV"),
                             personalFouls = resultSet.getFloat("PF"),
                             minutesPlayed = resultSet.getFloat("MP"),
+                            gamesStarted = resultSet.getInt("GS"),
                             fieldGoals = resultSet.getFloat("FG"),
                             fieldGoalAttempts = resultSet.getFloat("FGA"),
                             fieldGoalPercent = resultSet.getFloat("FG_PERCENT"),
@@ -342,6 +369,9 @@ class DatabaseHandler {
                             twoPointers = resultSet.getFloat("2P"),
                             twoPointerAttempts = resultSet.getFloat("2PA"),
                             twoPointPercent = resultSet.getFloat("2P_PERCENT"),
+                            freeThrows = resultSet.getFloat("FT"),
+                            freeThrowAttempts = resultSet.getFloat("FTA"),
+                            freeThrowPercent = resultSet.getFloat("FT_PERCENT"),
                             effectiveFieldGoalPercent = resultSet.getFloat("eFG_PERCENT"),
                             offensiveRebounds = resultSet.getFloat("ORB"),
                             defensiveRebounds = resultSet.getFloat("DRB")
@@ -372,6 +402,7 @@ class DatabaseHandler {
                     turnovers = resultSet.getFloat("TOV"),
                     personalFouls = resultSet.getFloat("PF"),
                     minutesPlayed = resultSet.getFloat("MP"),
+                    gamesStarted = resultSet.getInt("GS"),
                     fieldGoals = resultSet.getFloat("FG"),
                     fieldGoalAttempts = resultSet.getFloat("FGA"),
                     fieldGoalPercent = resultSet.getFloat("FG_PERCENT"),
@@ -381,6 +412,9 @@ class DatabaseHandler {
                     twoPointers = resultSet.getFloat("2P"),
                     twoPointerAttempts = resultSet.getFloat("2PA"),
                     twoPointPercent = resultSet.getFloat("2P_PERCENT"),
+                    freeThrows = resultSet.getFloat("FT"),
+                    freeThrowAttempts = resultSet.getFloat("FTA"),
+                    freeThrowPercent = resultSet.getFloat("FT_PERCENT"),
                     effectiveFieldGoalPercent = resultSet.getFloat("eFG_PERCENT"),
                     offensiveRebounds = resultSet.getFloat("ORB"),
                     defensiveRebounds = resultSet.getFloat("DRB")

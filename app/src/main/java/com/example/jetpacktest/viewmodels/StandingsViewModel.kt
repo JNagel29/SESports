@@ -17,6 +17,20 @@ class StandingsViewModel : ViewModel() {
     private val _easternFlow = MutableStateFlow<List<TeamStanding>>(emptyList())
     val easternFlow: Flow<List<TeamStanding>> = _easternFlow
 
+    val yearOptions = listOf("1991", "1992", "1993", "1994", "1995", "1996", "1997", "1998",
+        "1999", "2000", "2001", "2002", "2003", "2004", "2005", "2006", "2007", "2008", "2009",
+        "2010", "2011", "2012", "2013", "2014", "2015", "2016", "2017", "2018", "2019", "2020",
+        "2021", "2022", "2023", "2024").reversed()
+    init {
+        updateWesternStandings(year = "2024")
+        updateEasternStandings(year = "2024")
+    }
+
+    fun updateWesternStandings(year: String) {
+        Log.d("StandingsVM", "Fetching Western Standings of $year...")
+        databaseHandler.executeStandings(
+            conference = Conference.WESTERN,
+            year = year
     init {
         fetchWesternStandings()
         fetchEasternStandings()
@@ -31,6 +45,11 @@ class StandingsViewModel : ViewModel() {
         }
     }
 
+    fun updateEasternStandings(year: String) {
+        Log.d("StandingsVM", "Fetching Eastern Standings $year...")
+        databaseHandler.executeStandings(
+            conference = Conference.EASTERN,
+            year = year
     private fun fetchEasternStandings() {
         Log.d("StandingsVM", "Fetching Eastern Standings...")
         databaseHandler.executeStandings(

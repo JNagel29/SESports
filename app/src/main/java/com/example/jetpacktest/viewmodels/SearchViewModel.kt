@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.*
 
 
 @OptIn(FlowPreview::class)
-class SearchViewModel() : ViewModel() {
+class SearchViewModel : ViewModel() {
 
     private val databaseHandler = DatabaseHandler()
     private val restHandler = RestHandler()
@@ -51,7 +51,7 @@ class SearchViewModel() : ViewModel() {
             emptyList()
         )
 
-    /* TODO: Was testing connecting via REST API and it worked, will implement more l8r
+    /* Was testing connecting via REST API and it worked, will implement more later
     @OptIn(ExperimentalCoroutinesApi::class)
     val playerResults = combine(
         _selectedSearchType,
