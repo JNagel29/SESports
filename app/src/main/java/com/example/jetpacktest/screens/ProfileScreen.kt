@@ -139,7 +139,7 @@ fun ProfileScreen(
                     imgId = imgId,
                     team = player.team,
                     position = player.position,
-                    jerseyNumber = playerPersonalInfo.data[0].jerseyNumber,
+                    jerseyNumber = "32",
                     injuryStartDate = injuryStartDate,
                     headshotHandler = headshotHandler,
                     favoritesHandler = favoritesHandler,
@@ -354,8 +354,8 @@ fun InfoStatBoxes(playerPersonalInfo: PlayerPersonalInfo, color: Color) {
     ) {
         StatBox(
             label = "Height/Weight",
-            value = "${playerPersonalInfo.data[0].height} | " +
-                    playerPersonalInfo.data[0].weight,
+            value = "6'4 | " +
+                    "25lbs",
             labelFontSize = 14.sp,
             valueFontSize = 16.sp
         )
