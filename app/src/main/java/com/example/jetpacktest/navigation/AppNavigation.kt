@@ -36,6 +36,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -61,6 +65,10 @@ import com.example.jetpacktest.screens.SplashScreen
 import com.example.jetpacktest.screens.StandingBracketPager
 import com.example.jetpacktest.screens.TeamProfileScreen
 import com.example.jetpacktest.viewmodel.BaseballHomeViewModel
+import androidx.navigation.compose.*
+import com.example.jetpacktest.screens.*
+import com.example.jetpacktest.viewmodel.BaseballHomeViewModel
+import com.example.jetpacktest.viewmodels.BaseballSearchViewModel
 import com.example.jetpacktest.viewmodels.BaseballStandingsViewModel
 import com.example.jetpacktest.viewmodels.HomeViewModel
 import com.example.jetpacktest.viewmodels.SearchViewModel

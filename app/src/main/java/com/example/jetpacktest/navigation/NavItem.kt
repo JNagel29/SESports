@@ -6,6 +6,7 @@ import androidx.compose.material.icons.filled.Analytics
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.SportsBaseball
 import androidx.compose.ui.graphics.vector.ImageVector
 
 data class NavItem(
