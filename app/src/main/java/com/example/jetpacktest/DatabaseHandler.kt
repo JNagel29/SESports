@@ -1,12 +1,36 @@
 package com.example.jetpacktest
 
+import android.system.Os.connect
 import android.util.Log
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.example.jetpacktest.models.BaseballPlayerSeasonStats
+import com.example.jetpacktest.models.BaseballTeamStanding
+import com.example.jetpacktest.models.Batter
 import com.example.jetpacktest.models.InjuredPlayer
+import com.example.jetpacktest.models.Pitcher
 import com.example.jetpacktest.models.Player
 import com.example.jetpacktest.models.StatLeader
 import com.example.jetpacktest.models.TeamMaps
 import com.example.jetpacktest.models.TeamStanding
 import com.example.jetpacktest.models.TeamStanding.Conference
+import com.example.jetpacktest.screens.PlayerDataRow
+import com.example.jetpacktest.screens.StatBox
+import com.example.jetpacktest.ui.components.ExpandableCategory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -24,11 +48,14 @@ class DatabaseHandler {
         const val NUM_PLAYERS_TO_GRAB = 10
     }
     private val scope = CoroutineScope(Dispatchers.IO)
-    private val url = "jdbc:mysql://nikoarak.cikeys.com:3306/nikoarak_SESports?useSSL=false"
+    private val url = "jdbc:mysql://nikoarak.cikeys.com:3306/nikoarak_SESports?allowPublicKeyRetrieval=true&useSSL=false"
     //private val url = "jdbc:mysql://nikoarak.cikeys.com:3306/nikoarak_SESports?useSSL=true&enabledTLSProtocols=TLSv1.2"
-
+    //private val url = "jdbc:mysql://nikoarak.cikeys.com:3306/nikoarak_SESports"
     private val user = Keys.DB_USER
     private val password = Keys.DB_PASS
+    private var connection: Connection? = null
+
+
 
     fun executeStatLeaders(chosenStat: String, year: String,
                            onDataReceived: (MutableList<StatLeader>) -> Unit) {
@@ -102,6 +129,17 @@ class DatabaseHandler {
             }
         }
     }
+    fun executeBaseballStandings(
+        league: BaseballTeamStanding.League,
+        year: String,
+        onDataReceived: (MutableList<BaseballTeamStanding>) -> Unit
+    ) {
+        scope.launch {
+            val standingsList = getBaseballStandings(league, year)
+            onDataReceived(standingsList)
+        }
+    }
+
 
     private fun checkInjuredStartDate(playerName: String): String {
         var injuredStartDate = ""
@@ -169,6 +207,551 @@ class DatabaseHandler {
             val standingsList = getStandings(conference =conference, year = year)
             onDataReceived(standingsList)
         }
+    }
+    fun executeQuery(
+        query: String,
+        columnName: String,
+        callback: (List<String>) -> Unit
+    ) {
+        scope.launch {
+            var connection: Connection? = null
+            var statement: Statement? = null
+            var resultSet: ResultSet? = null
+
+            try {
+                Log.d("DatabaseDebug", "Executing query: $query")
+
+                connection = DriverManager.getConnection(url, user, password)
+                statement = connection.createStatement()
+                resultSet = statement.executeQuery(query)
+
+                val results = mutableListOf<String>()
+                while (resultSet.next()) {
+                    results.add(resultSet.getString(columnName))
+                }
+
+                withContext(Dispatchers.Main) {
+                    callback(results)
+                }
+            } catch (e: SQLException) {
+                Log.e("DatabaseDebug", "SQL Exception: ${e.localizedMessage}")
+                withContext(Dispatchers.Main) {
+                    callback(emptyList())
+                }
+            } catch (e: Exception) {
+                Log.e("DatabaseDebug", "Exception: ${e.localizedMessage}")
+                withContext(Dispatchers.Main) {
+                    callback(emptyList())
+                }
+            } finally {
+                try { resultSet?.close() } catch (_: Exception) {}
+                try { statement?.close() } catch (_: Exception) {}
+                try { connection?.close() } catch (_: Exception) {}
+            }
+        }
+    }
+
+
+    fun executeBaseballStatLeaders(
+        chosenStat: String,
+        year: String,
+        onDataReceived: (MutableList<StatLeader>) -> Unit
+    ) {
+        scope.launch {
+            val statLeadersList = getBaseballStatLeaders(chosenStat, year)
+            withContext(Dispatchers.IO) {
+                onDataReceived(statLeadersList)
+            }
+        }
+    }
+
+    fun executePitcherSearch(searchText: String, callback: (List<String>) -> Unit) {
+        val query = """
+        SELECT DISTINCT player_name FROM mlb_pitchers
+        WHERE player_name LIKE '%$searchText%'
+        ORDER BY player_name
+        LIMIT 50;
+    """.trimIndent()
+        executeQuery(query, "player_name", callback)
+    }
+
+    fun executePitcherYears(playerName: String, onDataReceived: (MutableList<String>) -> Unit) {
+        scope.launch {
+            val yearsList = getPitcherYears(playerName)
+            withContext(Dispatchers.IO) {
+                onDataReceived(yearsList)
+            }
+        }
+    }
+    fun executeBatterYears(playerName: String, onDataReceived: (MutableList<String>) -> Unit) {
+        scope.launch {
+            val yearsList = getBatterYears(playerName)
+            withContext(Dispatchers.IO) {
+                onDataReceived(yearsList)
+            }
+        }
+    }
+
+    fun executeBatterSearch(searchText: String, callback: (List<String>) -> Unit) {
+        val query = """
+        SELECT DISTINCT player_name FROM mlb_batters
+        WHERE player_name LIKE '%$searchText%'
+        ORDER BY player_name
+        LIMIT 50;
+    """.trimIndent()
+        executeQuery(query, "player_name", callback)
+    }
+
+    fun getBatterData(name: String, year: String, callback: (Batter?) -> Unit) {
+        scope.launch {
+            var result: Batter? = null
+            try {
+                Class.forName("com.mysql.jdbc.Driver")
+                val conn = DriverManager.getConnection(url, user, password)
+                val stmt = conn.createStatement()
+                val rs = stmt.executeQuery("""
+                SELECT 
+                    season, team, player_name, position, air_outs, at_bats, at_bats_per_home_run, avg, babip,
+                    base_on_balls, catchers_interference, caught_stealing, doubles, games_played,
+                    ground_into_double_play, ground_outs, ground_outs_to_airouts, hit_by_pitch, hits,
+                    home_runs, intentional_walks, left_on_base, number_of_pitches, obp, ops,
+                    plate_appearances, rbi, runs, sac_bunts, sac_flies, slg, stolen_base_percentage,
+                    stolen_bases, strike_outs, total_bases, triples
+                FROM mlb_batters
+                WHERE player_name = "$name" AND season = $year
+                LIMIT 1
+            """.trimIndent())
+
+                if (rs.next()) {
+                    result = Batter(
+                        season = rs.getInt("season"),
+                        team = rs.getString("team"),
+                        playerName = rs.getString("player_name"),
+                        position = rs.getString("position"),
+                        airOuts = rs.getInt("air_outs"),
+                        atBats = rs.getInt("at_bats"),
+                        atBatsPerHomeRun = rs.getDouble("at_bats_per_home_run"),
+                        avg = rs.getDouble("avg"),
+                        babip = rs.getDouble("babip"),
+                        baseOnBalls = rs.getInt("base_on_balls"),
+                        catchersInterference = rs.getInt("catchers_interference"),
+                        caughtStealing = rs.getInt("caught_stealing"),
+                        doubles = rs.getInt("doubles"),
+                        gamesPlayed = rs.getInt("games_played"),
+                        groundIntoDoublePlay = rs.getInt("ground_into_double_play"),
+                        groundOuts = rs.getInt("ground_outs"),
+                        groundOutsToAirouts = rs.getDouble("ground_outs_to_airouts"),
+                        hitByPitch = rs.getInt("hit_by_pitch"),
+                        hits = rs.getInt("hits"),
+                        homeRuns = rs.getInt("home_runs"),
+                        intentionalWalks = rs.getInt("intentional_walks"),
+                        leftOnBase = rs.getInt("left_on_base"),
+                        numberOfPitches = rs.getInt("number_of_pitches"),
+                        obp = rs.getDouble("obp"),
+                        ops = rs.getDouble("ops"),
+                        plateAppearances = rs.getInt("plate_appearances"),
+                        rbi = rs.getInt("rbi"),
+                        runs = rs.getInt("runs"),
+                        sacBunts = rs.getInt("sac_bunts"),
+                        sacFlies = rs.getInt("sac_flies"),
+                        slg = rs.getDouble("slg"),
+                        stolenBasePercentage = rs.getDouble("stolen_base_percentage"),
+                        stolenBases = rs.getInt("stolen_bases"),
+                        strikeOuts = rs.getInt("strike_outs"),
+                        totalBases = rs.getInt("total_bases"),
+                        triples = rs.getInt("triples")
+                    )
+                }
+                rs.close()
+                stmt.close()
+                conn.close()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+            withContext(Dispatchers.Main) {
+                callback(result)
+            }
+        }
+    }
+    private fun getBatterYears(playerName: String): MutableList<String> {
+        val yearsList = mutableListOf<String>()
+        var myConn: Connection? = null
+        var statement: Statement? = null
+        var resultSet: ResultSet? = null
+        try {
+            Class.forName("com.mysql.jdbc.Driver")
+            myConn = DriverManager.getConnection(url, user, password)
+            statement = myConn.createStatement()
+
+            val sql = """
+            SELECT DISTINCT season
+            FROM mlb_batters
+            WHERE player_name = "$playerName"
+            ORDER BY season DESC
+        """.trimIndent()
+
+            resultSet = statement.executeQuery(sql)
+            while (resultSet.next()) {
+                yearsList.add(resultSet.getInt("season").toString())
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            closeResources(myConn, resultSet, statement)
+        }
+        return yearsList
+    }
+
+
+    // This private helper will actually query the database
+    private fun getPitcherYears(playerName: String): MutableList<String> {
+        var myConn: Connection? = null
+        var statement: Statement? = null
+        var resultSet: ResultSet? = null
+        val yearsList = mutableListOf<String>()
+        try {
+            Class.forName("com.mysql.jdbc.Driver")
+            myConn = DriverManager.getConnection(url, user, password)
+            statement = myConn.createStatement()
+
+            val sql = """
+            SELECT DISTINCT season 
+            FROM mlb_pitchers 
+            WHERE player_name = "$playerName"
+            ORDER BY season DESC
+        """.trimIndent()
+
+            resultSet = statement.executeQuery(sql)
+            while (resultSet.next()) {
+                yearsList.add(resultSet.getInt("season").toString())
+            }
+        } catch (e: SQLException) {
+            Log.d(Const.TAG, e.message ?: "SQL error during getPitcherYears")
+            e.printStackTrace()
+        } catch (e: ClassNotFoundException) {
+            e.printStackTrace()
+        } finally {
+            closeResources(myConn, resultSet, statement)
+        }
+        return yearsList
+    }
+    fun executePitcherData(playerName: String, year: String, onDataReceived: (Pitcher) -> Unit) {
+        scope.launch {
+            val pitcher = getPitcherData(playerName, year)
+            withContext(Dispatchers.IO) {
+                onDataReceived(pitcher)
+            }
+        }
+    }
+
+    // This private function will actually fetch the pitcher stats
+    private fun getPitcherData(playerName: String, year: String): Pitcher {
+        var myConn: Connection? = null
+        var statement: Statement? = null
+        var resultSet: ResultSet? = null
+        var pitcher = Pitcher() // this is your Pitcher model (already built)
+
+        try {
+            Class.forName("com.mysql.jdbc.Driver")
+            myConn = DriverManager.getConnection(url, user, password)
+            statement = myConn.createStatement()
+
+            val sql = """
+    SELECT 
+        season,
+        team,
+        player_name,
+        position,
+        air_outs,
+        at_bats,
+        avg,
+        balks,
+        base_on_balls,
+        batters_faced,
+        blown_saves,
+        catchers_interference,
+        caught_stealing,
+        complete_games,
+        doubles,
+        earned_runs,
+        era,
+        games_finished,
+        games_pitched,
+        games_played,
+        games_started,
+        ground_into_double_play,
+        ground_outs,
+        ground_outs_to_airouts,
+        hit_batsmen,
+        hit_by_pitch,
+        hits,
+        hits_per9inn,
+        holds,
+        home_runs,
+        home_runs_per9,
+        inherited_runners,
+        inherited_runners_scored,
+        innings_pitched,
+        intentional_walks,
+        losses,
+        number_of_pitches,
+        obp,
+        ops,
+        outs,
+        pickoffs,
+        pitches_per_inning,
+        runs,
+        runs_scored_per9,
+        sac_bunts,
+        sac_flies,
+        save_opportunities,
+        saves,
+        shutouts,
+        slg,
+        stolen_base_percentage,
+        stolen_bases,
+        strike_outs,
+        strike_percentage,
+        strikeout_walk_ratio,
+        strikeouts_per9inn,
+        strikes,
+        total_bases,
+        triples,
+        walks_per9inn,
+        whip,
+        wild_pitches,
+        win_percentage,
+        wins
+    FROM mlb_pitchers
+    WHERE player_name = "$playerName" AND season = $year
+    LIMIT 1;
+""".trimIndent()
+
+
+
+            resultSet = statement.executeQuery(sql)
+
+            if (resultSet.next()) {
+                pitcher = Pitcher(
+                    season = resultSet.getInt("season"),
+                    team = resultSet.getString("team"),
+                    playerName = resultSet.getString("player_name"),
+                    position = resultSet.getString("position"),
+                    airOuts = resultSet.getInt("air_outs"),
+                    atBats = resultSet.getInt("at_bats"),
+                    avg = resultSet.getDouble("avg"),
+                    balks = resultSet.getInt("balks"),
+                    baseOnBalls = resultSet.getInt("base_on_balls"),
+                    battersFaced = resultSet.getInt("batters_faced"),
+                    blownSaves = resultSet.getInt("blown_saves"),
+                    catchersInterference = resultSet.getInt("catchers_interference"),
+                    caughtStealing = resultSet.getInt("caught_stealing"),
+                    completeGames = resultSet.getInt("complete_games"),
+                    doubles = resultSet.getInt("doubles"),
+                    earnedRuns = resultSet.getInt("earned_runs"),
+                    era = resultSet.getDouble("era"),
+                    gamesFinished = resultSet.getInt("games_finished"),
+                    gamesPitched = resultSet.getInt("games_pitched"),
+                    gamesPlayed = resultSet.getInt("games_played"),
+                    gamesStarted = resultSet.getInt("games_started"),
+                    groundIntoDoublePlay = resultSet.getInt("ground_into_double_play"),
+                    groundOuts = resultSet.getInt("ground_outs"),
+                    groundOutsToAirouts = resultSet.getDouble("ground_outs_to_airouts"),
+                    hitBatsmen = resultSet.getInt("hit_batsmen"),
+                    hitByPitch = resultSet.getInt("hit_by_pitch"),
+                    hits = resultSet.getInt("hits"),
+                    hitsPer9Inn = resultSet.getDouble("hits_per9inn"), // ✅ fixed
+                    holds = resultSet.getInt("holds"),
+                    homeRuns = resultSet.getInt("home_runs"),
+                    homeRunsPer9 = resultSet.getDouble("home_runs_per9"), // ✅ fixed
+                    inheritedRunners = resultSet.getInt("inherited_runners"),
+                    inheritedRunnersScored = resultSet.getInt("inherited_runners_scored"),
+                    inningsPitched = resultSet.getDouble("innings_pitched"),
+                    intentionalWalks = resultSet.getInt("intentional_walks"),
+                    losses = resultSet.getInt("losses"),
+                    numberOfPitches = resultSet.getInt("number_of_pitches"),
+                    obp = resultSet.getDouble("obp"),
+                    ops = resultSet.getDouble("ops"),
+                    outs = resultSet.getInt("outs"),
+                    pickoffs = resultSet.getInt("pickoffs"),
+                    pitchesPerInning = resultSet.getDouble("pitches_per_inning"),
+                    runs = resultSet.getInt("runs"),
+                    runsScoredPer9 = resultSet.getDouble("runs_scored_per9"),
+                    sacBunts = resultSet.getInt("sac_bunts"),
+                    sacFlies = resultSet.getInt("sac_flies"),
+                    saveOpportunities = resultSet.getInt("save_opportunities"),
+                    saves = resultSet.getInt("saves"),
+                    shutouts = resultSet.getInt("shutouts"),
+                    slg = resultSet.getDouble("slg"),
+                    stolenBasePercentage = resultSet.getDouble("stolen_base_percentage"),
+                    stolenBases = resultSet.getInt("stolen_bases"),
+                    strikeOuts = resultSet.getInt("strike_outs"),
+                    strikePercentage = resultSet.getDouble("strike_percentage"),
+                    strikeoutWalkRatio = resultSet.getDouble("strikeout_walk_ratio"),
+                    strikeoutsPer9Inn = resultSet.getDouble("strikeouts_per9inn"), // ✅ fixed
+                    strikes = resultSet.getInt("strikes"),
+                    totalBases = resultSet.getInt("total_bases"),
+                    triples = resultSet.getInt("triples"),
+                    walksPer9Inn = resultSet.getDouble("walks_per9inn"), // ✅ fixed
+                    whip = resultSet.getDouble("whip"),
+                    wildPitches = resultSet.getInt("wild_pitches"),
+                    winPercentage = resultSet.getDouble("win_percentage"),
+                    wins = resultSet.getInt("wins")
+                )
+
+            }
+
+        } catch (e: SQLException) {
+            Log.d(Const.TAG, e.message ?: "SQL error during getPitcherData")
+            e.printStackTrace()
+        } catch (e: ClassNotFoundException) {
+            e.printStackTrace()
+        }
+        finally {
+            closeResources(myConn, resultSet, statement)
+        }
+        return pitcher
+    }
+
+    // Helper function for above
+    private fun getBaseballStatLeaders(chosenStat: String, year: String): MutableList<StatLeader> {
+        var myConn: Connection? = null
+        var statement: Statement? = null
+        var resultSet: ResultSet? = null
+        val statLeadersList = mutableListOf<StatLeader>()
+        val addedPlayers = mutableSetOf<String>()
+
+        try {
+            Class.forName("com.mysql.jdbc.Driver")
+            myConn = DriverManager.getConnection(url, user, password)
+            statement = myConn.createStatement()
+            val sql = """
+            SELECT Name, $chosenStat 
+            FROM PlayerSeasonStats$year
+            WHERE $chosenStat IS NOT NULL
+            ORDER BY $chosenStat DESC
+            LIMIT ${Const.NUM_PLAYERS_TO_GRAB}
+        """.trimIndent()
+            resultSet = statement.executeQuery(sql)
+
+            var rank = 1
+            while (resultSet.next()) {
+                val playerName = resultSet.getString("Name")
+                val statValue = resultSet.getFloat(chosenStat)
+
+                if (!addedPlayers.contains(playerName)) {
+                    statLeadersList.add(StatLeader(rank++, playerName, statValue))
+                    addedPlayers.add(playerName)
+                }
+            }
+        } catch (e: SQLException) {
+            Log.d(Const.TAG, e.message ?: "SQL error during getBaseballStatLeaders")
+            e.printStackTrace()
+        } catch (e: ClassNotFoundException) {
+            e.printStackTrace()
+        }
+        finally {
+            closeResources(myConn, resultSet, statement)
+        }
+
+        return statLeadersList
+    }
+    fun fetchBaseballStatLeaders(
+        isPitcher: Boolean,
+        chosenStat: String,
+        year: String,
+        callback: (List<StatLeader>) -> Unit
+    ) {
+        scope.launch {
+            val table = if (isPitcher) "mlb_pitchers" else "mlb_batters"
+            val results = mutableListOf<StatLeader>()
+
+            try {
+                Class.forName("com.mysql.jdbc.Driver")
+                val conn = DriverManager.getConnection(url, user, password)
+                val stmt = conn.createStatement()
+                val rs = stmt.executeQuery(
+                    """
+                SELECT player_name, $chosenStat
+                FROM $table
+                WHERE $chosenStat IS NOT NULL
+                AND season = $year
+                ORDER BY $chosenStat DESC
+                LIMIT 20
+                """.trimIndent()
+                )
+
+                var rank = 1
+                while (rs.next()) {
+                    val name = rs.getString("player_name")
+                    val statValue = rs.getFloat(chosenStat)
+                    results.add(StatLeader(rank++, name, statValue))
+                }
+
+                rs.close()
+                stmt.close()
+                conn.close()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+
+            withContext(Dispatchers.Main) {
+                callback(results)
+            }
+        }
+    }
+
+
+
+    fun executeBaseballPlayerSearch(searchText: String, callback: (List<String>) -> Unit) {
+        val query = """
+        SELECT DISTINCT player_name FROM mlb_pitchers
+        WHERE player_name LIKE '%$searchText%'
+        ORDER BY player_name
+        LIMIT 50;
+    """.trimIndent()
+
+        executeQuery(query, "player_name", callback)
+    }
+
+
+    private fun getBaseballStandings(
+        league: BaseballTeamStanding.League,
+        year: String
+    ): MutableList<BaseballTeamStanding> {
+        val teamStandings = mutableListOf<BaseballTeamStanding>()
+        var myConn: Connection? = null
+        var statement: Statement? = null
+        var resultSet: ResultSet? = null
+        try {
+            Class.forName("com.mysql.jdbc.Driver")
+            myConn = DriverManager.getConnection(url, user, password)
+            statement = myConn.createStatement()
+            val sql = "SELECT * FROM BaseballTeamStanding WHERE season = $year AND league = '${league.name}' ORDER BY wins DESC"
+            resultSet = statement.executeQuery(sql)
+            while (resultSet.next()) {
+                val standing = BaseballTeamStanding(
+                    rank = resultSet.getInt("ranking"),
+                    name = resultSet.getString("name"),
+                    wins = resultSet.getInt("wins"),
+                    losses = resultSet.getInt("losses"),
+                    winLossPercentage = resultSet.getFloat("winLossPercentage"),
+                    league = league,
+                    abbrev = resultSet.getString("abbrev"),
+                    logoUrl = resultSet.getString("wikiLogoUrl"),
+                    season = resultSet.getInt("season")
+                )
+                teamStandings.add(standing)
+            }
+        } catch (e: SQLException) {
+            Log.d(Const.TAG, e.message!!)
+            e.printStackTrace()
+        } catch (e: ClassNotFoundException) {
+            e.printStackTrace()
+        } finally {
+            closeResources(myConn, resultSet, statement)
+        }
+        return teamStandings
     }
 
     private fun getStandings(conference: Conference, year: String): MutableList<TeamStanding> {
@@ -501,4 +1084,5 @@ class DatabaseHandler {
     }
 
 }
+
 

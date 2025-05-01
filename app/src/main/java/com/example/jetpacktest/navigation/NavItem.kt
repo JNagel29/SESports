@@ -39,5 +39,5 @@ val listOfNavItems = listOf(
         label = "Games",
         icon = Icons.Default.CalendarToday,
         route = Screens.GamesScreen.name // Returns enum name as string
-    )
+    ),
 )

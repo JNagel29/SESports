@@ -36,10 +36,5 @@
             android:name=".props.ui2.PropsDetailActivity"
             android:exported="true" />
 
-        <!-- (Optional) keep your legacy player detail if still used -->
-        <activity
-            android:name=".PlayerDetailActivity"
-            android:exported="true" />
-
     </application>
 </manifest>

@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit
 
 object RetrofitClient {
     // RapidAPI (props) constants
-    private const val RAPIDAPI_KEY  = "c0c269a646msh669c49d84b83243p15ca00jsn0a60e047f7b4"
+    private const val RAPIDAPI_KEY  = "44b0d91a57msh9b725c07bd8b849p1eda8cjsnc05beb64cc4b"
     private const val RAPIDAPI_HOST = "nba-player-props-odds.p.rapidapi.com"
 
     // TheOddsAPI constants

@@ -218,6 +218,38 @@ object TeamMaps {
         "76ers" to "Philadelphia Sixers",
         "Nets" to "Brooklyn Nets"
     )
+    val baseballTeamColorsMap = mapOf(
+        "Arizona Diamondbacks" to R.color.diamondbacks,
+        "Atlanta Braves" to R.color.braves,
+        "Baltimore Orioles" to R.color.orioles,
+        "Boston Red Sox" to R.color.redsox,
+        "Chicago Cubs" to R.color.cubs,
+        "Chicago White Sox" to R.color.whitesox,
+        "Cincinnati Reds" to R.color.reds,
+        "Cleveland Guardians" to R.color.guardians,
+        "Colorado Rockies" to R.color.rockies,
+        "Detroit Tigers" to R.color.tigers,
+        "Houston Astros" to R.color.astros,
+        "Kansas City Royals" to R.color.royals,
+        "Los Angeles Angels" to R.color.angels,
+        "Los Angeles Dodgers" to R.color.dodgers,
+        "Miami Marlins" to R.color.marlins,
+        "Milwaukee Brewers" to R.color.brewers,
+        "Minnesota Twins" to R.color.twins,
+        "New York Mets" to R.color.mets,
+        "New York Yankees" to R.color.yankees,
+        "Oakland Athletics" to R.color.athletics,
+        "Philadelphia Phillies" to R.color.phillies,
+        "Pittsburgh Pirates" to R.color.pirates,
+        "San Diego Padres" to R.color.padres,
+        "San Francisco Giants" to R.color.giants,
+        "Seattle Mariners" to R.color.mariners,
+        "St. Louis Cardinals" to R.color.cardinals,
+        "Tampa Bay Rays" to R.color.rays,
+        "Texas Rangers" to R.color.rangers,
+        "Toronto Blue Jays" to R.color.bluejays,
+        "Washington Nationals" to R.color.nationals
+    )
 
     val teamColorsMap = mapOf(
         "LAL" to R.color.lal,
