@@ -9,7 +9,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object RapidApiRetrofitClient {
     private const val BASE_URL = "https://nba-player-props-odds.p.rapidapi.com/"
-    private const val API_KEY = "44b0d91a57msh9b725c07bd8b849p1eda8cjsnc05beb64cc4b"
+    private const val API_KEY = "1789e2d204msh12f314e2a1f19e9p150196jsnd8d55be5e1a1"
     private const val HOST    = "nba-player-props-odds.p.rapidapi.com"
 
     // Interceptor to add the required headers

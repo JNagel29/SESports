@@ -137,7 +137,10 @@ fun AppNavigation(randomStat: String) {
                                         }
                                     },
                                     icon = {
-                                        Icon(imageVector = navItem.icon, contentDescription = navItem.label)
+                                        Icon(
+                                            imageVector = navItem.icon,
+                                            contentDescription = navItem.label
+                                        )
                                     },
                                     label = {
                                         Text(text = navItem.label)
@@ -146,7 +149,7 @@ fun AppNavigation(randomStat: String) {
                             }
                             NavigationBarItem(
                                 selected = false,
-                                onClick  = {
+                                onClick = {
                                     ctx.startActivity(
                                         Intent(ctx, EventsActivity::class.java)
                                             .putExtra("randomStat", randomStat)
@@ -191,9 +194,15 @@ fun AppNavigation(randomStat: String) {
                                         restoreState = true
                                     }
                                 },
-                                icon = { Icon(Icons.Default.Analytics, contentDescription = "Standings") },
+                                icon = {
+                                    Icon(
+                                        Icons.Default.Analytics,
+                                        contentDescription = "Standings"
+                                    )
+                                },
                                 label = { Text("Standings") }
                             )
+
                             NavigationBarItem(
                                 selected = currentDestination?.route == Screens.BaseballSearchScreen.name,
                                 onClick = {
@@ -205,9 +214,15 @@ fun AppNavigation(randomStat: String) {
                                         restoreState = true
                                     }
                                 },
-                                icon = { Icon(Icons.Default.Search, contentDescription = "Search") },
+                                icon = {
+                                    Icon(
+                                        Icons.Default.Search,
+                                        contentDescription = "Search"
+                                    )
+                                },
                                 label = { Text("Search") }
                             )
+
                             NavigationBarItem(
                                 selected = currentDestination?.route == Screens.BaseballCompareScreen.name,
                                 onClick = {
@@ -219,8 +234,32 @@ fun AppNavigation(randomStat: String) {
                                         restoreState = true
                                     }
                                 },
-                                icon = { Icon(Icons.Default.CompareArrows, contentDescription = "Compare") },
+                                icon = {
+                                    Icon(
+                                        Icons.Default.CompareArrows,
+                                        contentDescription = "Compare"
+                                    )
+                                },
                                 label = { Text("Compare") }
+                            )
+
+                            NavigationBarItem(
+                                selected = false,
+                                onClick = {
+                                    ctx.startActivity(
+                                        Intent(
+                                            ctx,
+                                            com.example.jetpacktest.propsBaseball.ui.BaseballEventsActivity::class.java
+                                        )
+                                    )
+                                },
+                                icon = {
+                                    Icon(
+                                        Icons.Filled.EmojiEvents,
+                                        contentDescription = "Props"
+                                    )
+                                },
+                                label = { Text("Props") }
                             )
                         }
                     }

@@ -1,6 +1,5 @@
 package com.example.jetpacktest.props.network
 
-import com.example.jetpacktest.props.network.OddsApiService
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -10,7 +9,7 @@ import java.util.concurrent.TimeUnit
 
 object RetrofitClient {
     // RapidAPI (props) constants
-    private const val RAPIDAPI_KEY  = "44b0d91a57msh9b725c07bd8b849p1eda8cjsnc05beb64cc4b"
+    private const val RAPIDAPI_KEY  = "1789e2d204msh12f314e2a1f19e9p150196jsnd8d55be5e1a1"
     private const val RAPIDAPI_HOST = "nba-player-props-odds.p.rapidapi.com"
 
     // TheOddsAPI constants
