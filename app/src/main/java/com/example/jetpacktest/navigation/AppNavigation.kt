@@ -1,6 +1,7 @@
 package com.example.jetpacktest.navigation
 
 import BaseballHomeScreen
+import android.content.Intent
 import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInHorizontally
@@ -10,6 +11,31 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Analytics
+import androidx.compose.material.icons.filled.CompareArrows
+import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.SportsBaseball
+import androidx.compose.material.icons.filled.SportsBasketball
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -18,6 +44,27 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
+import com.example.jetpacktest.props.ui2.EventsActivity
+import com.example.jetpacktest.screens.BaseballComparePlayer
+import com.example.jetpacktest.screens.BaseballCompareResultScreen
+import com.example.jetpacktest.screens.BaseballCompareScreen
+import com.example.jetpacktest.screens.BaseballProfileScreen
+import com.example.jetpacktest.screens.BaseballSearchScreen
+import com.example.jetpacktest.screens.BaseballStandingsScreen
+import com.example.jetpacktest.screens.CompareResultsScreen
+import com.example.jetpacktest.screens.CompareScreen
+import com.example.jetpacktest.screens.GamesScreen
+import com.example.jetpacktest.screens.HomeScreen
+import com.example.jetpacktest.screens.ProfileScreen
+import com.example.jetpacktest.screens.SearchScreen
+import com.example.jetpacktest.screens.SplashScreen
+import com.example.jetpacktest.screens.StandingBracketPager
+import com.example.jetpacktest.screens.TeamProfileScreen
+import com.example.jetpacktest.viewmodel.BaseballHomeViewModel
 import androidx.navigation.compose.*
 import com.example.jetpacktest.screens.*
 import com.example.jetpacktest.viewmodel.BaseballHomeViewModel
@@ -31,6 +78,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun AppNavigation(randomStat: String) {
     val navController = rememberNavController()
+    val ctx = LocalContext.current                         // ← need this to launch the Activity
     val searchViewModel = viewModel<SearchViewModel>()
     val homeViewModel = viewModel<HomeViewModel>()
     val standingsViewModel = viewModel<StandingsViewModel>()
@@ -104,6 +152,22 @@ fun AppNavigation(randomStat: String) {
                                     }
                                 )
                             }
+                            NavigationBarItem(
+                                selected = false,
+                                onClick  = {
+                                    ctx.startActivity(
+                                        Intent(ctx, EventsActivity::class.java)
+                                            .putExtra("randomStat", randomStat)
+                                    )
+                                },
+                                icon = {
+                                    Icon(
+                                        imageVector = Icons.Filled.EmojiEvents,
+                                        contentDescription = "Props"
+                                    )
+                                },
+                                label = { Text("Props") }
+                            )
                         }
                     }
 

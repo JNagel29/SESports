@@ -1,4 +1,17 @@
 <resources>
     <string name="app_name">JetpackTest</string>
     <string name="title_activity_search">SearchActivity</string>
+
+    <!-- static labels used as default text in PlayerDetailActivity layout -->
+    <string name="player_name_label">Player Name</string>
+    <string name="player_info_label">Team, Position, #Jersey</string>
+    <string name="player_next_game_label">Next Game: Opponent, Time</string>
+
+    <!-- formatting patterns for when you populate those TextViews in code -->
+    <string name="player_vs_format">%1$s vs %2$s</string>
+    <string name="player_info_format">%1$s, %2$s - #%3$s</string>
+    <string name="player_next_game_format">Next Game: %1$s at %2$s</string>
+
+    <!-- for displaying points (one decimal place) -->
+    <string name="player_points_format">Pts: %1$.1f</string>
 </resources>
