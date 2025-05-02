@@ -16,7 +16,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.JetpackTest">
 
-        <!-- your original launcher -->
+        <!-- Launcher -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -27,14 +27,27 @@
             </intent-filter>
         </activity>
 
-        <!-- Props feature screens -->
+        <!-- Basketball Props -->
         <activity
             android:name=".props.ui2.EventsActivity"
             android:exported="true" />
-
         <activity
             android:name=".props.ui2.PropsDetailActivity"
             android:exported="true" />
+
+        <!-- Baseball Props -->
+        <activity
+            android:name=".propsBaseball.ui.BaseballEventsActivity"
+            android:exported="true" />
+
+        <activity
+            android:name=".propsBaseball.sportradar.SportradarPlayerPropsActivity"
+            android:exported="true" />
+
+        <activity
+            android:name=".propsBaseball.ui.StaticBaseballPropsActivity"
+            android:exported="true" />
+
 
     </application>
 </manifest>
