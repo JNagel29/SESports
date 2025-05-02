@@ -1,5 +1,7 @@
 package com.example.jetpacktest.models
 
+import java.math.BigDecimal
+
 data class Batter(
     val season: Int?,
     val team: String?,
@@ -34,7 +36,8 @@ data class Batter(
     val slg: Double?,
     val stolenBasePercentage: Double?,
     val stolenBases: Int?,
-    val strikeOuts: Int?,
+    val strikeOuts: Float?,
     val totalBases: Int?,
-    val triples: Int?
+    val triples: Int,
+    val war: BigDecimal?
 )

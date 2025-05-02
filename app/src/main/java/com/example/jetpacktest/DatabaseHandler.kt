@@ -35,6 +35,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.math.BigDecimal
 import java.sql.Connection
 import java.sql.DriverManager
 import java.sql.ResultSet
@@ -54,7 +55,7 @@ class DatabaseHandler {
     private val user = Keys.DB_USER
     private val password = Keys.DB_PASS
     private var connection: Connection? = null
-
+    var salaryResultSet: ResultSet? = null
 
 
     fun executeStatLeaders(chosenStat: String, year: String,
@@ -81,6 +82,7 @@ class DatabaseHandler {
             val player = getPlayerData(playerName, year)
             withContext(Dispatchers.IO) {
                 onDataReceived(player)
+
             }
         }
     }
@@ -357,9 +359,10 @@ class DatabaseHandler {
                         slg = rs.getDouble("slg"),
                         stolenBasePercentage = rs.getDouble("stolen_base_percentage"),
                         stolenBases = rs.getInt("stolen_bases"),
-                        strikeOuts = rs.getInt("strike_outs"),
+                        strikeOuts = rs.getFloat("strike_outs"),
                         totalBases = rs.getInt("total_bases"),
-                        triples = rs.getInt("triples")
+                        triples = rs.getInt("triples"),
+                        war = BigDecimal.ZERO
                     )
                 }
                 rs.close()
@@ -596,7 +599,9 @@ class DatabaseHandler {
                     whip = resultSet.getDouble("whip"),
                     wildPitches = resultSet.getInt("wild_pitches"),
                     winPercentage = resultSet.getDouble("win_percentage"),
-                    wins = resultSet.getInt("wins")
+                    wins = resultSet.getInt("wins"),
+                    war = BigDecimal.ZERO
+
                 )
 
             }
@@ -656,6 +661,12 @@ class DatabaseHandler {
 
         return statLeadersList
     }
+    private fun isLowerBetter(statName: String): Boolean {
+        return statName.lowercase() in listOf(
+            "era", "losses", "walks per 9 inn", "runs scored per 9", "whip",
+            "ground outs", "grounds into double play", "left on base", "at bats per hr", "wild pitches", "hit batsmen", "home runs per 9", "runs scored per 9", "hits per 9 innings"
+        )
+    }
     fun fetchBaseballStatLeaders(
         isPitcher: Boolean,
         chosenStat: String,
@@ -670,20 +681,25 @@ class DatabaseHandler {
                 Class.forName("com.mysql.jdbc.Driver")
                 val conn = DriverManager.getConnection(url, user, password)
                 val stmt = conn.createStatement()
-                val rs = stmt.executeQuery(
-                    """
-                SELECT player_name, $chosenStat
-                FROM $table
-                WHERE $chosenStat IS NOT NULL
-                AND season = $year
-                ORDER BY $chosenStat DESC
-                LIMIT 20
-                """.trimIndent()
-                )
 
+                val sortDirection = if (isLowerBetter(chosenStat)) "ASC" else "DESC"
+
+                val query = """
+                SELECT player_name, $chosenStat 
+                FROM $table 
+                WHERE $chosenStat IS NOT NULL 
+                AND season = $year 
+                AND games_played >= 15 
+                ORDER BY $chosenStat $sortDirection 
+                LIMIT 20
+            """.trimIndent()
+
+                val rs = stmt.executeQuery(query)
                 var rank = 1
+
                 while (rs.next()) {
-                    val name = rs.getString("player_name")
+                    val rawName = rs.getString("player_name")
+                    val name = removeAccents(rawName)
                     val statValue = rs.getFloat(chosenStat)
                     results.add(StatLeader(rank++, name, statValue))
                 }
@@ -700,6 +716,9 @@ class DatabaseHandler {
             }
         }
     }
+
+
+
 
 
 
@@ -882,31 +901,53 @@ class DatabaseHandler {
         var myConn: Connection? = null
         var statement: Statement? = null
         var resultSet: ResultSet? = null
+        var salaryResultSet: ResultSet? = null
         var player = Player()
-        //Remove accents since can't have any when searching DB
+        var salary = 20_000_000f // default fallback salary
+
         val playerNameNoAccents = removeAccents(playerName)
+
+        // Normalize year to map to salary column (only allow 2023 and 2024 based on the second part of the column name)
+        val salaryYear = when (year) {
+            "2023", "2022_2023" -> "Year2022_2023"
+            "2024", "2023_2024" -> "Year2023_2024"
+            else -> null
+        }
+
+        val displayYear = salaryYear?.takeLast(4) // e.g., "2023_2024" -> "2024"
+
+        val salaryQuery = if (salaryYear != null)
+            "SELECT `$salaryYear` AS Salary FROM SALARY WHERE PlayerName = \"$playerNameNoAccents\" LIMIT 1"
+        else
+            ""
+
         try {
             Class.forName("com.mysql.jdbc.Driver")
             myConn = DriverManager.getConnection(url, user, password)
             statement = myConn.createStatement()
-            //NOTE: Needed to wrap in double, not single quotes, since some players have ' in name
-            val sql = "SELECT* FROM PLAYER WHERE Player = \"$playerNameNoAccents\" AND Year = $year"
+
+            if (salaryQuery.isNotEmpty()) {
+                salaryResultSet = statement.executeQuery(salaryQuery)
+                if (salaryResultSet?.next() == true) {
+                    salary = salaryResultSet.getFloat("Salary")
+                    val formattedSalary = "%.2f".format(salary / 1_000_000f)
+                    Log.d("PlayerSalary", "Retrieved salary for $playerNameNoAccents in $displayYear: $$formattedSalary million")
+                }
+            }
+
+            val sql = "SELECT * FROM PLAYER WHERE Player = \"$playerNameNoAccents\" AND Year = $year"
             resultSet = statement.executeQuery(sql)
-            //First thing to do, is check if player was on multiple teams
+
             var rowCount = 0
             while (resultSet.next()) {
                 rowCount++
             }
-            //Before anything after, reset resultSet back so it points to before first row again
             resultSet.beforeFirst()
-            //If rowCount is greater than 1, that means that there is a record with
-            //team "TOT" (total) that we will grab stats from, and we'll also use other rows
-            //to append to team so profile shows all teams they were on that year!
+
             if (rowCount > 1) {
                 var appendedTeam = ""
                 while (resultSet.next()) {
                     if (resultSet.getString("Team") == "TOT") {
-                        //Get numerical data from row (everything except team)
                         player = Player(
                             name = resultSet.getString("Player"),
                             year = resultSet.getInt("Year"),
@@ -935,20 +976,15 @@ class DatabaseHandler {
                             freeThrowPercent = resultSet.getFloat("FT_PERCENT"),
                             effectiveFieldGoalPercent = resultSet.getFloat("eFG_PERCENT"),
                             offensiveRebounds = resultSet.getFloat("ORB"),
-                            defensiveRebounds = resultSet.getFloat("DRB")
+                            defensiveRebounds = resultSet.getFloat("DRB"),
+                            salary = salary
                         )
-                    }
-                    else {
-                        //From the other rows, just grab the team name and append
+                    } else {
                         appendedTeam += "${resultSet.getString("Team")}/"
                     }
                 }
-                //Now, we've set all fields except team name, so do that now
-                player.team = appendedTeam.dropLast(1) // Drop trailing slash
-            }
-            //Otherwise, we only have one record and can just grab all our data
-            else {
-                //Point resultSet one ahead to point at actual data
+                player.team = appendedTeam.dropLast(1)
+            } else {
                 resultSet.next()
                 player = Player(
                     name = resultSet.getString("Player"),
@@ -978,7 +1014,8 @@ class DatabaseHandler {
                     freeThrowPercent = resultSet.getFloat("FT_PERCENT"),
                     effectiveFieldGoalPercent = resultSet.getFloat("eFG_PERCENT"),
                     offensiveRebounds = resultSet.getFloat("ORB"),
-                    defensiveRebounds = resultSet.getFloat("DRB")
+                    defensiveRebounds = resultSet.getFloat("DRB"),
+                    salary = salary
                 )
             }
         } catch (e: SQLException) {
@@ -987,10 +1024,14 @@ class DatabaseHandler {
         } catch (e: ClassNotFoundException) {
             e.printStackTrace()
         } finally {
+            salaryResultSet?.close()
             closeResources(myConn, resultSet, statement)
         }
         return player
     }
+
+
+
 
 
     //This function is the one actually connecting to DB and giving us the data for stat leads

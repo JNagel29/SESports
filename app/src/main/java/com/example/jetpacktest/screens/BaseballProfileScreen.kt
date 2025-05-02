@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.jetpacktest.DatabaseHandler
 import com.example.jetpacktest.R
+import com.example.jetpacktest.evaluateBaseballPlayer
 import com.example.jetpacktest.models.Batter
 import com.example.jetpacktest.models.Pitcher
 import com.example.jetpacktest.models.TeamMaps
@@ -232,7 +233,18 @@ fun NameAndTeamInfo(name: String, team: String, position: String) {
         }
     }
 }
-
+val LEAGUE_ERA = 4.00
+// Calculates an approximate WAR for a batter using OBP and AB
+fun calculateBatterWAR(stats: Batter): Double {
+    if (stats.obp == null || stats.atBats == null) return 0.0
+    val slugging = stats.ops?.minus(stats.obp) ?: 0.0
+    return ((stats.obp + slugging) / 2.0 * stats.atBats) / 500.0
+}
+// Calculates an approximate WAR for a pitcher using innings pitched and ERA
+fun calculatePitcherWAR(stats: Pitcher): Double {
+    if (stats.inningsPitched == null || stats.era == null) return 0.0
+    return (stats.inningsPitched * (LEAGUE_ERA - stats.era)) / 9.0
+}
 @Composable
 fun PitcherStatsSection(stats: Pitcher) {
     ExpandableCategory(title = "Main Stats", showByDefault = true) {
@@ -243,6 +255,9 @@ fun PitcherStatsSection(stats: Pitcher) {
             StatRow("Losses", stats.losses)
             StatRow("Saves", stats.saves)
             StatRow("Innings Pitched", stats.inningsPitched)
+            StatRow("WAR", calculatePitcherWAR(stats))
+            StatRow("Performance Rating", evaluateBaseballPlayer(null, stats, 20_000_000f))
+
         }
     }
     ExpandableCategory(title = "Pitching Details", showByDefault = false) {
@@ -275,6 +290,9 @@ fun BatterStatsSection(stats: Batter) {
             StatRow("Hits", stats.hits)
             StatRow("Home Runs", stats.homeRuns)
             StatRow("Runs Batted In (RBI)", stats.rbi)
+            StatRow("WAR", calculateBatterWAR(stats))
+            StatRow("Performance Rating", evaluateBaseballPlayer(stats, null, 35_000_000f))
+
         }
     }
     ExpandableCategory(title = "Batting Details", showByDefault = false) {

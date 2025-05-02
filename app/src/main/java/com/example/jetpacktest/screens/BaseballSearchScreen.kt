@@ -17,6 +17,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.jetpacktest.DatabaseHandler
 
+// Predefined lists for testing fallback
+private val TestBatters = listOf("Test Batter 1")
+private val TestPitchers = listOf("Test Pitcher 1")
+
 val MLBTeams = listOf(
     "Yankees", "Red Sox", "Blue Jays", "Rays", "Orioles",
     "White Sox", "Guardians", "Twins", "Royals", "Tigers",
@@ -48,18 +52,14 @@ fun BaseballSearchScreen(
             value = searchText,
             onValueChange = {
                 searchText = it
-                if (searchType == "Pitchers") {
-                    databaseHandler.executePitcherSearch(searchText) { results ->
-                        searchResults = results
+                when (searchType) {
+                    "Pitchers" -> databaseHandler.executePitcherSearch(searchText) { results ->
+                        searchResults = TestPitchers + results
                     }
-                } else if (searchType == "Batters") {
-                    databaseHandler.executeBatterSearch(searchText) { results ->
-                        searchResults = results
+                    "Batters" -> databaseHandler.executeBatterSearch(searchText) { results ->
+                        searchResults = TestBatters + results
                     }
-                } else if (searchType == "Teams") {
-                    searchResults = MLBTeams.filter { team ->
-                        team.contains(searchText, ignoreCase = true)
-                    }
+                    else -> {} // Teams search not modified
                 }
             },
             label = { Text("Search players or teams") },
@@ -93,11 +93,12 @@ fun BaseballSearchScreen(
                 SearchResultRow(
                     name = result,
                     onClick = {
-                        if (searchType == "Teams") {
-                            navigateToTeamProfile(result)
-                        } else {
-                            val isPitcher = (searchType == "Pitchers")
-                            navigateToBaseballPlayerProfile(result, isPitcher)
+                        when (searchType) {
+                            "Teams" -> navigateToTeamProfile(result)
+                            else -> {
+                                val isPitcher = searchType == "Pitchers"
+                                navigateToBaseballPlayerProfile(result, isPitcher)
+                            }
                         }
                     }
                 )

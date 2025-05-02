@@ -34,7 +34,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -64,7 +63,6 @@ import com.example.jetpacktest.screens.SearchScreen
 import com.example.jetpacktest.screens.SplashScreen
 import com.example.jetpacktest.screens.StandingBracketPager
 import com.example.jetpacktest.screens.TeamProfileScreen
-import com.example.jetpacktest.viewmodel.BaseballHomeViewModel
 import androidx.navigation.compose.*
 import com.example.jetpacktest.screens.*
 import com.example.jetpacktest.viewmodel.BaseballHomeViewModel

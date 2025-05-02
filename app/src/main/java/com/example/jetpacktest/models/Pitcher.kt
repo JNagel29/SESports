@@ -2,6 +2,7 @@ package com.example.jetpacktest.models
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
+import java.math.BigDecimal
 
 @Parcelize
 data class Pitcher(
@@ -69,5 +70,6 @@ data class Pitcher(
     val whip: Double = 0.0,
     val wildPitches: Int = 0,
     val winPercentage: Double = 0.0,
-    val wins: Int = 0
+    val wins: Int = 0,
+    val war: BigDecimal? = BigDecimal.ZERO
 ) : Parcelable

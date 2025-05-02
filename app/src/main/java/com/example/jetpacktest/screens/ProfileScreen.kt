@@ -47,6 +47,7 @@ import com.example.jetpacktest.DatabaseHandler
 import com.example.jetpacktest.FavoritesHandler
 import com.example.jetpacktest.R
 import com.example.jetpacktest.HeadshotHandler
+import com.example.jetpacktest.evaluateSalaryPerformance
 import com.example.jetpacktest.getFantasyRating
 import com.example.jetpacktest.models.TeamMaps
 import com.example.jetpacktest.ui.components.LargeDropdownMenu
@@ -410,7 +411,7 @@ fun PlayerStatisticTable(player: Player) {
                 modifier = Modifier
                     .padding(4.dp)
             ) {
-                PlayerDataRow("Fantasy Rating", getFantasyRating(player))
+                PlayerDataRow("Performance Rating", evaluateSalaryPerformance(player, player.salary))
                 PlayerDataRow("Field Goals", player.fieldGoals.toString())
                 PlayerDataRow("Field Goal Attempts", player.fieldGoalAttempts.toString())
                 PlayerDataRow("Field Goal %", "%.1f%%"
