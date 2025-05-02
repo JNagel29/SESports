@@ -67,12 +67,17 @@ fun BaseballEventItem(event: BaseballEvent) {
             .fillMaxWidth()
             .padding(vertical = 6.dp)
             .clickable {
-                val intent = Intent(context, SportradarPlayerPropsActivity::class.java).apply {
-                    putExtra("event_id", event.id)
-                    putExtra("home_team", event.homeTeam)
-                    putExtra("away_team", event.awayTeam)
+                if (event.id == "static_world_series") {
+                    val intent = Intent(context, StaticBaseballPropsActivity::class.java)
+                    context.startActivity(intent)
+                } else {
+                    val intent = Intent(context, SportradarPlayerPropsActivity::class.java).apply {
+                        putExtra("event_id", event.id)
+                        putExtra("home_team", event.homeTeam)
+                        putExtra("away_team", event.awayTeam)
+                    }
+                    context.startActivity(intent)
                 }
-                context.startActivity(intent)
             },
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {

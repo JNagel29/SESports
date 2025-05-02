@@ -1,4 +1,4 @@
-package com.example.jetpacktest.propsBaseball.sportradar.network
+package com.example.jetpacktest.propsBaseball.sportradar
 
 import okhttp3.OkHttpClient
 import okhttp3.Request

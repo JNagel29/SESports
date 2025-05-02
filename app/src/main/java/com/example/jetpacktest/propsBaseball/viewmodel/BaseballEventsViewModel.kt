@@ -29,7 +29,15 @@ class BaseballEventsViewModel : ViewModel() {
                 override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
                     if (response.isSuccessful) {
                         response.body()?.string()?.let { body ->
-                            _events.value = parseOddsApiEvents(body)
+                            val parsed = parseOddsApiEvents(body)
+                            _events.value = listOf(
+                                BaseballEvent(
+                                    id = "static_world_series",
+                                    homeTeam = "Los Angeles Dodgers",
+                                    awayTeam = "New York Yankees",
+                                    commenceTime = "2024-10-27T17:18:00Z"
+                                )
+                            ) + parsed
                             _error.value = ""
                         } ?: run {
                             _error.value = "Empty response"

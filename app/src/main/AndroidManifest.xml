@@ -44,5 +44,10 @@
             android:name=".propsBaseball.sportradar.SportradarPlayerPropsActivity"
             android:exported="true" />
 
+        <activity
+            android:name=".propsBaseball.ui.StaticBaseballPropsActivity"
+            android:exported="true" />
+
+
     </application>
 </manifest>
