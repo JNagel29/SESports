@@ -33,11 +33,12 @@ data class Player(
     val effectiveFieldGoalPercent: Float,
     val offensiveRebounds: Float,
     val defensiveRebounds: Float,
+    val salary: Float = 20_000_000f
 ) : Parcelable {
     //Secondary constructor, default for ()
     constructor() : this("", -1, "", "", -1.0f, -1.0f, -1.0f,
         -1.0f, -1.0f, -1.0f, -1.0f, -1.0f, 0, -1.0f,
         -1.0f, -1.0f, -1.0f, -1.0f, -1.0f,
         -1.0f, -1.0f, -1.0f, -1.0f, -1.0f,
-        -1.0f, -1.0f, -1.0f, -1.0f)
+        -1.0f, -1.0f, -1.0f, -1.0f, -1.0f)
 }

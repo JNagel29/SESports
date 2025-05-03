@@ -40,6 +40,37 @@
     <color name="tor">#CE1141</color>
     <color name="uta">#002B5C</color>
     <color name="was">#E31837</color>
+    <!-- MLB Team Colors -->
+    <color name="diamondbacks">#A71930</color>
+    <color name="braves">#13274F</color>
+    <color name="orioles">#DF4601</color>
+    <color name="redsox">#BD3039</color>
+    <color name="cubs">#0E3386</color>
+    <color name="whitesox">#27251F</color>
+    <color name="reds">#C6011F</color>
+    <color name="guardians">#00385D</color>
+    <color name="rockies">#333366</color>
+    <color name="tigers">#0C2340</color>
+    <color name="astros">#002D62</color>
+    <color name="royals">#004687</color>
+    <color name="angels">#BA0021</color>
+    <color name="dodgers">#005A9C</color>
+    <color name="marlins">#00A3E0</color>
+    <color name="brewers">#12284B</color>
+    <color name="twins">#002B5C</color>
+    <color name="mets">#002D72</color>
+    <color name="yankees">#003087</color>
+    <color name="athletics">#003831</color>
+    <color name="phillies">#E81828</color>
+    <color name="pirates">#FDB827</color>
+    <color name="padres">#2F241D</color>
+    <color name="giants">#FD5A1E</color>
+    <color name="mariners">#0C2C56</color>
+    <color name="cardinals">#C41E3A</color>
+    <color name="rays">#092C5C</color>
+    <color name="rangers">#003278</color>
+    <color name="bluejays">#134A8E</color>
+    <color name="nationals">#AB0003</color>
 
     <color name="higherStat">#E4F4E4</color>
 </resources>

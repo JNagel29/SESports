@@ -47,6 +47,7 @@ import com.example.jetpacktest.DatabaseHandler
 import com.example.jetpacktest.FavoritesHandler
 import com.example.jetpacktest.R
 import com.example.jetpacktest.HeadshotHandler
+import com.example.jetpacktest.evaluateSalaryPerformance
 import com.example.jetpacktest.getFantasyRating
 import com.example.jetpacktest.models.TeamMaps
 import com.example.jetpacktest.ui.components.LargeDropdownMenu
@@ -139,7 +140,7 @@ fun ProfileScreen(
                     imgId = imgId,
                     team = player.team,
                     position = player.position,
-                    jerseyNumber = playerPersonalInfo.data[0].jerseyNumber,
+                    jerseyNumber = "32",
                     injuryStartDate = injuryStartDate,
                     headshotHandler = headshotHandler,
                     favoritesHandler = favoritesHandler,
@@ -354,8 +355,8 @@ fun InfoStatBoxes(playerPersonalInfo: PlayerPersonalInfo, color: Color) {
     ) {
         StatBox(
             label = "Height/Weight",
-            value = "${playerPersonalInfo.data[0].height} | " +
-                    playerPersonalInfo.data[0].weight,
+            value = "6'4 | " +
+                    "25lbs",
             labelFontSize = 14.sp,
             valueFontSize = 16.sp
         )
@@ -410,7 +411,7 @@ fun PlayerStatisticTable(player: Player) {
                 modifier = Modifier
                     .padding(4.dp)
             ) {
-                PlayerDataRow("Fantasy Rating", getFantasyRating(player))
+                PlayerDataRow("Performance Rating", evaluateSalaryPerformance(player, player.salary))
                 PlayerDataRow("Field Goals", player.fieldGoals.toString())
                 PlayerDataRow("Field Goal Attempts", player.fieldGoalAttempts.toString())
                 PlayerDataRow("Field Goal %", "%.1f%%"

@@ -1,0 +1,43 @@
+package com.example.jetpacktest.models
+
+import java.math.BigDecimal
+
+data class Batter(
+    val season: Int?,
+    val team: String?,
+    val playerName: String?,
+    val position: String?,
+    val airOuts: Int?,
+    val atBats: Int?,
+    val atBatsPerHomeRun: Double?,
+    val avg: Double?,
+    val babip: Double?,
+    val baseOnBalls: Int?,
+    val catchersInterference: Int?,
+    val caughtStealing: Int?,
+    val doubles: Int?,
+    val gamesPlayed: Int?,
+    val groundIntoDoublePlay: Int?,
+    val groundOuts: Int?,
+    val groundOutsToAirouts: Double?,
+    val hitByPitch: Int?,
+    val hits: Int?,
+    val homeRuns: Int?,
+    val intentionalWalks: Int?,
+    val leftOnBase: Int?,
+    val numberOfPitches: Int?,
+    val obp: Double?,
+    val ops: Double?,
+    val plateAppearances: Int?,
+    val rbi: Int?,
+    val runs: Int?,
+    val sacBunts: Int?,
+    val sacFlies: Int?,
+    val slg: Double?,
+    val stolenBasePercentage: Double?,
+    val stolenBases: Int?,
+    val strikeOuts: Float?,
+    val totalBases: Int?,
+    val triples: Int,
+    val war: BigDecimal?
+)

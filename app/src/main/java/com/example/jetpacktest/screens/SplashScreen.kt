@@ -54,7 +54,7 @@ fun SplashScreen(navigateToHomeScreen: () -> Unit) {
             modifier = Modifier.fillMaxSize()
         ) {
             Image(
-                painter = painterResource(id = R.drawable.sesports__1_),
+                painter = painterResource(id = R.drawable.sesports_2025),
                 contentDescription = "Logo",
                 modifier = Modifier
                     .scale(scale.value)
